@@ -1,0 +1,82 @@
+﻿.arrow-down{
+    animation: 0.5s down-to-up-rotate;
+    transform: rotate(0deg);
+}
+
+.arrow-up {
+    animation: 0.5s up-to-down-rotate;
+    transform: rotate(180deg);
+}
+
+@keyframes up-to-down-rotate{
+    0%{
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(180deg);
+    }
+}
+
+@keyframes down-to-up-rotate {
+    0% {
+        transform: rotate(180deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+.collapse-card-header h4{
+    text-decoration: none;
+    -webkit-touch-callout: none; 
+      -webkit-user-select: none; 
+       -khtml-user-select: none; 
+         -moz-user-select: none; 
+          -ms-user-select: none; 
+              user-select: none;
+}
+
+@keyframes drop-card-body{
+    0%{
+        height: 0px;
+        margin: 0;
+        padding: 0;
+        content: none;
+        visibility: hidden;
+    }
+    100%{
+        height: auto;
+        visibility: visible;
+    }
+}
+
+@keyframes collapse-card-body{
+
+    0% {
+        height: auto;
+        visibility: visible;
+    }
+    100% {
+        content: none;
+        height: 0px;
+        margin: 0;
+        padding: 0;
+        visibility: hidden;
+    }
+}
+
+.collapse-card-body-droped {
+    animation: 0.2s drop-card-body;
+    height: auto;
+    visibility: visible;
+}
+
+.collapse-card-body-collapsed {
+    animation: 0.1s collapse-card-body;
+    content: none;
+    height: 0px;
+    margin: 0;
+    padding: 0;
+    visibility: hidden;
+}

@@ -1,0 +1,9 @@
+{
+    "name" : "Українська",
+    "shortName" : "UA",
+    "localDictionary" : {
+        "resistor" : "резистор",
+        "resistance" : "опір",
+        "accurancy" : "точність"
+    }
+}
