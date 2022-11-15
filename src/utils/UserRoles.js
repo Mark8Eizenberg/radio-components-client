@@ -17,19 +17,19 @@ const userRolesName = {
 
 export const userRolesLinks = {
     1: [
-        { name: 'Home', link:'/', element: <Home/>  }, 
-        { name: 'Reports', link: '/reports' , element: <OperationReport/> }, 
-        { name: 'Admin panel', link: '/admin-panel', element: <AdminPanel/> },
-        { name: 'Radiocomponents editor', link: '/radiocomponents-editor', element: <RadioComponents/>},
+        { name: 'Головна', link:'/', element: <Home/>  }, 
+        { name: 'Звіти', link: '/reports' , element: <OperationReport/> }, 
+        { name: 'Керування аккаунтами', link: '/admin-panel', element: <AdminPanel/> },
+        { name: 'Редагування компонентів', link: '/radiocomponents-editor', element: <RadioComponents/>},
     ],
     2: [
-        { name: 'Home', link:'/', element: <Home/>  }, 
-        { name: 'Reports', link: '/reports' , element: <OperationReport/> }, 
-        { name: 'Radiocomponents editor', link: '/radiocomponents-editor', element: <RadioComponents/>},
+        { name: 'Головна', link:'/', element: <Home/>  }, 
+        { name: 'Звіти', link: '/reports' , element: <OperationReport/> }, 
+        { name: 'Редагування компонентів', link: '/radiocomponents-editor', element: <RadioComponents/>},
     ],
     3: [
-        { name: 'Home', link:'/', element: <Home/>  }, 
-        { name: 'Reports', link: '/reports' , element: <OperationReport/> }, 
+        { name: 'Головна', link:'/', element: <Home/>  }, 
+        { name: 'Звіти', link: '/reports' , element: <OperationReport/> }, 
     ],
 }
 

@@ -1,15 +1,21 @@
-﻿import React, { Component } from 'react';
+import React, { Component } from 'react';
 import DateTimePicker from './helpers/DateTimePicker';
 import UserPicker from './helpers/UserPicker';
 import {
     Card,
-    Collapse,
     Table,
     Alert,
     Button, ButtonGroup,
     Container, Row, Col
 } from 'react-bootstrap';
 import DropDownCard from './helpers/DropDownCard';
+
+const translateOperation = {
+    Remove: 'Взято зі складу',
+    Add : 'Додано в склад',
+    Create: 'Створення',
+    Delete: 'Видалення'
+}
 
 export default class OperationReport extends Component {
     static displayName = OperationReport.name;
@@ -89,20 +95,20 @@ export default class OperationReport extends Component {
             <thead>
                 <tr>
                     <th>Id</th>
-                    <th>User</th>
-                    <th>Operation type</th>
-                    <th>Component</th>
-                    <th>Count</th>
-                    <th>DateTime</th>
+                    <th>Користувач</th>
+                    <th>Тип оперції</th>
+                    <th>Компонент</th>
+                    <th>Кількість</th>
+                    <th>Час виконання операції</th>
                 </tr>
             </thead>
             <tbody>
             {reports.map((operation) =>
                 <tr key={operation.id}>
                     <td>{operation.id}</td>
-                    <td>{operation.user?.fullName ?? "Unknown"}</td>
-                    <td>{operation.operationType}</td>
-                    <td>{operation.radioComponent?.name ?? "Unknown"}</td>
+                    <td>{operation.user?.fullName ?? "Невідомий"}</td>
+                    <td>{translateOperation[operation.operationType] ?? operation.operationType }</td>
+                    <td>{operation.radioComponent?.name ?? "Невідомо"}</td>
                     <td>{operation.count}</td>
                     <td>{new Date(operation.dateTime).toLocaleDateString() + " " + new Date(operation.dateTime).toLocaleTimeString()}</td>
                 </tr>
@@ -112,7 +118,7 @@ export default class OperationReport extends Component {
     }
 
     getPageSwitcher() {
-        let pages = new Array();
+        let pages = [];
         if (this.state.totalPages < 5) {
             for (let i = 0; i < this.state.totalPages; i++) {
                 pages.push({
@@ -133,7 +139,7 @@ export default class OperationReport extends Component {
                     this.populateReports(1);
                 }, variant: "info"
             });
-            pages.push({ id: 2, content: "Current page: " + (this.state.page + 1), disable: true, callback: null, variant: "info" });
+            pages.push({ id: 2, content: "Теперішня сторінка: " + (this.state.page + 1), disable: true, callback: null, variant: "info" });
             pages.push({
                 id: this.state.totalPages - 2, content: this.state.totalPages - 1, disable: false, callback: () => {
                     this.populateReports(this.state.totalPages - 2);
@@ -146,31 +152,31 @@ export default class OperationReport extends Component {
             });
         }
         return this.state.totalPages > 1 ? (<ButtonGroup className="me-2">
-            <Button disabled={this.state.page == 0} onClick={() => {
+            <Button disabled={this.state.page === 0} onClick={() => {
                 this.populateReports(this.state.page - 1);
-            }} variant="info">Previous</Button>
-            {pages.map(p => <Button disabled={p.disable || this.state.page == p.id } key={p.id} onClick={p.callback} variant={p.variant}>{p.content}</Button>) }
+            }} variant="info">Попередня</Button>
+            {pages.map(p => <Button disabled={p.disable || this.state.page === p.id } key={p.id} onClick={p.callback} variant={p.variant}>{p.content}</Button>) }
             <Button disabled={this.state.page + 1 >= this.state.totalPages} onClick={() => {
                 this.populateReports(this.state.page + 1);
-            }} variant="info">Next</Button>
+            }} variant="info">Наступна</Button>
         </ButtonGroup>) : null
     }
 
     searchFilterUpdateData() {
         return <>
-            <DropDownCard name={"Search filters"} show={false}>
+            <DropDownCard name={"Фільтри пошуку"} show={false}>
                 <Container>
                     <Row className="p-2">
                         <Col>
-                            <label>Date from</label>
+                            <label>з</label>
                             <input type="checkbox" value={this.state.filters.needDateFrom} onChange={(e) => {
-                                if (this.state.filters.needDateFrom != e.target.checked)
+                                if (this.state.filters.needDateFrom !== e.target.checked)
                                     this.setState({ filters: this.#getEditedDictionary('filters', 'needDateFrom', e.target.checked) });
                             }}></input>
                         </Col>
                         <Col>
                             <DateTimePicker callbackToGetDate={(dateTime) => {
-                                if (this.state.dataHandlers.dateFrom != dateTime) {
+                                if (this.state.dataHandlers.dateFrom !== dateTime) {
                                     this.setState({ dataHandlers: this.#getEditedDictionary('dataHandlers', 'dateFrom', dateTime)});
                                 }
                             }} />
@@ -178,15 +184,15 @@ export default class OperationReport extends Component {
                     </Row>
                     <Row className="p-2">
                         <Col>
-                            <label>Date to</label>
+                            <label>по</label>
                             <input  type="checkbox" value={this.state.filters.needDateTo} onChange={(e) => {
-                                if (this.state.filters.needDateTo != e.target.checked)
+                                if (this.state.filters.needDateTo !== e.target.checked)
                                     this.setState({ filters: this.#getEditedDictionary('filters', 'needDateTo', e.target.checked) });
                             }}></input>
                         </Col>
                         <Col>
                             <DateTimePicker callbackToGetDate={(dateTime) => {
-                                if (this.state.dataHandlers.dateTo != dateTime) {
+                                if (this.state.dataHandlers.dateTo !== dateTime) {
                                     this.setState({ dataHandlers: this.#getEditedDictionary('dataHandlers', 'dateTo', dateTime) });
                                 }
                             }} />
@@ -194,15 +200,15 @@ export default class OperationReport extends Component {
                     </Row>
                     <Row className="p-2">
                         <Col>
-                            <label>User</label>
+                            <label>Користувач</label>
                             <input type="checkbox" value={this.state.filters.needUserId} onChange={(e) => {
-                                if (this.state.filters.needUserId != e.target.checked)
+                                if (this.state.filters.needUserId !== e.target.checked)
                                     this.setState({ filters: this.#getEditedDictionary('filters', 'needUserId', e.target.checked) });
                             }}></input>
                         </Col>
                         <Col>
                             <UserPicker calbackToSetUser={(user) => {
-                                if (this.state.dataHandlers.userId != user) {
+                                if (this.state.dataHandlers.userId !== user) {
                                     this.setState({ dataHandlers: this.#getEditedDictionary('dataHandlers', 'userId', user) });
                                 }
                             }} />
@@ -210,7 +216,7 @@ export default class OperationReport extends Component {
                     </Row>
                     <Row><Button onClick={() => {
                         this.populateReports(0);
-                    }}>Search</Button></Row>
+                    }}>Пошук</Button></Row>
                 </Container>
             </DropDownCard>
            
@@ -222,7 +228,7 @@ export default class OperationReport extends Component {
         
         return (
             <>
-                <h2 className="text-center">Operation reports</h2>
+                <h2 className="text-center">Звіт операцій</h2>
                 {this.state.message}
                 {this.searchFilterUpdateData()}
                 <Card className="mt-2">
@@ -230,18 +236,18 @@ export default class OperationReport extends Component {
                         <Container>
                             <Row>
                                 <Col>
-                                    <p>Rows on page:</p>
+                                    <p>Записів на сторінці:</p>
                                 </Col>
                                 <Col>
                                     <input type="number" defaultValue={this.state.countOnPage} onChange={(e) => { this.setState({ countOnPage: e.target.value }) } }/>
                                 </Col>
                                 <Col>
-                                    <Button onClick={() => { this.populateReports(0); } }>Set count</Button>
+                                    <Button onClick={() => { this.populateReports(0); } }>Встановити кількість записів</Button>
                                 </Col>
                             </Row>
                         </Container>
                     </Card.Header>
-                    <div className="m-2">{this.state.loading ? <p>Loading...</p> : OperationReport.showReportsTable(this.state.reports)}</div>
+                    <div className="m-2">{this.state.loading ? <p>Триває завантаження ...</p> : OperationReport.showReportsTable(this.state.reports)}</div>
                     <div className="d-flex justify-content-center m-2">{this.getPageSwitcher()}</div>
                 </Card>
             </>

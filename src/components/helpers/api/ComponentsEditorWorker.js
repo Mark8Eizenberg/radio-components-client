@@ -1,5 +1,3 @@
-import apiUrl from "./apiSettings";
-
 export const Components = {
     resistor: 'resistor',
     capacitor: "capacitor",
@@ -8,11 +6,12 @@ export const Components = {
     optocouple: "optocouple",
     quartz: "quartz",
     stabilizer: "stabilizer",
-    tranzistor: "tranzistor",
+    transistor: "transistor",
     zenerDiode: "zenerDiode",
+    other: "other"
 }
 
-export function addComponent(component, componentBody, token, errorFunc, okFunc){
+export async function addComponent(component, componentBody, token, errorFunc, okFunc){
     
     if(Components[component] == null){
         errorFunc({
@@ -34,21 +33,21 @@ export function addComponent(component, componentBody, token, errorFunc, okFunc)
     redirect: 'follow'
     };
 
-    fetch(`/api/storage/${Components[component]}/add`, requestOptions)
-    .then(response => {
-        if(response.ok) return response.json(); 
-        errorFunc(response.json());
-        throw response.statusText;        
-    })
-    .then(result => {
-        okFunc(result);
-    })
-    .catch(error => console.error('error', error));
+    let result = await fetch(`/api/storage/${Components[component]}/add`, requestOptions);
+    
+    if(result.ok){
+        var data = await result.json();
+        okFunc(data);
+    } else {
+        var error = await result.json();
+        errorFunc(error);
+        return false;
+    }
 
     return true;
 }
 
-export function removeComponent(component, id, token, errorFunc, okFunc){
+export async function removeComponent(component, id, token, errorFunc, okFunc){
     
     if(Components[component] == null){
         errorFunc({
@@ -67,20 +66,53 @@ export function removeComponent(component, id, token, errorFunc, okFunc){
         redirect: 'follow'
     };
 
-    fetch(`/api/storage/${Components[component]}/delete/${id}`, requestOptions)
-    .then(response => {
-        if(response.ok) return true;
-        errorFunc(response.json());
-    })
-    .then(result => {
-        okFunc(result);
-    })
-    .catch(error => console.log('error', error));
+    let result = await fetch(`/api/storage/${Components[component]}/delete/${id}`, requestOptions);
+    
+    if(result.ok){
+        var data = await result.json();
+        okFunc(data);
+    } else {
+        var error = await result.json();
+        errorFunc(error);
+        return false;
+    }
 
     return true;
 }
 
-export function showAllComponent(component, token, errorFunc, okFunc){
+export async function showAllComponent(component, token, errorFunc, okFunc){
+    
+    if(Components[component] == null){
+        errorFunc({
+            message: `Component ${component} does not exixts`
+        })
+        return false;
+    }
+
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", "Bearer " + token);
+
+    var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+    };
+    
+    let result = await fetch(`/api/storage/${Components[component]}/all`, requestOptions);
+    
+    if(result.ok){
+        var data = await result.json();
+        okFunc(data);
+    } else {
+        var error = await result.json();
+        errorFunc(error);
+        return false;
+    }
+
+    return true;
+}
+
+export async function showAllActiveComponent(component, token, errorFunc, okFunc){
     
     if(Components[component] == null){
         errorFunc({
@@ -98,46 +130,16 @@ export function showAllComponent(component, token, errorFunc, okFunc){
         redirect: 'follow'
     };
 
-    fetch(`/api/storage/${Components[component]}/all`, requestOptions)
-    .then(response => {
-        if(response.ok) return response.json();
-        errorFunc(response.json());
-    })
-    .then(result => {
-        okFunc(result);
-    })
-    .catch(error => console.log('error', error));
-
-    return true;
-}
-
-export function showAllActiveComponent(component, token, errorFunc, okFunc){
+    let result = await fetch(`/api/storage/${Components[component]}/active`, requestOptions);
     
-    if(Components[component] == null){
-        errorFunc({
-            message: `Component ${component} does not exixts`
-        })
+    if(result.ok){
+        var data = await result.json();
+        okFunc(data);
+    } else {
+        var error = await result.json();
+        errorFunc(error);
         return false;
     }
-
-    var myHeaders = new Headers();
-    myHeaders.append("Authorization", "Bearer " + token);
-
-    var requestOptions = {
-        method: 'GET',
-        headers: myHeaders,
-        redirect: 'follow'
-    };
-
-    fetch(`/api/storage/${Components[component]}/active`, requestOptions)
-    .then(response => {
-        if(response.ok) return response.json();
-        errorFunc(response.json());
-    })
-    .then(result => {
-        okFunc(result);
-    })
-    .catch(error => console.log('error', error));
 
     return true;
 }
@@ -178,6 +180,56 @@ export async function getComponentInfo(id, token){
     }
 }
 
+export async function addComponentToStorage(token, id, count){
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${token}`);
+    myHeaders.append("Content-Type", "application/json");
+
+    var raw = JSON.stringify({
+    "componentId": id,
+    "count": count
+    });
+
+    var requestOptions = {
+    method: 'POST',
+    headers: myHeaders,
+    body: raw,
+    redirect: 'follow'
+    };
+
+    let responce = await fetch("/api/storage/add", requestOptions);
+    if(responce.ok){
+        return true;
+    } else {
+        return false;
+    }
+}
+
+export async function takeComponentFromStorage(token, id, count){
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${token}`);
+    myHeaders.append("Content-Type", "application/json");
+
+    var raw = JSON.stringify({
+    "componentId": id,
+    "count": count
+    });
+
+    var requestOptions = {
+    method: 'POST',
+    headers: myHeaders,
+    body: raw,
+    redirect: 'follow'
+    };
+
+    let responce = await fetch("/api/storage/remove", requestOptions);
+    if(responce.ok){
+        return true;
+    } else {
+        return false;
+    }
+}
+
 export function OmToReadeble(om){
     if(om / 1000 < 1){
         return `${om} Om`;
@@ -185,6 +237,16 @@ export function OmToReadeble(om){
         return `${om / 1000} kOm`; 
     } else {
         return `${om / 1000000 } MOm`
+    }
+}
+
+export function HzToReadeble(om){
+    if(om / 1000 < 1){
+        return `${om} Hz`;
+    } else if(om / 1000000 < 1){
+        return `${om / 1000} kHz`; 
+    } else {
+        return `${om / 1000000 } MHz`
     }
 }
 

@@ -3,6 +3,7 @@ import Alert  from 'react-bootstrap/Alert'
 import Table from 'react-bootstrap/Table'
 import Card from 'react-bootstrap/Card'
 import userRoles, { getUserRoleName } from '../utils/UserRoles'
+import { Button, Form, InputGroup } from 'react-bootstrap'
 
 export default class AdminPanel extends Component {
     constructor(props) {
@@ -52,7 +53,7 @@ export default class AdminPanel extends Component {
             .then(response => {
                 !response.ok && this.setState({
                     message: (<Alert variant="danger" onClose={() => this.setState({ message: null })} dismissible>
-                        {response.json().message ?? "Unknown error"}
+                        {response.json().message ?? "Невідома помилка"}
                     </Alert>)
                 });
                 this.updateUsersList();
@@ -62,10 +63,10 @@ export default class AdminPanel extends Component {
     }
 
     addUser(userName, password, fullName, roleId) {
-        if (userName == null || userName.length < 4) {
+        if (userName == null || userName.length < 3) {
             this.setState({
                 message: (<Alert variant="danger" onClose={() => this.setState({ message: null })} dismissible>
-                    Wrong username or length less than 4 characters
+                    Нікнейм користувача закороткий або невірний
                 </Alert>)
             });
             return;
@@ -74,7 +75,7 @@ export default class AdminPanel extends Component {
         if (password == null || password.length < 8) {
             this.setState({
                 message: (<Alert variant="danger" onClose={() => this.setState({ message: null })} dismissible>
-                    Wrong password or length less than 8 characters
+                    Довжина пароль повинна бути більше 7 символів
                 </Alert>)
             });
             return;
@@ -103,12 +104,12 @@ export default class AdminPanel extends Component {
                 response.ok ?
                     this.setState({
                         message: (<Alert variant="success" onClose={() => this.setState({ message: null })} dismissible>
-                            User {response.json().name} was added succefully
+                            Користувача {response.json().name} успішно додано
                         </Alert>)
                     }) :
                     this.setState({
                         message: (<Alert variant="danger" onClose={() => this.setState({ message: null })} dismissible>
-                            {response.json().message ?? "Unknown error"}
+                            {response.json().message ?? "Невідома помилка"}
                         </Alert>)
                     });
                 this.updateUsersList();
@@ -125,48 +126,91 @@ export default class AdminPanel extends Component {
 
         return (
             <div>
-                <Table striped bordered hover>
-                    <thead>
-                        <tr>
-                            <th>Id</th>
-                            <th>Username</th>
-                            <th>Full name</th>
-                            <th>Type of user</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {users.map(user =>
-                            <tr key={user.id}>
-                                <td>{user.id}</td>
-                                <td>{user.name}</td>
-                                <td>{user.fullName}</td>
-                                <td>{getUserRoleName(user.userRoleId)}</td>
-                                <td>
-                                    <button className="btn btn-outline-danger w-100" onClick={() => {
-                                        window.confirm("Are you sure that you want DELETE user " + user.name) && this.removeUserById(user.id);
-                                    }}>
-                                        Remove user
-                                    </button>
-                                </td>
-                            </tr> 
-                           )}
-                    </tbody>
-                </Table>
-                <Card>
-                    <div className="container">
-                        <div className="row m-2">
-                            <input type="text" placeholder="Username" className="col-md-6 col-sm-12 p-1 mb-1" onChange={(e) => userName = e.target.value} />
-                            <input type="password" placeholder="Password" className="col-md-6 col-sm-12 p-1 mb-1" onChange={(e) => userPassword = e.target.value} />
-                            <input type="text" placeholder="User full name" className="col-md-6 col-sm-12 p-1 mb-1" onChange={(e) => userFullName = e.target.value} />
-                            <select className="col-md-6 col-sm-12 p-1 mb-1" onChange={(e) => roleId = Number(e.target.value)}>
-                                {userRoles.map((role, index) => <option key={role.id} value={role.id}>{role.role}</option>)}
-                            </select>
-                            <button className="btn btn-outline-success col-12" onClick={() => { this.addUser(userName, userPassword, userFullName, roleId); }}>
-                                Add user
-                            </button>
-                        </div>
-                    </div>
+                <div className='d-flex justify-content-center'>
+                </div>
+                <Card className='m-2'>
+                    <Card.Header>
+                        <h2>Список користувачів</h2>
+                    </Card.Header>
+                    <Card.Body>
+                        <Table striped bordered hover responsive >
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Нікнейм</th>
+                                    <th>Повне ім'я</th>
+                                    <th>Тип користувача</th>
+                                    <th>Дії</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {users.map(user =>
+                                    <tr key={user.id}>
+                                        <td>{user.id}</td>
+                                        <td>{user.name}</td>
+                                        <td>{user.fullName}</td>
+                                        <td>{getUserRoleName(user.userRoleId)}</td>
+                                        <td>
+                                            <button className="btn btn-outline-danger w-100" onClick={() => {
+                                                window.confirm("Чи впевнені ви, що хочете ВИДАЛИТИ користувача " + user.name) && this.removeUserById(user.id);
+                                            }}>
+                                                Видалити користувача
+                                            </button>
+                                        </td>
+                                    </tr> 
+                                )}
+                            </tbody>
+                        </Table>
+                    </Card.Body>
+                </Card>
+                <Card className='m-2'>
+                    <Card.Header>
+                        <h2>Додати нового користувача</h2>
+                    </Card.Header>
+                    <Card.Body>
+                        <InputGroup className='mb-1'>
+                        <InputGroup.Text >Нікнейм</InputGroup.Text>
+                        <Form.Control
+                            aria-label="Nickname"
+                            placeholder='Нікнейм'
+                            onChange={(e) => {
+                                userName = e.target.value
+                            }}
+                        />
+                        </InputGroup>
+                        <InputGroup className='mb-1'>
+                        <InputGroup.Text >Пароль</InputGroup.Text>
+                        <Form.Control
+                            type = "password" 
+                            aria-label="capacity"
+                            placeholder='Password'
+                            onChange={(e) => {
+                                userPassword = e.target.value
+                            }}
+                        />
+                        </InputGroup>
+                        <InputGroup className='mb-1'>
+                        <InputGroup.Text >Повне ім'я</InputGroup.Text>
+                        <Form.Control
+                            aria-label="capacity"
+                            placeholder='Full Name'
+                            onChange={(e) => {
+                                userFullName = e.target.value
+                            }}
+                        />
+                        </InputGroup>
+                        <InputGroup className='mb-1'>
+                        <InputGroup.Text >Тип користувача</InputGroup.Text>
+                        <Form.Select
+                            onChange={(e) => {
+                                roleId = Number(e.target.value);
+                            }}
+                        >
+                            {userRoles.map((role, index) => <option key={role.id} value={role.id}>{role.role}</option>)}
+                        </Form.Select>
+                        </InputGroup>
+                        <Button variant="outline-success" className='w-100' onClick={() => { this.addUser(userName, userPassword, userFullName, roleId); }}>Додати користувача</Button>
+                    </Card.Body>
                 </Card>
             </div>
             )
@@ -176,7 +220,7 @@ export default class AdminPanel extends Component {
         return(
         <div>
             {this.state.message != null && this.state.message}
-                {this.state.loading ? <p>Loading...</p> : this.createUsersViews(this.state.users) }
+                {this.state.loading ? <p>Триває завантаження ...</p> : this.createUsersViews(this.state.users) }
             </div>
         )
     }

@@ -1,6 +1,19 @@
 import React, {useEffect, useState} from 'react'
 import { Table, Modal, Button } from 'react-bootstrap';
-import { getComponentInfo, microFaradToReadeble, OmToReadeble } from '../helpers/api/ComponentsEditorWorker';
+import { getComponentInfo, microFaradToReadeble, OmToReadeble, HzToReadeble } from '../helpers/api/ComponentsEditorWorker';
+
+const localString = new Map([
+    ["resistance" , "Опір"],
+    ["accuracy" ,  "Точність"],
+    ["powerRating" , "Потужність"],
+    ["name" , "Назва"],
+    ["packagingId" , "Id типу корпуса"],
+    ["description" , "Опис"],
+    ["notice" , "Примітки"],
+    ["count" , "Кількість"],
+    ["chipTypeId", "Id типу мікросхеми"]
+]);
+
 
 export default function ComponentViewer({id, onClose, title}){
     const [loading, setLoading] = useState(true);
@@ -25,38 +38,41 @@ export default function ComponentViewer({id, onClose, title}){
             });
     },[])
 
-    const createComponentInfo = () => {
-
-        
+    const createComponentInfo = () => {     
         return<>
             <Table striped bordered hover responsive>
                 <tbody>
                     {Object.entries(component.component).map((item, index) => {
                         switch (item[0]) {
+                            case 'frequency':
+                                return <tr key={index}>
+                                    <td>Частота</td>
+                                    <td><p>{HzToReadeble(item[1])}</p></td>
+                                </tr>
                             case 'resistance':
                                 return <tr key={index}>
-                                    <td>{item[0]}</td>
+                                    <td>Опір</td>
                                     <td><p>{OmToReadeble(item[1])}</p></td>
                                 </tr>
                             case 'capacity':
                                 return <tr key={index}>
-                                <td>{item[0]}</td>
+                                <td>Ємність</td>
                                 <td><p>{microFaradToReadeble(item[1])}</p></td>
                             </tr>
                             default:
                                 break;
                         }
                         return <tr key={index}>
-                            <td>{item[0]}</td>
+                            <td>{localString.get(item[0]) ?? item[0]}</td>
                             <td><p>{item[1]}</p></td>
                         </tr>
                     })}
                     <tr>
-                        <td>Packaging</td>
+                        <td>Тип корпусу</td>
                         <td>{component.package.name}</td>
                     </tr>
                     <tr>
-                        <td>Created by</td>
+                        <td>Ким додано</td>
                         <td>{component.creator.fullName}</td>
                     </tr>
                 </tbody>
@@ -74,12 +90,12 @@ export default function ComponentViewer({id, onClose, title}){
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {loading ? <p>Loading...</p> : <>
+                {loading ? <p>Триває завантаження...</p> : <>
                 { error ?? createComponentInfo()}
             </> }
             </Modal.Body>
             <Modal.Footer>
-                <Button onClick={close}>Close</Button>
+                <Button onClick={close}>Закрити</Button>
             </Modal.Footer>
         </Modal>
     </>

@@ -23,7 +23,8 @@ export async function signIn(username, password){
                 localStorage.setItem('token', data.token ?? null);
                 localStorage.setItem('userRole', data.role.id);
                 localStorage.setItem('userName', data.userName);
-                localStorage.setItem('userFullName', data.userFullName)
+                localStorage.setItem('userFullName', data.userFullName);
+                localStorage.setItem('validTo', data.validTo);
                 return {isOk: true};
             } else {
                 return {isOk: false, error: data};

@@ -15,7 +15,7 @@ export const SignIn = () =>{
                         variant='danger' 
                         dismissible 
                         onClose={() => setMessage(null)}
-                    >Cannot sign in: {result?.error?.message ?? "Unknown error"}</Alert>)
+                    >Помилка авторизації: {result?.error?.message ?? "Unknown error"}</Alert>)
                 } else {
                     window.location.href = '/';
                 }
@@ -28,19 +28,19 @@ export const SignIn = () =>{
     <Container>
         <Row className='d-flex justify-content-center'>
             <Card className='col-md-6 mt-5 p-0'>
-                <Card.Header>Sign in</Card.Header>
+                <Card.Header>Вхід</Card.Header>
                 <Card.Body>
                     <Form action='/' onSubmit={submit}>
                         <Form.Group controlId='username'>
-                            <Form.Label>Username</Form.Label>
+                            <Form.Label>Нікнейм</Form.Label>
                             <Form.Control type='text' placeholder='username' onChange={e => setUserName(e.target.value)} required />
                         </Form.Group>
                         <Form.Group controlId='password'>
-                            <Form.Label>password</Form.Label>
+                            <Form.Label>Пароль</Form.Label>
                             <Form.Control type='password' placeholder='password' onChange={e => setPassword(e.target.value)} required />
                         </Form.Group>
                         <Button variant='success' type='submit' className='w-100 mt-2'>
-                            Sign in
+                            Увійти
                         </Button>
                     </Form>
                 </Card.Body>

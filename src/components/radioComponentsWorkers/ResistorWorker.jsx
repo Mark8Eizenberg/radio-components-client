@@ -9,6 +9,7 @@ import {
     showAllActiveComponent, removeComponent,
     addComponent, OmToReadeble, getComponentInfo
 } from '../helpers/api/ComponentsEditorWorker';
+import { PackagesWorker } from '../helpers/api/ComponentsWorker';
 import ComponentViewer from './ComponentViewer';
 
 export function EditorResistor() {
@@ -57,13 +58,13 @@ export function EditorResistor() {
                 <thead>
                     <tr>
                         <th>Id</th>
-                        <th>Name</th>
-                        <th>Packaging</th>
-                        <th>R</th>
-                        <th>Acc</th>
-                        <th>Whatts</th>
-                        <th>Count</th>
-                        <th>Actions</th>
+                        <th>Назва</th>
+                        <th>Тип корпусу</th>
+                        <th>Резистивність</th>
+                        <th>Точність</th>
+                        <th>Потужність</th>
+                        <th>Кількість</th>
+                        <th>Дії</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -75,13 +76,16 @@ export function EditorResistor() {
                         />)}}>
                             <td>{resistor.id}</td>
                             <td>{resistor.name}</td>
-                            <td>{resistor.packagingId}</td>
+                            <td>{resistor.packaging.name}</td>
                             <td>{OmToReadeble(resistor.resistance)}</td>
                             <td>{resistor.accuracy}</td>
                             <td>{resistor.powerRating}</td>
                             <td>{resistor.count}</td>
                             <td>
-                                <Button style={{ zIndex: '1000' }} variant='outline-danger' onClick={ () => deleteResistor(resistor.id) }>Delete element</Button>
+                                <Button style={{ zIndex: '1000' }} variant='outline-danger' 
+                                    onClick={ () => {if(window.confirm(`Видалити резистор: "${resistor.name}"?`))deleteResistor(resistor.id)} }
+                                >Видалити елемент
+                                </Button>
                             </td>
                         </tr>)}
                 </tbody>
@@ -94,7 +98,7 @@ export function EditorResistor() {
                         onClose={clearMessage} 
                         onAdding={(isOk)=>{setMessage(
                             <Alert dismissible variant='success'
-                                onClose={clearMessage}>Component addings
+                                onClose={clearMessage}>Додано нові компоненти
                             </Alert>);
                             populateData();
                         }}/>
@@ -112,7 +116,7 @@ export function EditorResistor() {
 
     return <>
         { message }
-        {loading ? <><p>Loading</p><Spinner animation="border" size="sm" /></> : showTable(resistors) }
+        {loading ? <><p>Завантаження даних...</p><Spinner animation="border" size="sm" /></> : showTable(resistors) }
     </>
 }
 
@@ -174,18 +178,18 @@ function ResistorAddingModal({ onClose, onAdding }) {
         backdrop="static"
         keyboard={false}>
         <Modal.Header >
-            <Modal.Title>Add resistor</Modal.Title>
+            <Modal.Title>Додати резистор</Modal.Title>
         </Modal.Header>
         <Modal.Body>
             {message}
             <InputGroup className="mb-3">
-                <InputGroup.Text id="resistance-number">Resistance</InputGroup.Text>
+                <InputGroup.Text id="resistance-number">Резистивність</InputGroup.Text>
                 <Form.Control
                     aria-label="resistance"
                     aria-describedby="resistance-number"
                     placeholder='0'
                     onChange={(e) => {
-                        if (isNumeric(e.target.value)) {
+                        if (!isNaN(e.target.value)) {
                             setResistance(Number(e.target.value));
                         } else if (e.target.value.length == 0) {
                             return;
@@ -205,12 +209,12 @@ function ResistorAddingModal({ onClose, onAdding }) {
             </InputGroup>
 
             <InputGroup className="mb-3">
-                <InputGroup.Text >Accurancy</InputGroup.Text>
+                <InputGroup.Text >Точність</InputGroup.Text>
                 <Form.Control
                     placeholder="0"
                     aria-label="Accuracy of resistor"
                     onChange={(e) => {
-                        if (isNumeric(e.target.value)) {
+                        if (!isNaN(e.target.value)) {
                             setAccuracy(Number(e.target.value));
                         } else if (e.target.value.length == 0) {
                             return;
@@ -224,12 +228,12 @@ function ResistorAddingModal({ onClose, onAdding }) {
             </InputGroup>
 
             <InputGroup className="mb-3">
-                <InputGroup.Text >Power rating</InputGroup.Text>
+                <InputGroup.Text >Розсіювальна потужність</InputGroup.Text>
                 <Form.Control
                     placeholder="0"
                     aria-label="Power rating of resistor"
                     onChange={(e) => {
-                        if (isNumeric(e.target.value)) {
+                        if (!isNaN(e.target.value)) {
                            setPowerRating(Number(e.target.value));
                         } else if (e.target.value.length == 0) {
                             return;
@@ -243,7 +247,7 @@ function ResistorAddingModal({ onClose, onAdding }) {
             </InputGroup>
 
             <InputGroup className="mb-3">
-                <InputGroup.Text >Resistor name</InputGroup.Text>
+                <InputGroup.Text >Назва</InputGroup.Text>
                 <Form.Control
                     placeholder="Resistor name"
                     aria-label="Name of resistor"
@@ -254,21 +258,23 @@ function ResistorAddingModal({ onClose, onAdding }) {
             </InputGroup>
 
             <InputGroup className="mb-3">
-                <InputGroup.Text >Packaging</InputGroup.Text>
-                <Form.Select>
-                    <option value='1'>This feature will be create</option>
+                <InputGroup.Text >Тип корпусу</InputGroup.Text>
+                <Form.Select onChange={(e) => {setPackaging(e.target.value)}}>
+                {PackagesWorker.getPackages().map((item, index)=>{
+                        return <option key={index} value={item.id}>{item.name}</option>
+                    })}
                 </Form.Select>
             </InputGroup>
 
             <InputGroup className="mb-3">
-                <InputGroup.Text>Description</InputGroup.Text>
+                <InputGroup.Text>Опис</InputGroup.Text>
                 <Form.Control as='textarea' onChange={(e) => {
                     setDescriprion(e.target.value);
                 }}/>
             </InputGroup>
 
             <InputGroup className='mb-3'>
-                <InputGroup.Text>Notice</InputGroup.Text>
+                <InputGroup.Text>Примітки</InputGroup.Text>
                 <Form.Control as='textarea' onChange={(e) => {
                     setNotice(e.target.value);
                 }}/>
@@ -277,9 +283,9 @@ function ResistorAddingModal({ onClose, onAdding }) {
         </Modal.Body>
         <Modal.Footer>
             <Button variant="success" onClick={addResistor}>
-                Add resistor
+                Додати резистор
             </Button>
-            <Button variant="danger" onClick={close}>Cancel</Button>
+            <Button variant="danger" onClick={close}>Відміна</Button>
         </Modal.Footer>
     </Modal>
 }

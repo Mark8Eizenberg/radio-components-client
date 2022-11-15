@@ -7,14 +7,39 @@ import {
   Route,
   NavLink
 } from "react-router-dom";
-import { Button, Nav, Navbar } from 'react-bootstrap';
+import { Alert, Button, Nav, Navbar } from 'react-bootstrap';
 import {userRolesLinks} from './utils/UserRoles'
+
 function App() {
+  var message = null;
+
+  if(localStorage.validTo != undefined){
+    var today = new Date();
+    var validTokenDate = new Date(localStorage.validTo);
+    if(today > validTokenDate){
+      localStorage.clear();
+      message = <Alert 
+          className='w-100'
+          variant='danger' 
+          dismissible 
+          onClose={() => message = null}
+      >Час дії вашого токена вичерпаний увійдіть знову</Alert>
+    }
+  } else {
+    localStorage.clear();
+    message = <Alert 
+          className='w-100'
+          variant='danger' 
+          dismissible 
+          onClose={() => message = null}
+      >Для користування сайтом спочатку необхідно увійти, або отримати аккаунт у адміністратора</Alert>
+  }
 
   return  <div className="App">
+      {message}
       {localStorage.token ? <Router>
         <Navbar collapseOnSelect bg='light' expand='lg'>
-        <Navbar.Brand href="#">RadioComponents</Navbar.Brand>
+        <Navbar.Brand href="#">Облік радіокомпонентів</Navbar.Brand>
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className='pills-from-navbar' defaultActiveKey="/home">
@@ -24,7 +49,7 @@ function App() {
                 </Nav.Item>  
               )}
               <Nav.Item>
-                <Nav.Link className="exit-btn" onClick={()=>{localStorage.clear(); window.location.href = '/';}}>Exit</Nav.Link>
+                <Nav.Link className="exit-btn" onClick={()=>{localStorage.clear(); window.location.href = '/';}}>Вихід</Nav.Link>
               </Nav.Item>
             </Nav>
           </Navbar.Collapse>
@@ -39,7 +64,7 @@ function App() {
 }
 
 function Home() {
-  return localStorage.token ? <div>You signIn: {JSON.stringify(userRolesLinks[localStorage.userRole].map((i, k)=>[i,k]))}</div> : <SignIn/> ;
+  return localStorage.token ? <div>{JSON.stringify(userRolesLinks[localStorage.userRole].map((i, k)=>[i,k]))}</div> : <SignIn/> ;
 }
 
 export default App;
