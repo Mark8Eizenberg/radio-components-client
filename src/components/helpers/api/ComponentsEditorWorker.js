@@ -144,6 +144,62 @@ export async function showAllActiveComponent(component, token, errorFunc, okFunc
     return true;
 }
 
+export async function editComponentInfo(token, component){
+    var componentPath = null;
+
+    if(component.resistance){
+        componentPath = 'resistor';
+    } else if(component.capacity){
+        componentPath = 'capacitor';
+    } else if(component.frequency){
+        componentPath = 'quartz';
+    } else if(component.chipTypeId){
+        componentPath = 'chip';
+    } else if(component.transistorTypeId){
+        componentPath = 'transistor';
+    } else {
+        componentPath = 'other';
+    }
+
+    var myHeaders = new Headers();
+    myHeaders.append("Authorization", `Bearer ${token}`);
+    myHeaders.append("Content-Type", "application/json");
+    
+    var raw = JSON.stringify(component);
+    
+    var requestOptions = {
+        method: 'PUT',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+    };
+
+    
+    var response = await fetch(`/api/storage/${componentPath}/Edit`, requestOptions);
+
+    if(!response.ok){
+        try{
+            var error = await response.json();
+            return {
+                isOk: false,
+                error: error.message,
+            };
+        }
+        catch{
+            return {
+                isOk: false,
+                error: null,
+            };
+        }
+    }
+    
+    var result = await response.json();
+    return {
+        isOk: true,
+        component: result
+    }
+}
+
 
 export async function getComponentInfo(id, token){
     var myHeaders = new Headers();

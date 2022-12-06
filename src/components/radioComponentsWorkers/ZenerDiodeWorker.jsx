@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     Table, Spinner, Alert, Button,
     Modal, InputGroup, Form
@@ -6,7 +6,7 @@ import {
 import { 
     Components as ComponentSelector, 
     showAllActiveComponent, removeComponent,
-    addComponent, getComponentInfo,
+    addComponent
 } from '../helpers/api/ComponentsEditorWorker';
 import { PackagesWorker } from '../helpers/api/ComponentsWorker';
 import ComponentViewer from './ComponentViewer';
@@ -66,16 +66,27 @@ export function ZenerDiodeWorker() {
                 </thead>
                 <tbody>
                     {components.map(component =>
-                        <tr key={component.id} 
-                            onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage}
+                        <tr key={component.id} >
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
                                 title={component.name}
-                        />)}}>
-                            <td>{component.id}</td>
-                            <td>{component.name}</td>
-                            <td>{component.voltage} V</td>
-                            <td>{component.packaging.name}</td>
-                            <td>{component.count}</td>
+                            />)}}>{component.id}</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.name}</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.voltage} V</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.packaging.name}</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.count}</td>
                             <td>
                             <Button style={{ zIndex: '1000' }} variant='outline-danger' 
                                     onClick={ () => {if(window.confirm(`Видалити стабілітрон: "${component.name}"?`))deleteZenerDiode(component.id)} }
@@ -115,7 +126,7 @@ export function ZenerDiodeWorker() {
     </>
 }
 
-function ZenerDiodeAddingModal({ onClose, onAdding }) {
+export function ZenerDiodeAddingModal({ onClose, onAdding }) {
     const [show, setShow] = useState(true);
     const [message, setMessage] = useState(null);
 
@@ -124,6 +135,7 @@ function ZenerDiodeAddingModal({ onClose, onAdding }) {
     const [packagingId, setPackaging] = useState(1);
     const [description, setDescriprion] = useState(null);
     const [notice, setNotice] = useState(null);
+    const [count, setCount] = useState(0);
 
     const close = () => setShow(false);
     const errorMessage = (error) => {
@@ -157,6 +169,7 @@ function ZenerDiodeAddingModal({ onClose, onAdding }) {
             packagingId: packagingId,
             description: description,
             notice: notice,
+            count: count
         }
         
         addComponent(ComponentSelector.zenerDiode, zenerDiode, localStorage.token, errorMessage, (result)=>{
@@ -223,6 +236,25 @@ function ZenerDiodeAddingModal({ onClose, onAdding }) {
                 <Form.Control as='textarea' onChange={(e) => {
                     setNotice(e.target.value);
                 }}/>
+            </InputGroup>
+
+            <InputGroup className="mb-3">
+                <InputGroup.Text >Кількість</InputGroup.Text>
+                <Form.Control
+                    placeholder="0"
+                    aria-label="Кількість"
+                    onChange={(e) => {
+                        if (!isNaN(e.target.value)) {
+                            setCount(Number(e.target.value));
+                        } else if (e.target.value.length == 0) {
+                            return;
+                        } else {
+                            errorMessage({message: 'Кількість може бути лише в чисельній формі'});
+                            e.target.value = 0;
+                        }
+                    }}
+                />
+                <InputGroup.Text>Штук</InputGroup.Text>
             </InputGroup>
 
         </Modal.Body>

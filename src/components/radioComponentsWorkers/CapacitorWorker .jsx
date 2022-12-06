@@ -67,21 +67,35 @@ export function EditorCapacitor() {
                     </tr>
                 </thead>
                 <tbody>
-                    {components.map(capacitor =>
-                        <tr key={capacitor.id} 
-                            onClick={()=>{setMessage(
-                                <ComponentViewer id={capacitor.id} onClose={clearMessage}
-                                title={capacitor.name}
-                        />)}}>
-                            <td>{capacitor.id}</td>
-                            <td>{capacitor.name}</td>
-                            <td>{capacitor.packaging.name}</td>
-                            <td>{microFaradToReadeble(capacitor.capacity)}</td>
-                            <td>{capacitor.accuracy}</td>
-                            <td>{capacitor.count}</td>
+                    {components.map(component =>
+                        <tr key={component.id}>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.id}</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.name}</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.packaging.name}</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{microFaradToReadeble(component.capacity)}</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.accuracy}</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.count}</td>
                             <td>
                                 <Button style={{ zIndex: '1000' }} variant='outline-danger' 
-                                    onClick={ () => {if(window.confirm(`Видалити конденсатор: "${capacitor.name}"?`))deleteCapacitor(capacitor.id)} 
+                                    onClick={ () => {if(window.confirm(`Видалити конденсатор: "${component.name}"?`))deleteCapacitor(component.id)} 
                                 }>Видалити компонент</Button>
                             </td>
                         </tr>)}
@@ -117,7 +131,7 @@ export function EditorCapacitor() {
     </>
 }
 
-function CapacitorAddingModal({ onClose, onAdding }) {
+export function CapacitorAddingModal({ onClose, onAdding }) {
     const [show, setShow] = useState(true);
     const [message, setMessage] = useState(null);
 
@@ -128,6 +142,7 @@ function CapacitorAddingModal({ onClose, onAdding }) {
     const [description, setDescriprion] = useState(null);
     const [notice, setNotice] = useState(null);
     const [multiplicator, setMultiplicator] = useState(1);
+    const [count, setCount] = useState(0);
 
     const close = () => setShow(false);
     const errorMessage = (error) => {
@@ -146,6 +161,7 @@ function CapacitorAddingModal({ onClose, onAdding }) {
             packagingId: packagingId,
             description: description,
             notice: notice,
+            count: count
         }
 
         if(capacity == null){
@@ -184,7 +200,7 @@ function CapacitorAddingModal({ onClose, onAdding }) {
                     aria-label="capacity"
                     placeholder='0'
                     onChange={(e) => {
-                        if (isNumeric(e.target.value)) {
+                        if (!isNaN(e.target.value)) {
                             setCapacity(Number(e.target.value));
                         } else if (e.target.value.length == 0) {
                             return;
@@ -211,7 +227,7 @@ function CapacitorAddingModal({ onClose, onAdding }) {
                     placeholder="0"
                     aria-label="Точність конденсатору"
                     onChange={(e) => {
-                        if (isNumeric(e.target.value)) {
+                        if (!isNaN(e.target.value)) {
                             setAccuracy(Number(e.target.value));
                         } else if (e.target.value.length == 0) {
                             return;
@@ -257,6 +273,25 @@ function CapacitorAddingModal({ onClose, onAdding }) {
                 <Form.Control as='textarea' onChange={(e) => {
                     setNotice(e.target.value);
                 }}/>
+            </InputGroup>
+
+            <InputGroup className="mb-3">
+                <InputGroup.Text >Кількість</InputGroup.Text>
+                <Form.Control
+                    placeholder="0"
+                    aria-label="Кількість"
+                    onChange={(e) => {
+                        if (!isNaN(e.target.value)) {
+                            setCount(Number(e.target.value));
+                        } else if (e.target.value.length == 0) {
+                            return;
+                        } else {
+                            errorMessage({message: 'Кількість може бути лише в чисельній формі'});
+                            e.target.value = 0;
+                        }
+                    }}
+                />
+                <InputGroup.Text>Штук</InputGroup.Text>
             </InputGroup>
 
         </Modal.Body>

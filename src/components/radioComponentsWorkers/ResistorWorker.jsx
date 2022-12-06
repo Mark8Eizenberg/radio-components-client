@@ -68,22 +68,39 @@ export function EditorResistor() {
                     </tr>
                 </thead>
                 <tbody>
-                    {resistors.map(resistor =>
-                        <tr key={resistor.id} 
-                            onClick={()=>{setMessage(
-                                <ComponentViewer id={resistor.id} onClose={clearMessage}
-                                title={resistor.name}
-                        />)}}>
-                            <td>{resistor.id}</td>
-                            <td>{resistor.name}</td>
-                            <td>{resistor.packaging.name}</td>
-                            <td>{OmToReadeble(resistor.resistance)}</td>
-                            <td>{resistor.accuracy}</td>
-                            <td>{resistor.powerRating}</td>
-                            <td>{resistor.count}</td>
+                    {resistors.map(component =>
+                        <tr key={component.id}>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.id}</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.name}</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.packaging.name}</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{OmToReadeble(component.resistance)}</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.accuracy}</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.powerRating}</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.count}</td>
                             <td>
                                 <Button style={{ zIndex: '1000' }} variant='outline-danger' 
-                                    onClick={ () => {if(window.confirm(`Видалити резистор: "${resistor.name}"?`))deleteResistor(resistor.id)} }
+                                    onClick={ () => {if(window.confirm(`Видалити резистор: "${component.name}"?`))deleteResistor(component.id)} }
                                 >Видалити елемент
                                 </Button>
                             </td>
@@ -113,14 +130,13 @@ export function EditorResistor() {
         populateData(); 
     }, []);
 
-
     return <>
         { message }
         {loading ? <><p>Завантаження даних...</p><Spinner animation="border" size="sm" /></> : showTable(resistors) }
     </>
 }
 
-function ResistorAddingModal({ onClose, onAdding }) {
+export function ResistorAddingModal({ onClose, onAdding }) {
     const [show, setShow] = useState(true);
     const [message, setMessage] = useState(null);
 
@@ -132,6 +148,7 @@ function ResistorAddingModal({ onClose, onAdding }) {
     const [description, setDescriprion] = useState(null);
     const [notice, setNotice] = useState(null);
     const [multiplicator, setMultiplicator] = useState(1);
+    const [count, setCount] = useState(0);
 
     const close = () => setShow(false);
     const errorMessage = (error) => {
@@ -151,6 +168,7 @@ function ResistorAddingModal({ onClose, onAdding }) {
             packagingId: packagingId,
             description: description,
             notice: notice,
+            count: count
         }
 
         if(resistance == null){
@@ -278,6 +296,25 @@ function ResistorAddingModal({ onClose, onAdding }) {
                 <Form.Control as='textarea' onChange={(e) => {
                     setNotice(e.target.value);
                 }}/>
+            </InputGroup>
+
+            <InputGroup className="mb-3">
+                <InputGroup.Text >Кількість</InputGroup.Text>
+                <Form.Control
+                    placeholder="0"
+                    aria-label="Кількість"
+                    onChange={(e) => {
+                        if (!isNaN(e.target.value)) {
+                            setCount(Number(e.target.value));
+                        } else if (e.target.value.length == 0) {
+                            return;
+                        } else {
+                            errorMessage({message: 'Кількість може бути лише в чисельній формі'});
+                            e.target.value = 0;
+                        }
+                    }}
+                />
+                <InputGroup.Text>Штук</InputGroup.Text>
             </InputGroup>
 
         </Modal.Body>

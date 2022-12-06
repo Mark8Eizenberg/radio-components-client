@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import { Alert, Button, Nav, Navbar } from 'react-bootstrap';
 import {userRolesLinks} from './utils/UserRoles'
+import TestRoom from './components/TestingRoom';
 
 function App() {
   var message = null;
@@ -51,6 +52,10 @@ function App() {
               <Nav.Item>
                 <Nav.Link className="exit-btn" onClick={()=>{localStorage.clear(); window.location.href = '/';}}>Вихід</Nav.Link>
               </Nav.Item>
+              {/* TESTING ROOM */}
+              <Nav.Item>
+                <Nav.Link as={NavLink} to={'/testroom'} end >TEST ROOM</Nav.Link>
+              </Nav.Item>
             </Nav>
           </Navbar.Collapse>
         </Navbar>
@@ -58,6 +63,7 @@ function App() {
         {userRolesLinks[localStorage.userRole].map((link, index) => 
             <Route key={index} path={link.link} element={link.element} /> 
           )}
+          <Route path={'testroom'} element={<TestRoom/>} />
         </Routes>
       </Router> : <SignIn/>}
     </div>

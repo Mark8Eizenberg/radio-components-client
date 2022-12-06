@@ -66,16 +66,27 @@ export function TransistorWorker() {
                 </thead>
                 <tbody>
                     {components.map(component =>
-                        <tr key={component.id} 
-                            onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage}
+                        <tr key={component.id}>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
                                 title={component.name}
-                        />)}}>
-                            <td>{component.id}</td>
-                            <td>{component.name}</td>
-                            <td>{component.transistorType.name} </td>
-                            <td>{component.packaging.name}</td>
-                            <td>{component.count}</td>
+                            />)}}>{component.id}</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.name}</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.transistorType.name} </td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.packaging.name}</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.count}</td>
                             <td>
                             <Button style={{ zIndex: '1000' }} variant='outline-danger' 
                                     onClick={ () => {if(window.confirm(`Видалити транзистор: "${component.name}"?`))deleteTransistor(component.id)} }
@@ -88,7 +99,7 @@ export function TransistorWorker() {
                 variant="outline-success" 
                 className='w-100' 
                 onClick={() => setMessage(
-                    <StabilizerAddingModal 
+                    <TransistorAddingModal 
                         onClose={clearMessage} 
                         onAdding={(isOk)=>{setMessage(
                             <Alert dismissible variant='success'
@@ -114,7 +125,7 @@ export function TransistorWorker() {
     </>
 }
 
-function StabilizerAddingModal({ onClose, onAdding }) {
+export function TransistorAddingModal({ onClose, onAdding }) {
     const [show, setShow] = useState(true);
     const [message, setMessage] = useState(null);
 
@@ -123,6 +134,7 @@ function StabilizerAddingModal({ onClose, onAdding }) {
     const [packagingId, setPackaging] = useState(1);
     const [description, setDescriprion] = useState(null);
     const [notice, setNotice] = useState(null);
+    const [count, setCount] = useState(0);
 
     const close = () => setShow(false);
     const errorMessage = (error) => {
@@ -151,6 +163,7 @@ function StabilizerAddingModal({ onClose, onAdding }) {
             packagingId: packagingId,
             description: description,
             notice: notice,
+            count: count
         }
         
         addComponent(ComponentSelector.transistor, transistor, localStorage.token, errorMessage, (result)=>{
@@ -221,6 +234,25 @@ function StabilizerAddingModal({ onClose, onAdding }) {
                 <Form.Control as='textarea' onChange={(e) => {
                     setNotice(e.target.value);
                 }}/>
+            </InputGroup>
+
+            <InputGroup className="mb-3">
+                <InputGroup.Text >Кількість</InputGroup.Text>
+                <Form.Control
+                    placeholder="0"
+                    aria-label="Кількість"
+                    onChange={(e) => {
+                        if (!isNaN(e.target.value)) {
+                            setCount(Number(e.target.value));
+                        } else if (e.target.value.length == 0) {
+                            return;
+                        } else {
+                            errorMessage({message: 'Кількість може бути лише в чисельній формі'});
+                            e.target.value = 0;
+                        }
+                    }}
+                />
+                <InputGroup.Text>Штук</InputGroup.Text>
             </InputGroup>
 
         </Modal.Body>

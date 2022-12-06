@@ -19,7 +19,7 @@ export default function RadioComponents() {
         PackagesWorker.updatePackages(localStorage.token);
         ChipTypeWorker.updateChipTypes(localStorage.token);
         TransistorTypeWorker.updateTransistorTypes(localStorage.token);
-    },[]);
+    }, []);
     
     return <>
         <DropDownCard name="Редагування радіокомпонентів">
@@ -86,48 +86,33 @@ const PackageEditor = () => {
     const [description, setDescription] = useState(null);
     
     useEffect(()=>{
-        var myHeaders = new Headers();
-        myHeaders.append("Authorization", `Bearer ${localStorage.token}`);
-        
-        var requestOptions = {
-            method: 'GET',
-            headers: myHeaders,
-            redirect: 'follow'
-        };
-    
-        fetch("/api/storage/packaging", requestOptions)
-            .then(response => response.ok ? response.json() : errorMessage('Не вдалося завантажити дані'))
-            .then(result => {
-                if(result != null){
-                    setPackages(result);
+        if(PackagesWorker.getPackages().length < 1){
+            PackagesWorker.updatePackages(localStorage.token)
+                .then(result =>{
+                    setPackages(PackagesWorker.getPackages());
                     setLoading(false);
-                }
-            })
-            .catch(error => console.log('error', error));
+                })
+        } else {
+            setPackages(PackagesWorker.getPackages());
+            setLoading(false);
+        }
     }, [])
 
     useEffect(()=>{
         if(needUpdate){
             setLoading(true);
-            var myHeaders = new Headers();
-            myHeaders.append("Authorization", `Bearer ${localStorage.token}`);
-            
-            var requestOptions = {
-                method: 'GET',
-                headers: myHeaders,
-                redirect: 'follow'
-            };
-        
-            fetch("/api/storage/packaging", requestOptions)
-                .then(response => response.ok ? response.json() : errorMessage('Не вдалося завантажити дані'))
-                .then(result => {
-                    if(result != null){
-                        setPackages(result);
+            if(PackagesWorker.getPackages().length < 1){
+                PackagesWorker.updatePackages(localStorage.token)
+                    .then(result =>{
+                        setPackages(PackagesWorker.getPackages());
                         setLoading(false);
                         setNeedUpdate(false);
-                    }
-                })
-                .catch(error => console.log('error', error));
+                    })
+            } else {
+                setPackages(PackagesWorker.getPackages());
+                setLoading(false);
+                setNeedUpdate(false);
+            }
         }
     }, [needUpdate] )
 
@@ -148,12 +133,16 @@ const PackageEditor = () => {
             </Form.Select>
             <Button variant='danger' onClick={(e)=>{
                 if(window.confirm("Ви впевнені що бажаєте видалити обраний тип корпусу ?")){
-                    PackagesWorker.removePackage(localStorage.token, id, errorMessage);
-                    setMessage(
-                        <Alert dismissible variant='success' onClose={clearMessage}> 
-                            Тип корпусу видалено
-                        </Alert>);
-                    setNeedUpdate(true);
+                    PackagesWorker.removePackage(localStorage.token, id, errorMessage)
+                        .then(result => {
+                            if(result){
+                                setMessage(
+                                    <Alert dismissible variant='success' onClose={clearMessage}> 
+                                        Тип корпусу видалено
+                                    </Alert>);
+                                setNeedUpdate(true);
+                            }
+                    });
                 }
             }}>Видалити</Button>
         </InputGroup>
@@ -169,12 +158,16 @@ const PackageEditor = () => {
                         errorMessage("Необхідно ввести назву нового типу корпусу");
                         return;
                     }
-                    PackagesWorker.addNewPackages(localStorage.token, name, description, errorMessage);
-                    setMessage(
-                        <Alert dismissible variant='success' onClose={clearMessage}> 
-                            Тип корпусу додано
-                        </Alert>);
-                    setNeedUpdate(true);
+                    PackagesWorker.addNewPackages(localStorage.token, name, description, errorMessage)
+                        .then(result => {
+                            if(result){
+                                setMessage(
+                                    <Alert dismissible variant='success' onClose={clearMessage}> 
+                                        Тип корпусу додано
+                                    </Alert>);
+                                setNeedUpdate(true);
+                            }
+                        });
                 }}>
                     Додати
                 </Button>
@@ -200,48 +193,27 @@ const TransistorTypeEditor = () => {
     const [name, setName] = useState(null);
     
     useEffect(()=>{
-        var myHeaders = new Headers();
-        myHeaders.append("Authorization", `Bearer ${localStorage.token}`);
-        
-        var requestOptions = {
-            method: 'GET',
-            headers: myHeaders,
-            redirect: 'follow'
-        };
-    
-        fetch("/api/storage/TransistorType", requestOptions)
-            .then(response => response.ok ? response.json() : errorMessage('Не вдалося завантажити дані'))
-            .then(result => {
-                if(result != null){
-                    setTransistorTypes(result);
+        if(TransistorTypeWorker.getTransistorTypes().length < 1){
+            TransistorTypeWorker.updateTransistorTypes(localStorage.token)
+                .then(() => {
+                    setTransistorTypes(TransistorTypeWorker.getTransistorTypes());
                     setLoading(false);
-                }
-            })
-            .catch(error => console.log('error', error));
-    })
+                });
+        } else {
+            setTransistorTypes(TransistorTypeWorker.getTransistorTypes());
+            setLoading(false);
+        }
+    }, [])
 
     useEffect(()=>{
         if(needUpdate){
             setLoading(true);
-            var myHeaders = new Headers();
-            myHeaders.append("Authorization", `Bearer ${localStorage.token}`);
-            
-            var requestOptions = {
-                method: 'GET',
-                headers: myHeaders,
-                redirect: 'follow'
-            };
-        
-            fetch("/api/storage/TransistorType", requestOptions)
-                .then(response => response.ok ? response.json() : errorMessage('Не вдалося завантажити дані'))
-                .then(result => {
-                    if(result != null){
-                        setTransistorTypes(result);
-                        setLoading(false);
-                        setNeedUpdate(false);
-                    }
-                })
-                .catch(error => console.log('error', error));
+            TransistorTypeWorker.updateTransistorTypes(localStorage.token)
+                .then(() => {
+                    setTransistorTypes(TransistorTypeWorker.getTransistorTypes());
+                    setLoading(false);
+                    setNeedUpdate(false);
+                });
         }
     }, [needUpdate] )
 
@@ -262,12 +234,16 @@ const TransistorTypeEditor = () => {
             </Form.Select>
             <Button variant='danger' onClick={(e)=>{
                 if(window.confirm("Ви впевнені що бажаєте видалити обраний тип транзистору?")){
-                    TransistorTypeWorker.removeTransistorType(localStorage.token, id, errorMessage);
-                    setMessage(
-                        <Alert dismissible variant='success' onClose={clearMessage}> 
-                            Тип транзистору видалено
-                        </Alert>);
-                    setNeedUpdate(true);
+                    TransistorTypeWorker.removeTransistorType(localStorage.token, id, errorMessage)
+                        .then(result =>{
+                            if(result){
+                                setMessage(
+                                    <Alert dismissible variant='success' onClose={clearMessage}> 
+                                        Тип транзистору видалено
+                                    </Alert>);
+                                setNeedUpdate(true);
+                            }
+                        })
                 }
             }}>Видалити</Button>
         </InputGroup>
@@ -312,48 +288,27 @@ const ChipTypeEditor = () => {
     const [name, setName] = useState(null);
     
     useEffect(()=>{
-        var myHeaders = new Headers();
-        myHeaders.append("Authorization", `Bearer ${localStorage.token}`);
-        
-        var requestOptions = {
-            method: 'GET',
-            headers: myHeaders,
-            redirect: 'follow'
-        };
-    
-        fetch("/api/storage/chiptype", requestOptions)
-            .then(response => response.ok ? response.json() : errorMessage('Не вдалося завантажити дані'))
-            .then(result => {
-                if(result != null){
-                    setChipTypes(result);
+        if(ChipTypeWorker.getChipTypes().length < 1){
+            ChipTypeWorker.updateChipTypes(localStorage.token)
+                .then(() => {
+                    setChipTypes(ChipTypeWorker.getChipTypes());
                     setLoading(false);
-                }
-            })
-            .catch(error => console.log('error', error));
-    })
+                });
+        } else {
+            setChipTypes(ChipTypeWorker.getChipTypes());
+            setLoading(false);
+        }
+    }, [])
 
     useEffect(()=>{
         if(needUpdate){
             setLoading(true);
-            var myHeaders = new Headers();
-            myHeaders.append("Authorization", `Bearer ${localStorage.token}`);
-            
-            var requestOptions = {
-                method: 'GET',
-                headers: myHeaders,
-                redirect: 'follow'
-            };
-        
-            fetch("/api/storage/chiptype", requestOptions)
-                .then(response => response.ok ? response.json() : errorMessage('Не вдалося завантажити дані'))
-                .then(result => {
-                    if(result != null){
-                        setChipTypes(result);
-                        setLoading(false);
-                        setNeedUpdate(false);
-                    }
-                })
-                .catch(error => console.log('error', error));
+            ChipTypeWorker.updateChipTypes(localStorage.token)
+                .then(() => {
+                    setChipTypes(ChipTypeWorker.getChipTypes());
+                    setLoading(false);
+                    setNeedUpdate(false);
+                });
         }
     }, [needUpdate] )
 
@@ -374,12 +329,15 @@ const ChipTypeEditor = () => {
             </Form.Select>
             <Button variant='danger' onClick={(e)=>{
                 if(window.confirm("Ви впевнені що бажаєте видалити обраний тип корпусу ?")){
-                    ChipTypeWorker.removeChipType(localStorage.token, id, errorMessage);
-                    setMessage(
-                        <Alert dismissible variant='success' onClose={clearMessage}> 
-                            Тип мікросхеми видалено
-                        </Alert>);
-                    setNeedUpdate(true);
+                    ChipTypeWorker.removeChipType(localStorage.token, id, errorMessage).then(result =>{
+                        if(result){
+                            setMessage(
+                                <Alert dismissible variant='success' onClose={clearMessage}> 
+                                    Тип мікросхеми видалено
+                                </Alert>);
+                            setNeedUpdate(true);
+                        }
+                    });
                 }
             }}>Видалити</Button>
         </InputGroup>
@@ -393,12 +351,15 @@ const ChipTypeEditor = () => {
                         errorMessage("Необхідно ввести назву нового типу мікросхеми");
                         return;
                     }
-                    ChipTypeWorker.addNewChipType(localStorage.token, name, errorMessage);
-                    setMessage(
-                        <Alert dismissible variant='success' onClose={clearMessage}> 
-                            Тип мікросхеми додано
-                        </Alert>);
-                    setNeedUpdate(true);
+                    ChipTypeWorker.addNewChipType(localStorage.token, name, errorMessage).then(result =>{
+                        if(result){
+                            setMessage(
+                                <Alert dismissible variant='success' onClose={clearMessage}> 
+                                    Тип мікросхеми додано
+                                </Alert>);
+                            setNeedUpdate(true);
+                        }
+                    });
                 }}>
                     Додати
                 </Button>

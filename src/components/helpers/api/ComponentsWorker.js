@@ -10,7 +10,7 @@ export class ChipTypeWorker{
         return this.#chipTypesMap.get(id);
     }
 
-    static updateChipTypes(token){
+    static async updateChipTypes(token){
         var myHeaders = new Headers();
         myHeaders.append("Authorization", `Bearer ${token}`);
 
@@ -20,20 +20,21 @@ export class ChipTypeWorker{
         redirect: 'follow'
         };
 
-        fetch("/api/storage/chiptype", requestOptions)
-        .then(response => response.ok && response.json())
-        .then(result => {
-            if(result != null){
-                this.#chipTypes = result;
-                result.map(item => 
-                    this.#chipTypesMap.set(item.id, item.name)
-                )
-            }
-        })
-        .catch(error => console.log('error', error));
+        let responce = await fetch("/api/storage/chiptype", requestOptions);
+
+        if(responce.ok){
+            let data = await responce.json();
+            this.#chipTypes = data;
+            data.map(item => 
+                this.#chipTypesMap.set(item.id, item.name)
+            )
+        } else {
+            let error = await responce.json();
+            console.error(error);
+        }
     }
 
-    static addNewChipType(token, name, errorFunc){
+    static async addNewChipType(token, name, errorFunc){
         var myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + token)
         myHeaders.append("Content-Type", "application/json");
@@ -49,38 +50,38 @@ export class ChipTypeWorker{
         redirect: 'follow'
         };
 
-        fetch("/api/storage/chiptype", requestOptions)
-        .then(response => {
-            if(response.ok){
-                return true
-            } else {
-                errorFunc(response.message ?? response.error ?? "Unknown error" );
-                return false;
-            }})
-        .then(result => result && this.updateChipTypes(token))
-        .catch(error => console.log('error', error));
+        let responce = await fetch("/api/storage/chiptype", requestOptions);
+
+        if(responce.ok){
+            await this.updateChipTypes(token);
+            return true
+        } else {
+            let error = await responce.json();
+            errorFunc(error.message ?? error.error ?? "Unknown error" );
+            return false;
+        }
     }
 
-    static removeChipType(token, id, errorFunc){
+    static async removeChipType(token, id, errorFunc){
         var myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + token);
 
         var requestOptions = {
-        method: 'DELETE',
-        headers: myHeaders,
-        redirect: 'follow'
+            method: 'DELETE',
+            headers: myHeaders,
+            redirect: 'follow'
         };
 
-        fetch("/api/storage/chiptype/" + id, requestOptions)
-        .then(response => {
-            if(response.ok){
-                return true
-            } else {
-                errorFunc(response.message ?? response.error ?? "Unknown error" );
-                return false;
-            }})
-        .then(result => result && this.updateChipTypes(token))
-        .catch(error => console.log('error', error));
+        let responce = await fetch("/api/storage/chiptype/" + id, requestOptions);
+
+        if(responce.ok){
+            await this.updateChipTypes(token);
+            return true
+        } else {
+            let error = await responce.json();
+            errorFunc(error.message ?? error.error ?? "Unknown error" );
+            return false;
+        }
     }
 }
 
@@ -97,7 +98,7 @@ export class TransistorTypeWorker{
         return this.#transistorTypesMap.get(id);
     }
 
-    static updateTransistorTypes(token){
+    static async updateTransistorTypes(token){
         var myHeaders = new Headers();
         myHeaders.append("Authorization", `Bearer ${token}`);
 
@@ -107,20 +108,21 @@ export class TransistorTypeWorker{
         redirect: 'follow'
         };
 
-        fetch("/api/storage/transistortype", requestOptions)
-        .then(response => response.ok && response.json())
-        .then(result => {
-            if(result != null){
-                this.#transistorTypes = result;
-                result.map(item => 
-                    this.#transistorTypesMap.set(item.id, item.name)
-                )
-            }
-        })
-        .catch(error => console.log('error', error));
+        let responce = await fetch("/api/storage/transistortype", requestOptions);
+        
+        if(responce.ok){
+            let data = await responce.json();
+            this.#transistorTypes = data;
+            data.map(item => 
+                this.#transistorTypesMap.set(item.id, item.name)
+            )
+        } else {
+            let error = await responce.json();
+            console.error(error);
+        }
     }
 
-    static addNewTransistorType(token, name, errorFunc){
+    static async addNewTransistorType(token, name, errorFunc){
         var myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + token)
         myHeaders.append("Content-Type", "application/json");
@@ -136,19 +138,18 @@ export class TransistorTypeWorker{
         redirect: 'follow'
         };
 
-        fetch("/api/storage/transistortype", requestOptions)
-        .then(response => {
-            if(response.ok){
-                return true
-            } else {
-                errorFunc(response.message ?? response.error ?? "Unknown error" );
-                return false;
-            }})
-        .then(result => result && this.updateTransistorTypes(token))
-        .catch(error => console.log('error', error));
+        let responce = await fetch("/api/storage/transistortype", requestOptions)
+        if(responce.ok){
+            await this.updateTransistorTypes(token);
+            return true
+        } else {
+            let error = await responce.json();
+            errorFunc(error.message ?? error.error ?? "Unknown error" );
+            return false;
+        }
     }
 
-    static removeTransistorType(token, id, errorFunc){
+    static async removeTransistorType(token, id, errorFunc){
         var myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + token);
 
@@ -158,16 +159,16 @@ export class TransistorTypeWorker{
         redirect: 'follow'
         };
     
-        fetch("/api/storage/transistortype/" + id, requestOptions)
-        .then(response => {
-            if(response.ok){
-                return true
-            } else {
-                errorFunc(response.message ?? response.error ?? "Unknown error" );
-                return false;
-            }})
-        .then(result => result && this.updateTransistorTypes(token))
-        .catch(error => console.log('error', error));
+        let responce = await fetch("/api/storage/transistortype/" + id, requestOptions)
+
+        if(responce.ok){
+            await this.updateTransistorTypes(token);
+            return true
+        } else {
+            let error = await responce.json();
+            errorFunc(error.message ?? error.error ?? "Unknown error" );
+            return false;
+        }
     }
 }
 
@@ -210,7 +211,7 @@ export class PackagesWorker{
         return true;
     }
 
-    static addNewPackages(token, name, description, errorFunc){
+    static async addNewPackages(token, name, description, errorFunc){
         var myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + token)
         myHeaders.append("Content-Type", "application/json");
@@ -227,19 +228,19 @@ export class PackagesWorker{
         redirect: 'follow'
         };
 
-        fetch("/api/storage/packaging", requestOptions)
-        .then(response => {
-            if(response.ok){
-                return true
-            } else {
-                errorFunc(response.message ?? response.error ?? "Unknown error" );
-                return false;
-            }})
-        .then(result => result && this.updatePackages(token))
-        .catch(error => console.log('error', error));
+        let responce = await fetch("/api/storage/packaging", requestOptions);
+        
+        if(responce.ok){
+            await this.updatePackages(token)
+            return true
+        } else {
+            let error = await responce.json();
+            errorFunc(error.message ?? error.error ?? "Unknown error" );
+            return false;
+        }
     }
 
-    static removePackage(token, id, errorFunc){
+    static async removePackage(token, id, errorFunc){
         var myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + token);
 
@@ -249,15 +250,16 @@ export class PackagesWorker{
         redirect: 'follow'
         };
         
-        fetch("/api/storage/packaging/" + id, requestOptions)
-        .then(response => {
-            if(response.ok){
-                return true
-            } else {
-                errorFunc(response.message ?? response.error ?? "Невідома помилка, перевірте чи використовується цей корпус в базі" );
-                return false;
-            }})
-        .then(result => result && this.updatePackages(token))
-        .catch(error => console.log('error', error));
+        let responce = await fetch("/api/storage/packaging/" + id, requestOptions);
+        
+        if(responce.ok){
+            await this.updatePackages(token)
+            return true
+        } else {
+            let error = await responce.json();
+            errorFunc(error.message ?? error.error ?? "Unknown error" );
+            return false;
+        }
+
     }
 } 

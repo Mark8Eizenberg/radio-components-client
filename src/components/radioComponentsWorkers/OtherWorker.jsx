@@ -65,15 +65,23 @@ export function OtherWorker() {
                 </thead>
                 <tbody>
                     {components.map(component =>
-                        <tr key={component.id} 
-                            onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage}
+                        <tr key={component.id}>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
                                 title={component.name}
-                        />)}}>
-                            <td>{component.id}</td>
-                            <td>{component.name}</td>
-                            <td>{component.packaging.name}</td>
-                            <td>{component.count}</td>
+                            />)}}>{component.id}</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.name}</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.packaging.name}</td>
+                            <td onClick={()=>{setMessage(
+                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                title={component.name}
+                            />)}}>{component.count}</td>
                             <td>
                                 <Button style={{ zIndex: '1000' }} variant='outline-danger' 
                                         onClick={ () => {if(window.confirm(`Видалити компонент: "${component.name}"?`))deleteOther(component.id)} }
@@ -113,7 +121,7 @@ export function OtherWorker() {
     </>
 }
 
-function OtherAddingModal({ onClose, onAdding }) {
+export function OtherAddingModal({ onClose, onAdding }) {
     const [show, setShow] = useState(true);
     const [message, setMessage] = useState(null);
 
@@ -121,6 +129,7 @@ function OtherAddingModal({ onClose, onAdding }) {
     const [packagingId, setPackaging] = useState(1);
     const [description, setDescriprion] = useState(null);
     const [notice, setNotice] = useState(null);
+    const [count, setCount] = useState(0);
 
     const close = () => setShow(false);
     const errorMessage = (error) => {
@@ -143,6 +152,7 @@ function OtherAddingModal({ onClose, onAdding }) {
             packagingId: packagingId,
             description: description,
             notice: notice,
+            count: count
         }
         
         addComponent(ComponentSelector.other, otherComponent, localStorage.token, errorMessage, (result)=>{
@@ -199,6 +209,25 @@ function OtherAddingModal({ onClose, onAdding }) {
                 <Form.Control as='textarea' onChange={(e) => {
                     setNotice(e.target.value);
                 }}/>
+            </InputGroup>
+
+            <InputGroup className="mb-3">
+                <InputGroup.Text >Кількість</InputGroup.Text>
+                <Form.Control
+                    placeholder="0"
+                    aria-label="Кількість"
+                    onChange={(e) => {
+                        if (!isNaN(e.target.value)) {
+                            setCount(Number(e.target.value));
+                        } else if (e.target.value.length == 0) {
+                            return;
+                        } else {
+                            errorMessage({message: 'Кількість може бути лише в чисельній формі'});
+                            e.target.value = 0;
+                        }
+                    }}
+                />
+                <InputGroup.Text>Штук</InputGroup.Text>
             </InputGroup>
 
         </Modal.Body>
