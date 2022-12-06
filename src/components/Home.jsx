@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Row, Col, Button, InputGroup, Form, ListGroup, Table, ListGroupItem, Alert } from 'react-bootstrap';
-import DropDownCard from './helpers/DropDownCard';
+import { 
+  Row, Col, Button, InputGroup, 
+  Form, ListGroup, Table, ListGroupItem, Alert, Container, Card 
+} from 'react-bootstrap';
 import { PackagesWorker } from './helpers/api/ComponentsWorker'
 import { 
   showAllActiveComponent, Components, 
@@ -9,6 +11,8 @@ import {
 } from './helpers/api/ComponentsEditorWorker'
 
 import ComponentViewer from './radioComponentsWorkers/ComponentViewer';
+import AddingsComponentModalWindow from './radioComponentsWorkers/AddingsComponent';
+import SliderRange from './helpers/SliderRange';
 
 export default function Home(){
   const [message, setMessage] = useState(null);  
@@ -16,122 +20,50 @@ export default function Home(){
   const [components, setComponents] = useState({});
   const [loading, setLoading] = useState(true);
 
-  const [usePackageFilter, setUsePackageFilter] = useState(false);
-  const [packageFilterId, setPackageFilterId] = useState(1);
-
   const populateFilterData = async ()=>{
     var result = {};
-    var sortedPackage = usePackageFilter ? Number(packageFilterId) : null;
-    if(window.document.getElementById('need-resistor')?.checked){
-      await showAllActiveComponent(Components.resistor, localStorage.token, 
-        (error)=>{console.log(error)}, 
-        (data)=>{
-          if(sortedPackage){
-            data = data.filter(e=>e.packaging.id === sortedPackage);
-            if(data.length < 1) return;
+    let workingComponent = document.getElementById('choosen-component')?.value ?? Components.resistor;
+  
+    await showAllActiveComponent(Components[workingComponent], localStorage.token, 
+      (error)=>{console.log(error)}, 
+      (data)=>{
+        if(document.getElementById('need-packaging-filter')?.checked){
+          let packageFilterId = Number(document.getElementById('filter-package')?.value ?? 1); 
+          data = data.filter((item)=>item.packaging.id === packageFilterId)
+        }
+
+        //Resistance filter
+        if(document.getElementById('resistance')?.checked ?? false){
+          let resistanceRange = {
+            from: ((document.getElementById('resistance-from')?.value ?? 0) * (document.getElementById('resistance-from-mult')?.value ?? 1)),
+            to: ((document.getElementById('resistance-to')?.value ?? 1) * (document.getElementById('resistance-to-mult')?.value ?? 1000000)),
           }
-          result.resistor = data;
-      });
-    }
-    if(window.document.getElementById('need-capacitor')?.checked){
-      await showAllActiveComponent(Components.capacitor, localStorage.token, 
-        (error)=>{console.log(error)}, 
-        (data)=>{
-          if(sortedPackage){
-            data = data.filter(e=>e.packaging.id === sortedPackage);
+
+          data = data.filter(item => item.resistance > resistanceRange.from && item.resistance < resistanceRange.to);
+        }
+
+        //Capacity filter 
+        if(document.getElementById('capacity')?.checked ?? false){
+          let capacityRange = {
+            from: ((document.getElementById('capacity-from')?.value ?? 0) * (document.getElementById('capacity-from-mult')?.value ?? 0.000001)),
+            to: ((document.getElementById('capacity-to')?.value ?? 1) * (document.getElementById('capacity-to-mult')?.value ?? 1000000)),
           }
-          if(data.length < 1) return;
-          result.capacitor = data;
-      });
-    }
-    if(window.document.getElementById('need-chip')?.checked){
-      await showAllActiveComponent(Components.chip, localStorage.token, 
-        (error)=>{console.log(error)}, 
-        (data)=>{
-          if(sortedPackage){
-            data = data.filter(e=>e.packaging.id === sortedPackage);
+
+          data = data.filter(item => item.capacity > capacityRange.from && item.capacity < capacityRange.to);
+        }
+
+        //Accurancy filter
+        if(document.getElementById('accurancy')?.checked ?? false){
+          let accurancyRange = {
+            from: document.getElementById('accurancy-from')?.value ?? 0,
+            to: document.getElementById('accurancy-to')?.value ?? 100,
           }
-          if(data.length < 1) return;
-          result.chip = data;
-      });
-    }
-    if(window.document.getElementById('need-diode')?.checked){
-      await showAllActiveComponent(Components.diode, localStorage.token, 
-        (error)=>{console.log(error)}, 
-        (data)=>{
-          if(sortedPackage){
-            data = data.filter(e=>e.packaging.id === sortedPackage);
-          }
-          if(data.length < 1) return;
-          result.diode = data;
-      });
-    }
-    if(window.document.getElementById('need-optocouple')?.checked){
-      await showAllActiveComponent(Components.optocouple, localStorage.token, 
-        (error)=>{console.log(error)}, 
-        (data)=>{
-          if(sortedPackage){
-            data = data.filter(e=>e.packaging.id === sortedPackage);
-          }
-          if(data.length < 1) return;
-          result.optocouple = data;
-      });
-    }
-    if(window.document.getElementById('need-quartz')?.checked){
-      await showAllActiveComponent(Components.quartz, localStorage.token, 
-        (error)=>{console.log(error)}, 
-        (data)=>{
-          if(sortedPackage){
-            data = data.filter(e=>e.packaging.id === sortedPackage);
-          }
-          if(data.length < 1) return;
-          result.quartz = data;
-      });
-    }
-    if(window.document.getElementById('need-stabilizer')?.checked){
-      await showAllActiveComponent(Components.stabilizer, localStorage.token, 
-        (error)=>{console.log(error)}, 
-        (data)=>{
-          if(sortedPackage){
-            data = data.filter(e=>e.packaging.id === sortedPackage);
-          }
-          if(data.length < 1) return;
-          result.stabilizer = data;
-      });
-    }
-    if(window.document.getElementById('need-transistor')?.checked){
-      await showAllActiveComponent(Components.transistor, localStorage.token, 
-        (error)=>{console.log(error)}, 
-        (data)=>{
-          if(sortedPackage){
-            data = data.filter(e=>e.packaging.id === sortedPackage);
-          }
-          if(data.length < 1) return;
-          result.transistor = data;
-      });
-    }
-    if(window.document.getElementById('need-zenerDiode')?.checked){
-      await showAllActiveComponent(Components.zenerDiode, localStorage.token, 
-        (error)=>{console.log(error)}, 
-        (data)=>{
-          if(sortedPackage){
-            data = data.filter(e=>e.packaging.id === sortedPackage);
-          }
-          if(data.length < 1) return;
-          result.zenerDiode = data;
-      });
-    }
-    if(window.document.getElementById('need-other')?.checked){
-      await showAllActiveComponent(Components.other, localStorage.token, 
-        (error)=>{console.log(error)}, 
-        (data)=>{
-          if(sortedPackage){
-            data = data.filter(e=>e.packaging.id === sortedPackage);
-          }
-          if(data.length < 1) return;
-          result.other = data;
-      });
-    }
+
+          data = data.filter(item => item.accuracy >= accurancyRange.from && item.accuracy <= accurancyRange.to);
+        }
+
+        result = data;
+    });
     return result;
   }
 
@@ -180,16 +112,17 @@ export default function Home(){
                   <th>#</th>
                   <th>Id</th>
                   <th>назва</th>
-                  {components[0].frequency != null && <th>Частота</th>}
-                  {components[0].resistance != null && <th>Опір</th>}
-                  {components[0].capacity != null && <th>Ємність</th>}
-                  {components[0].chipType != null && <th>Тип мікросхеми</th>}
-                  {components[0].voltage != null && <th>Напруга</th>}
-                  {components[0].transistorType != null && <th>Тип транзистора</th>}
-                  {components[0].accuracy != null && <th>Точність</th>}
-                  <th>Пакування</th>
+                  {components[0]?.frequency != null && <th>Частота</th>}
+                  {components[0]?.resistance != null && <th>Опір</th>}
+                  {components[0]?.capacity != null && <th>Ємність</th>}
+                  {components[0]?.chipType != null && <th>Тип мікросхеми</th>}
+                  {components[0]?.powerRating != null && <th>Потужність</th>}
+                  {components[0]?.voltage != null && <th>Напруга</th>}
+                  {components[0]?.transistorType != null && <th>Тип транзистора</th>}
+                  {components[0]?.accuracy != null && <th>Точність</th>}
+                  <th>Корпус</th>
                   <th>Кількість</th>
-                  <th>Покласти</th>
+                  <th>Додати</th>
                   <th>Взяти</th>
                 </tr>
               </thead>
@@ -197,37 +130,40 @@ export default function Home(){
                 {components.map((item, index)=>{
                   return <tr key={item.id}>
                   <td onClick={()=>{
-                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name}/>)}
+                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={useFilter}/>)}
                   }>{index}</td>
                   <td onClick={()=>{
-                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name}/>)}
+                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={useFilter}/>)}
                   }>{item.id}</td>
                   <td onClick={()=>{
-                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name}/>)}
+                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={useFilter}/>)}
                   }>{item.name}</td>
-                  {components[0].frequency != null && <td onClick={()=>{
-                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name}/>)}
+                  {components[0]?.frequency != null && <td onClick={()=>{
+                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={useFilter}/>)}
                   }>{HzToReadeble(item.frequency)}</td>}
-                  {components[0].resistance != null && <td onClick={()=>{
-                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name}/>)}
+                  {components[0]?.resistance != null && <td onClick={()=>{
+                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={useFilter}/>)}
                   }>{OmToReadeble(item.resistance)}</td>}
-                  {components[0].capacity != null && <td onClick={()=>{
-                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name}/>)}
+                  {components[0]?.capacity != null && <td onClick={()=>{
+                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={useFilter}/>)}
                   }>{microFaradToReadeble(item.capacity)}</td>}
-                  {components[0].chipType != null && <td onClick={()=>{
-                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name}/>)}
+                  {components[0]?.chipType != null && <td onClick={()=>{
+                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={useFilter}/>)}
                   }>{item.chipType.name}</td>}
-                  {components[0].voltage != null && <td onClick={()=>{
-                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name}/>)}
+                  {components[0]?.powerRating != null && <td onClick={()=>{
+                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={useFilter}/>)}
+                  }>{item.powerRating}</td>}
+                  {components[0]?.voltage != null && <td onClick={()=>{
+                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={useFilter}/>)}
                   }>{item.voltage}</td>}
-                  {components[0].transistorType != null && <td onClick={()=>{
-                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name}/>)}
+                  {components[0]?.transistorType != null && <td onClick={()=>{
+                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={useFilter}/>)}
                   }>{item.transistorType.name}</td>}
-                  {components[0].accuracy != null && <td onClick={()=>{
-                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name}/>)}
+                  {components[0]?.accuracy != null && <td onClick={()=>{
+                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={useFilter}/>)}
                   }>{item.accuracy}</td>}
                   <td onClick={()=>{
-                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name}/>)}
+                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={useFilter}/>)}
                   }>{item.packaging.name}</td>
                   <td>{item.count}</td>
                   <td><Button className='w-100' variant='outline-success' onClick={()=>{addComponent(item.id)}}>+</Button></td>
@@ -240,57 +176,140 @@ export default function Home(){
   const showComponents = (components)=>{
     return <>
       <ListGroup>
-        {components.resistor && <>
-          <ListGroupItem variant='primary'>Резистори</ListGroupItem>
-          {componentsToTable(components.resistor)}
-        </>}
-        {components.capacitor && <>
-          <ListGroupItem variant='primary'>Конденсатори</ListGroupItem>
-          {componentsToTable(components.capacitor)}
-        </>}
-        {components.chip && <>
-          <ListGroupItem variant='primary'>Мікросхеми</ListGroupItem>
-          {componentsToTable(components.chip)}
-        </>}
-        {components.diode && <>
-          <ListGroupItem variant='primary'>Діоди</ListGroupItem>
-          {componentsToTable(components.diode)}
-        </>}
-        {components.optocouple && <>
-          <ListGroupItem variant='primary'>Оптопари</ListGroupItem>
-          {componentsToTable(components.optocouple)}
-        </>}
-        {components.quartz && <>
-          <ListGroupItem variant='primary'>Кварци</ListGroupItem>
-          {componentsToTable(components.quartz)}
-        </>}
-        {components.stabilizer && <>
-          <ListGroupItem variant='primary'>Стабілізатори</ListGroupItem>
-          {componentsToTable(components.stabilizer)}
-        </>}
-        {components.transistor && <>
-          <ListGroupItem variant='primary'>Транзистори</ListGroupItem>
-          {componentsToTable(components.transistor)}
-        </>}
-        {components.zenerDiode && <>
-          <ListGroupItem variant='primary'>Стабілітрони</ListGroupItem>
-          {componentsToTable(components.zenerDiode)}
-        </>}
-        {components.other && <>
-          <ListGroupItem variant='primary'>Інше</ListGroupItem>
-          {componentsToTable(components.other)}
-        </>}
+          
+          {componentsToTable(components)}
+          <Button variant='success' className='w-100' onClick={()=>{
+            let workingComponent = document.getElementById('choosen-component')?.value ?? Components.resistor;
+            setMessage(<AddingsComponentModalWindow component={workingComponent} onAdd={()=>{
+              setMessage(<Alert dismissible variant='success' onClose={()=>{
+                setMessage(null)
+              }}>Додано новий компонент</Alert>)
+              populateFilterData().then(result => setComponents(result));
+            }} onClose={()=>{
+              setMessage(null);
+            }} />)
+          }}>Додати новий компонент</Button>
       </ListGroup>
     </>
   }
 
-  useEffect(()=>{
-    PackagesWorker.updatePackages(localStorage.token).then(result => {setLoading(false)});
-  }, [])
+  const renderFilters = () => {
+    let workingComponent = document.getElementById('choosen-component')?.value ?? Components.resistor;
+    switch(workingComponent){
+      case Components.resistor:
+        return <>
+        <ListGroupItem variant='info'>
+          <input type='checkbox' id='resistance' onChange={useFilter}/>
+          <em className='p-3'>Опір</em>
+        </ListGroupItem>
+        {document.getElementById('resistance')?.checked && <ListGroupItem>
+          <InputGroup className='mb-1'>
+            <InputGroup.Text>З</InputGroup.Text>
+            <Form.Control id='resistance-from' onChange={useFilter} defaultValue={0}/>
+            <Form.Select defaultValue={1} id='resistance-from-mult' onChange={useFilter}>
+              <option value={1}>Om</option>
+              <option value={1000}>kOm</option>
+              <option value={1000000}>MOm</option>
+            </Form.Select>
+          </InputGroup>
+          <InputGroup>
+            <InputGroup.Text>По</InputGroup.Text>
+            <Form.Control id='resistance-to' onChange={useFilter} defaultValue={1000}/>
+            <Form.Select defaultValue={1000000} id='resistance-to-mult' onChange={useFilter}>
+              <option value={1}>Om</option>
+              <option value={1000}>kOm</option>
+              <option value={1000000}>MOm</option>
+            </Form.Select>
+          </InputGroup>
+        </ListGroupItem>}
+        <ListGroupItem variant='info'>
+          <input type='checkbox' id='accurancy' onChange={useFilter}/>
+          <em className='p-3'>Точність</em>
+        </ListGroupItem>
+        {document.getElementById('accurancy')?.checked && <ListGroupItem>
+          <input type={'number'} style={{visibility: 'hidden', position: 'absolute'}} id='accurancy-from'/>
+          <input type={'number'} style={{visibility: 'hidden', position: 'absolute'}} id='accurancy-to'/>
+          <SliderRange min={0} max={100} onChange={(range)=>{
+            const accuracyFrom = document.getElementById('accurancy-from');
+            const accuracyTo = document.getElementById('accurancy-to');
+
+            if(accuracyFrom){
+              accuracyFrom.value = range.min;
+            }
+
+            if(accuracyTo){
+              accuracyTo.value = range.max;
+            }
+
+            populateFilterData().then(result => setComponents(result));
+          }}/>
+        </ListGroupItem>}
+        </>
+      case Components.capacitor:
+        return <>
+        <ListGroupItem variant='info'>
+          <input type='checkbox' id='capacity' onChange={useFilter}/>
+          <em className='p-3'>Ємність</em>
+        </ListGroupItem>
+        {document.getElementById('capacity')?.checked && <ListGroupItem>
+          <InputGroup className='mb-1'>
+            <InputGroup.Text>З</InputGroup.Text>
+            <Form.Control id='capacity-from' onChange={useFilter} defaultValue={0}/>
+            <Form.Select defaultValue={0.000001} id='capacity-from-mult' onChange={useFilter}>
+              <option value={1000000}>F</option>
+              <option value={1000}>mF</option>
+              <option value={1}>µF</option>
+              <option value={0.001}>nF</option>
+              <option value={0.000001}>pF</option>
+            </Form.Select>
+          </InputGroup>
+          <InputGroup>
+            <InputGroup.Text>По</InputGroup.Text>
+            <Form.Control id='capacity-to' onChange={useFilter} defaultValue={1000}/>
+            <Form.Select defaultValue={1000000} id='capacity-to-mult' onChange={useFilter}>
+            <option value={1000000}>F</option>
+              <option value={1000}>mF</option>
+              <option value={1}>µF</option>
+              <option value={0.001}>nF</option>
+              <option value={0.000001}>pF</option>
+            </Form.Select>
+          </InputGroup>
+        </ListGroupItem>}
+        <ListGroupItem variant='info'>
+          <input type='checkbox' id='accurancy' onChange={useFilter}/>
+          <em className='p-3'>Точність</em>
+        </ListGroupItem>
+        {document.getElementById('accurancy')?.checked && <ListGroupItem>
+          <input type={'number'} style={{visibility: 'hidden', position: 'absolute'}} id='accurancy-from'/>
+          <input type={'number'} style={{visibility: 'hidden', position: 'absolute'}} id='accurancy-to'/>
+          <SliderRange min={0} max={100} onChange={(range)=>{
+            const accuracyFrom = document.getElementById('accurancy-from');
+            const accuracyTo = document.getElementById('accurancy-to');
+
+            if(accuracyFrom){
+              accuracyFrom.value = range.min;
+            }
+
+            if(accuracyTo){
+              accuracyTo.value = range.max;
+            }
+
+            populateFilterData().then(result => setComponents(result));
+          }}/>
+        </ListGroupItem>}
+        </>
+      default:
+        return <></>
+    }
+  }
 
   useEffect(()=>{
-    populateFilterData().then(result => setComponents(result));
-  },[usePackageFilter, packageFilterId]);
+    PackagesWorker.updatePackages(localStorage.token);
+    populateFilterData().then(result => {
+      setComponents(result);
+      setLoading(false);
+    });
+  }, [])
 
   return loading ? 
   <>
@@ -299,141 +318,51 @@ export default function Home(){
   </> : 
   <>
     {message}
-    <Row>
-      <InputGroup>
-        <InputGroup.Text>Компонент</InputGroup.Text>
-        <Form.Select>
-          <option>Резистори</option>
-          <option>Транзистори</option>
-          <option>Мікросхеми</option>
-        </Form.Select>
-      </InputGroup>
-    </Row>
+    <InputGroup className='mb-3'>
+      <Form.Select defaultValue={Components.resistor} id='choosen-component' size='lg'>
+        <option value={Components.resistor}>Резистори</option>
+        <option value={Components.capacitor}>Конденсатори</option>
+        <option value={Components.chip}>Мікросхеми</option>
+        <option value={Components.diode}>Діоди</option>
+        <option value={Components.optocouple}>Оптопари</option>
+        <option value={Components.other}>Інше</option>
+        <option value={Components.quartz}>Кварци</option>
+        <option value={Components.stabilizer}>Стабілізатори</option>
+        <option value={Components.transistor}>Транзистори</option>
+        <option value={Components.zenerDiode}>Стабілітрони</option>
+      </Form.Select>
+      <Button onClick={useFilter}>Обрати</Button>
+    </InputGroup>
     <Row className='justify-content-center'>
       <Col md={4} lg={3} className="mb-1">
-        <DropDownCard name={"Фільтри пошуку"} show >
-        <Form.Label>Тип компонентів</Form.Label>
-          <ListGroup className='mb-3'>
-            <ListGroup.Item>
-              <Row>
-                <Col>
-                  <input type="checkbox" id='need-resistor' onChange={useFilter} />
-                </Col>
-                <Col>
-                  <em>Резистори</em>
-                </Col>
-              </Row>
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <Row>
-                <Col>
-                  <input type="checkbox" id='need-capacitor' onChange={useFilter}/>
-                </Col>
-                <Col>
-                  <em>Конденсатори</em>
-                </Col>
-              </Row>
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <Row>
-                <Col>
-                  <input type="checkbox" id='need-chip' onChange={useFilter}/>
-                </Col>
-                <Col>
-                  <em>Мікросхеми</em>
-                </Col>
-              </Row>
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <Row>
-                <Col>
-                  <input type="checkbox" id='need-diode' onChange={useFilter}/>
-                </Col>
-                <Col>
-                  <em>Діоди</em>
-                </Col>
-              </Row>
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <Row>
-                <Col>
-                  <input type="checkbox" id='need-optocouple' onChange={useFilter}/>
-                </Col>
-                <Col>
-                  <em>Оптопари</em>
-                </Col>
-              </Row>
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <Row>
-                <Col>
-                  <input type="checkbox" id='need-quartz' onChange={useFilter}/>
-                </Col>
-                <Col>
-                  <em>Кварци</em>
-                </Col>
-              </Row>
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <Row>
-                <Col>
-                  <input type="checkbox" id='need-stabilizer' onChange={useFilter}/>
-                </Col>
-                <Col>
-                  <em>Стабілізатори</em>
-                </Col>
-              </Row>
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <Row>
-                <Col>
-                  <input type="checkbox" id='need-transistor' onChange={useFilter}/>
-                </Col>
-                <Col>
-                  <em>Транзистори</em>
-                </Col>
-              </Row>
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <Row>
-                <Col>
-                  <input type="checkbox" id='need-zenerDiode' onChange={useFilter}/>
-                </Col>
-                <Col>
-                  <em>Стабілітрони</em>
-                </Col>
-              </Row>
-            </ListGroup.Item>
-            <ListGroup.Item>
-              <Row>
-                <Col>
-                  <input type="checkbox" id='need-other' onChange={useFilter}/>
-                </Col>
-                <Col>
-                  <em>Інше</em>
-                </Col>
-              </Row>
-            </ListGroup.Item>
+      <ListGroup>
+            <ListGroupItem variant='info'>
+              <input type='checkbox' id='need-packaging-filter' onChange={useFilter}/>
+              <em className='p-3'>Тип корпусу</em>
+            </ListGroupItem>
+            {document.getElementById('need-packaging-filter')?.checked && <ListGroupItem>
+              <InputGroup>
+                <Form.Select 
+                  defaultValue={PackagesWorker.getPackages()[0]?.id} 
+                  id='filter-package' 
+                  onChange={useFilter}
+                >
+                  {PackagesWorker.getPackages().map((item)=>
+                    <option key={item.id} value={item.id}>{item.name}</option>
+                  )}
+                </Form.Select>
+              </InputGroup>
+            </ListGroupItem>}
+            {renderFilters()}
+            
           </ListGroup>
-          <Form.Label>Тип корпусу</Form.Label>
-          <InputGroup className='mb-3'>
-            <InputGroup.Checkbox onChange={(e)=>{
-              setUsePackageFilter(e.target.checked);
-            }}/>
-            <Form.Select onChange={e=>{
-                setPackageFilterId(e.target.value);
-              }}>
-              {PackagesWorker.getPackages().map((item) => 
-                <option key={item.id} value={item.id}>{`#${item.id}|${item.name}`}</option>
-              )}
-            </Form.Select>
-          </InputGroup>
-          <Button className='w-100' variant='outline-success' onClick={useFilter}>Use filters</Button>
-        </DropDownCard>
       </Col>
       <Col md={8} lg={9}>
-        {Object.entries(components).length > 0 ? showComponents(components) : <em>Не знайдено компонентів за даним фільтром</em>}
+        {Object.entries(components).length > 0 ? showComponents(components) : 
+          <ListGroup>
+            <ListGroupItem><em>Не знайдено компонентів за даним фільтром</em></ListGroupItem>
+          </ListGroup>}
       </Col>
     </Row>
-  </>
+  </> 
 }
