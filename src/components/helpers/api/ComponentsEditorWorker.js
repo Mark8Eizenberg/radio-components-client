@@ -68,15 +68,13 @@ export async function removeComponent(component, id, token, errorFunc, okFunc){
 
     let result = await fetch(`/api/storage/${Components[component]}/delete/${id}`, requestOptions);
     
-    if(result.ok){
-        var data = await result.json();
-        okFunc(data);
-    } else {
+    if(!result.ok){
         var error = await result.json();
         errorFunc(error);
         return false;
     }
 
+    okFunc();
     return true;
 }
 

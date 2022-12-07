@@ -78,7 +78,9 @@ export default function ComponentViewer({id, onClose, title, enableEditor=true, 
                 return false;
             }
             if(key === 'frequency' || key === 'resistance' || key === 'capacity'){
-                newInfo *= document.getElementById('converter-number')?.value;
+                const valueEnterElement = document.getElementById('converter-number');
+                newInfo *= valueEnterElement?.value;
+
             }
             newOBject[key] = newInfo;
             return true;
@@ -250,7 +252,7 @@ export default function ComponentViewer({id, onClose, title, enableEditor=true, 
             </Modal.Body>
             <Modal.Footer>
                 {enableEditor && editorMode && <Button variant='success' onClick={saveEditComponent}>Зберегти зміни</Button>}
-                <Button onClick={close}>Закрити</Button>
+                <Button onClick={close} variant="danger">Закрити</Button>
             </Modal.Footer>
         </Modal>
     </>

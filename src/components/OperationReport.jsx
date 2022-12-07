@@ -14,7 +14,16 @@ const translateOperation = {
     Remove: 'Взято зі складу',
     Add : 'Додано в склад',
     Create: 'Створення',
-    Delete: 'Видалення'
+    Delete: 'Видалення',
+    Edit: 'Редагування'
+}
+
+const colorShemaOperation = {
+    Remove: 'rgb(249 156 156)',
+    Add : 'rgb(156 249 221)',
+    Create: 'rgb(255 245 173)',
+    Delete: 'rgb(255 245 173)',
+    Edit: 'rgb(143 165 247)'
 }
 
 export default class OperationReport extends Component {
@@ -91,7 +100,7 @@ export default class OperationReport extends Component {
     }
 
     static showReportsTable(reports) {
-        return reports && (<Table striped bordered hover responsive>
+        return reports && (<Table bordered hover responsive>
             <thead>
                 <tr>
                     <th>Id</th>
@@ -104,7 +113,7 @@ export default class OperationReport extends Component {
             </thead>
             <tbody>
             {reports.map((operation) =>
-                <tr key={operation.id}>
+                <tr key={operation.id} style={{background: colorShemaOperation[operation.operationType] ?? '#eee'}}>
                     <td>{operation.id}</td>
                     <td>{operation.user?.fullName ?? "Невідомий"}</td>
                     <td>{translateOperation[operation.operationType] ?? operation.operationType }</td>
@@ -154,11 +163,11 @@ export default class OperationReport extends Component {
         return this.state.totalPages > 1 ? (<ButtonGroup className="me-2">
             <Button disabled={this.state.page === 0} onClick={() => {
                 this.populateReports(this.state.page - 1);
-            }} variant="info">Попередня</Button>
+            }} variant="info">{"<<"}</Button>
             {pages.map(p => <Button disabled={p.disable || this.state.page === p.id } key={p.id} onClick={p.callback} variant={p.variant}>{p.content}</Button>) }
             <Button disabled={this.state.page + 1 >= this.state.totalPages} onClick={() => {
                 this.populateReports(this.state.page + 1);
-            }} variant="info">Наступна</Button>
+            }} variant="info">{">>"}</Button>
         </ButtonGroup>) : null
     }
 

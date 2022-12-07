@@ -201,7 +201,7 @@ export function ResistorAddingModal({ onClose, onAdding }) {
         <Modal.Body>
             {message}
             <InputGroup className="mb-3">
-                <InputGroup.Text id="resistance-number">Резистивність</InputGroup.Text>
+                <InputGroup.Text id="resistance-number">Опір</InputGroup.Text>
                 <Form.Control
                     aria-label="resistance"
                     aria-describedby="resistance-number"

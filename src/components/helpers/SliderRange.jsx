@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './SliderRange.css';
 
-export default function SliderRange({min, max, onChange}){
+export default function SliderRange({min, max, minId, maxId, onChange}){
     const [_min, setMin] = useState(min);
     const [_max, setMax] = useState(max);
 
@@ -18,6 +18,7 @@ export default function SliderRange({min, max, onChange}){
                 <p className='--slider-label'>Min:</p>
                 <p className='--slider-label'>{_min}</p>
                 <input type={"range"}
+                    id={minId}
                     min={min}
                     max={max}
                     defaultValue={min}
@@ -37,6 +38,7 @@ export default function SliderRange({min, max, onChange}){
                 <p className='--slider-label'>{_max}</p>
                 <input type={"range"}
                     ref={maxRangeInput}
+                    id={maxId}
                     min={min}
                     max={max}
                     defaultValue={max}
