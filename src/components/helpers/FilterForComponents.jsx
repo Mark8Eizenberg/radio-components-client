@@ -16,7 +16,7 @@ function ResistorFilter({onChange, components}){
             accuracy: [],
             powerRating: [],
         }
-
+        
         components.map(item=>{
             variants.packaging.push(item.packaging.id);
             variants.resistance.push(item.resistance);
@@ -128,6 +128,38 @@ function ResistorFilter({onChange, components}){
                                             newAccuracy.splice(indexOfElement, 1);
                                         }
                                         return {...prevFilters, accuracy: newAccuracy};
+                                    })
+                                }
+                            })}/>
+                        {item}
+                    </ListGroupItem>)}
+                </ListGroup>
+            </ListGroupItem>}
+
+            <ListGroupItem variant="info">
+                <input type={'checkbox'}
+                    onChange={event=>{
+                        setFilters(prevFilters => ({...prevFilters, powerRating: (event.target.checked ? [] : null)}))
+                    }}
+                    style={{marginRight: '4px'}}/>
+                Потужність
+            </ListGroupItem>
+            {filters.powerRating && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+                <ListGroup>
+                    {variation.powerRating.map((item, index)=><ListGroupItem key={index}>
+                        <input type={'checkbox'} 
+                            style={{marginRight: '4px'}}
+                            onChange={(event=>{
+                                if(event.target.checked){
+                                    setFilters(prevFilters => ({...prevFilters, powerRating: [...prevFilters.powerRating, item]}))
+                                } else{
+                                    setFilters(prevFilters => {
+                                        var newData = prevFilters.powerRating;
+                                        const indexOfElement = newData.indexOf(item);
+                                        if(indexOfElement !== -1){
+                                            newData.splice(indexOfElement, 1);
+                                        }
+                                        return {...prevFilters, powerRating: newData};
                                     })
                                 }
                             })}/>

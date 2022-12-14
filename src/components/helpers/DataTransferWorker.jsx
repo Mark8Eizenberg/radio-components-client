@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from "react";
-import { Alert, Button, Col, Form, InputGroup, Row, Table } from "react-bootstrap";
-import { Components } from "./api/ComponentsEditorWorker";
+import { Alert, Button, Col, Form, InputGroup, ProgressBar, Row, Table } from "react-bootstrap";
+import { addComponent, Components } from "./api/ComponentsEditorWorker";
+import { PackagesWorker } from "./api/ComponentsWorker";
+import { HzToReadeble, OmToReadeble, microFaradToReadeble } from "./api/ComponentsEditorWorker";
 import "./DataTransferWorker.css"
 
 function ReadCSV({onRead, onClose}){
@@ -130,12 +132,62 @@ function ParsePercent(percent){
     return null;
 }
 
+function ComponentsToTable({components, onClose}){
+    var result = null;
+    try {
+        result = <Table striped bordered hover responsive>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>назва</th>
+            {components[0]?.frequency != null && <th>Частота</th>}
+            {components[0]?.current != null && <th>Струм</th>}
+            {components[0]?.resistance != null && <th>Опір</th>}
+            {components[0]?.capacity != null && <th>Ємність</th>}
+            {components[0]?.chipType != null && <th>Тип мікросхеми</th>}
+            {components[0]?.powerRating != null && <th>Потужність</th>}
+            {components[0]?.voltage != null && <th>Напруга</th>}
+            {components[0]?.transistorType != null && <th>Тип транзистора</th>}
+            {components[0]?.accuracy != null && <th>Точність</th>}
+            <th>Корпус</th>
+            <th>Кількість</th>
+          </tr>
+        </thead>
+        <tbody>
+          {components.map((item, index)=>{
+            return <tr key={index}>
+            <td>{index}</td>
+            <td>{item.name}</td>
+            {components[0]?.frequency != null && <td  >{HzToReadeble(item.frequency)}</td>}
+             {components[0]?.current != null && <td  >{HzToReadeble(item.current)}</td>}
+            {components[0]?.resistance != null && <td  >{OmToReadeble(item.resistance)}</td>}
+            {components[0]?.capacity != null && <td  >{microFaradToReadeble(item.capacity)}</td>}
+            {components[0]?.chipType != null && <td  >{item.chipType.name}</td>}
+            {components[0]?.powerRating != null && <td  >{item.powerRating}</td>}
+            {components[0]?.voltage != null && <td  >{item.voltage}</td>}
+            {components[0]?.transistorType != null && <td  >{item.transistorType.name}</td>}
+            {components[0]?.accuracy != null && <td  >{item.accuracy}</td>}
+            <td  >{item.packaging}</td>
+            <td>{item.count}</td>
+          </tr>})}
+        </tbody>
+      </Table>
+    } catch (error) {
+        result = <Alert dismissible variant="danger" onClose={onClose}>Помилка при спробі вивести компоненти</Alert>
+    }
+    return result;
+  }
+
 function ResistorImport({onClose}){
-    const [dataFromFile, setDateFromFiles] = useState(null);
-    const [resistorArray, setResistorArray] = useState(null)
+    const [dataFromFile, setDataFromFiles] = useState(null);
+    const [componentsArray, setComponentsArray] = useState(null)
 
     const [message, setMessage] = useState(null);
     const clearMessage = ()=>setMessage(null);
+
+    const loadingRef = useRef(null);
+    const progressBarRef = useRef(null);
+    const progressBarMessageRef = useRef(null);
 
     function ParseOm(OmString){
         if(!OmString) return null;
@@ -168,38 +220,296 @@ function ResistorImport({onClose}){
         }
     }
 
+    async function importData(){
+        function setProggress(progress){
+            if(progressBarRef.current && progressBarMessageRef.current){
+                progressBarRef.current.firstChild.ariaValueNow = progress;
+                progressBarRef.current.firstChild.style.width = `${progress}%`;
+                progressBarMessageRef.current.textContent = `Імпортовано ${progress}%`
+            }
+        }
+        if(loadingRef.current && progressBarRef.current){
+            loadingRef.current.style.display = 'flex'
+
+            setProggress(0);
+
+            const uniquePackaging = [...new Set(componentsArray.map(o=>o.packaging))];
+            
+            await PackagesWorker.updatePackages(localStorage.token);
+
+            uniquePackaging.filter(p => !PackagesWorker.getPackages().map(pack => pack.name).includes(p)).map(async p => 
+                await PackagesWorker.addNewPackages(localStorage.token, p, p, (error)=>{console.error(error)})
+            );
+            
+            componentsArray.map(c => 
+                c.packagingId = PackagesWorker.getPackages().filter(p => p.name === c.packaging)[0]?.id ?? 1
+            )
+            
+            
+            let errors = '';
+            function addError(error){
+                errors += error;
+            }
+            
+            for(var i = 0; i < componentsArray.length; i++){
+                const numOfComponent = i;
+                const currentComponent = componentsArray[i];
+                await addComponent(Components.resistor , currentComponent, localStorage.token, (error) => {
+                    addError(`Помилка імпорту компоненту №${numOfComponent} !\n`);
+                }, ()=>{});
+                setProggress(i / componentsArray.length * 100);
+            }
+            
+            let message = errors === '' ? 
+            "Дані успішно імпортовано. Ви можете продовжити імпорт, або ж завершити роботу з ним" :
+            "Виникли поммилки при імпорті:\n" + errors;
+            
+            setMessage(<Alert dismissible variant={errors==='' ? "success" : "warning"} onClose={clearMessage}>{message}</Alert>);
+            setComponentsArray(null);
+            loadingRef.current.style.display = 'none'
+        }       
+    }
+
     useEffect(()=>{
         if(dataFromFile){
-            var data =  dataFromFile.map(o => {
-                return {
-                    resistance: ParseOm(o[0]),
-                    accurancy: ParsePercent(o[2]),
-                    packaging: o[1],
-                    powerRating: o[2] ? Number(o[3].replace(',', '.')) : null,
-                    count: o[4] ? Number(o[4].replace(',', '.')) : null,
-                    name: o[0] + '_' + o[1] + '_' + o[2]
-                }
-            });
-            const uniquePackaging = [...new Set(data.map(o=>o.packaging))];
-            //TODO: Check packaging by name
-            debugger;
+            try {
+                const components = dataFromFile.map(o => {
+                    return {
+                        resistance: ParseOm(o[0]),
+                        accurancy: ParsePercent(o[2]),
+                        packaging: o[1],
+                        powerRating: o[2] ? Number(o[3].replace(',', '.')) : null,
+                        count: o[4] ? Number(o[4].replace(',', '.')) : null,
+                        name: o[0] + '_' + o[1] + '_' + o[2]
+                    }
+                })
+                setComponentsArray(components);
+            } catch (error) {
+                setMessage(<Alert dismissible onClose={clearMessage} variant="danger">Помилка читання даних!</Alert>)
+            }
         }
     },[dataFromFile])
 
     return <div className="--container-background">
-        {message}
         <button onClick={onClose} className="--close-button">X</button>
         <div className="--container">
-            <button onClick={()=>setMessage(<ReadCSV onClose={clearMessage} onRead={(headers, data)=>{setDateFromFiles(data)}}/>)}>Read file</button>
+            {message}
+            <Row className="m-0">
+                <div className="--progress-of-loading" ref={loadingRef} style={{display: 'none'}}>
+                    <div className="--progress-background">
+                        <ProgressBar ref={progressBarRef} now={0} striped animated/>
+                        <em ref={progressBarMessageRef} >Завантажено</em>
+                    </div>
+                </div>
+                <Col className="m-0">
+                    <Row className="m-0 mb-1">
+                        <Button onClick={()=>setMessage(<ReadCSV onClose={clearMessage} onRead={(headers, data)=>{setDataFromFiles(data)}}/>)}>Обрати файл з данними</Button>
+                    </Row>
+                    <Row style={{overflowY: 'scroll', maxHeight: '30vh', position: 'relative', margin: '0'}}>
+                        {componentsArray && <ComponentsToTable components={componentsArray} onClose={clearMessage}/>}
+                    </Row>
+                    {componentsArray && <Row className="m-0">
+                        <Col className="w-100">
+                            <Button variant="success" className="w-100" onClick={importData}>Імпортувати</Button>
+                        </Col>
+                        <Col className="w-100">
+                            <Button variant="danger" className="w-100" onClick={onClose}>Скасувати</Button>
+                        </Col>
+                    </Row>}
+                </Col>
+            </Row>
         </div>
     </div>
 }
 
-export default function ImportComponent({component, onClose}){
+function CapacitorImport({onClose}){
+    const [dataFromFile, setDataFromFiles] = useState(null);
+    const [componentsArray, setComponentsArray] = useState(null)
+
+    const [message, setMessage] = useState(null);
+    const clearMessage = ()=>setMessage(null);
+
+    const loadingRef = useRef(null);
+    const progressBarRef = useRef(null);
+    const progressBarMessageRef = useRef(null);
+
+    function ParseMicroFarad(microFaradString){
+        if(!microFaradString) return null;
+        if(!isNaN(microFaradString)) return Number(microFaradString);
+        const faradArray = microFaradString.split(' ');
+        if(isNaN(faradArray[faradArray.length - 1])){
+            switch (faradArray.length) {
+                case 1:
+                    return null;
+                case 2:
+                    switch (faradArray[1].toLowerCase()){
+                        case 'p': return Number(faradArray[0] * 0.000001);
+                        case 'pf': return Number(faradArray[0] * 0.000001);
+                        case 'n': return Number(faradArray[0]) * 0.001;
+                        case 'nf': return Number(faradArray[0]) * 0.001;
+                        case 'u': return Number(faradArray[0]);
+                        case 'uf': return Number(faradArray[0]);
+                        case 'm': return Number(faradArray[0]) * 1000;
+                        case 'mf': return Number(faradArray[0]) * 1000;
+                        case 'f': return Number(faradArray[0]) * 1000000;
+                        default: return null;
+                    }            
+                default:
+                    return null;
+                }
+        } else {
+            return Number(microFaradString)
+        }
+    }
+
+    async function importData(){
+        function setProggress(progress){
+            if(progressBarRef.current && progressBarMessageRef.current){
+                progressBarRef.current.firstChild.ariaValueNow = progress;
+                progressBarRef.current.firstChild.style.width = `${progress}%`;
+                progressBarMessageRef.current.textContent = `Імпортовано ${progress}%`
+            }
+        }
+        if(loadingRef.current && progressBarRef.current){
+            loadingRef.current.style.display = 'flex'
+
+            setProggress(0);
+
+            const uniquePackaging = [...new Set(componentsArray.map(o=>o.packaging))];
+            
+            await PackagesWorker.updatePackages(localStorage.token);
+
+            uniquePackaging.filter(p => !PackagesWorker.getPackages().map(pack => pack.name).includes(p)).map(async p => 
+                //await PackagesWorker.addNewPackages(localStorage.token, p, p, (error)=>{console.error(error)})
+                console.log(p)
+            );
+            
+            componentsArray.map(c => 
+                c.packagingId = PackagesWorker.getPackages().filter(p => p.name === c.packaging)[0]?.id ?? 1
+            )
+            
+            
+            let errors = '';
+            function addError(error){
+                errors += error;
+            }
+            
+            for(var i = 0; i < componentsArray.length; i++){
+                const numOfComponent = i;
+                const currentComponent = componentsArray[i];
+                // await addComponent(Components.resistor , currentComponent, localStorage.token, (error) => {
+                //     addError(`Помилка імпорту компоненту №${numOfComponent} !\n`);
+                // }, ()=>{});
+                setProggress(i / componentsArray.length * 100);
+            }
+            
+            let message = errors === '' ? 
+            "Дані успішно імпортовано. Ви можете продовжити імпорт, або ж завершити роботу з ним" :
+            "Виникли поммилки при імпорті:\n" + errors;
+            
+            setMessage(<Alert dismissible variant={errors==='' ? "success" : "warning"} onClose={clearMessage}>{message}</Alert>);
+            setComponentsArray(null);
+            loadingRef.current.style.display = 'none'
+        }       
+    }
+
+    useEffect(()=>{
+        if(dataFromFile){
+            try {
+                const components = dataFromFile.map(o => {
+                    return {
+                        capacity: ParseMicroFarad(o[0]),
+                        accurancy: ParsePercent(o[2]),
+                        packaging: o[1],
+                        powerRating: o[2] ? Number(o[3].replace(',', '.')) : null,
+                        count: o[4] ? Number(o[4].replace(',', '.')) : null,
+                        name: o[0] + '_' + o[1] + '_' + o[2]
+                    }
+                })
+                setComponentsArray(components);
+            } catch (error) {
+                setMessage(<Alert dismissible onClose={clearMessage} variant="danger">Помилка читання даних!</Alert>)
+            }
+        }
+    },[dataFromFile])
+
+    return <div className="--container-background">
+        <button onClick={onClose} className="--close-button">X</button>
+        <div className="--container">
+            {message}
+            <Row className="m-0">
+                <div className="--progress-of-loading" ref={loadingRef} style={{display: 'none'}}>
+                    <div className="--progress-background">
+                        <ProgressBar ref={progressBarRef} now={0} striped animated/>
+                        <em ref={progressBarMessageRef} >Завантажено</em>
+                    </div>
+                </div>
+                <Col className="m-0">
+                    <Row className="m-0 mb-1">
+                        <Button onClick={()=>setMessage(<ReadCSV onClose={clearMessage} onRead={(headers, data)=>{setDataFromFiles(data)}}/>)}>Обрати файл з данними</Button>
+                    </Row>
+                    <Row style={{overflowY: 'scroll', maxHeight: '30vh', position: 'relative', margin: '0'}}>
+                        {componentsArray && <ComponentsToTable components={componentsArray} onClose={clearMessage}/>}
+                    </Row>
+                    {componentsArray && <Row className="m-0">
+                        <Col className="w-100">
+                            <Button variant="success" className="w-100" onClick={importData}>Імпортувати</Button>
+                        </Col>
+                        <Col className="w-100">
+                            <Button variant="danger" className="w-100" onClick={onClose}>Скасувати</Button>
+                        </Col>
+                    </Row>}
+                </Col>
+            </Row>
+        </div>
+    </div>
+}
+
+export function ExportComponents(components, separator){
+    try {
+        
+        let result =  "Назва" + separator +
+        (components[0]?.frequency != null ? "Частота" + separator : '') +
+        (components[0]?.current != null ? "Струм" + separator : '') +
+        (components[0]?.resistance != null ? "Опір" + separator : '') +
+        (components[0]?.capacity != null ? "Ємність" + separator : '') +
+        (components[0]?.chipType != null ? "Тип мікросхеми" + separator : '') +
+        (components[0]?.powerRating != null ? "Потужність" + separator : '') +
+        (components[0]?.voltage != null ? "Напруга" + separator : '') +
+        (components[0]?.transistorType != null ? "Тип транзистора" + separator : '') +
+        (components[0]?.accuracy != null ? "Точність" + separator : '') +
+        "Корпус" + separator + "Кількість\n";
+
+        result += components.map((item)=>
+            "" + item.name + separator +
+            (components[0]?.frequency != null ? HzToReadeble(item.frequency) + separator : '') +
+            (components[0]?.current != null ? item.current + separator : '') +
+            (components[0]?.resistance != null ? OmToReadeble(item.resistance) + separator : '') +
+            (components[0]?.capacity != null ? microFaradToReadeble(item.capacity) + separator : '') +
+            (components[0]?.chipType != null ? (item.chipType.name) + separator : '') +
+            (components[0]?.powerRating != null ? (item.powerRating) + separator : '') +
+            (components[0]?.voltage != null ? (item.voltage) + separator : '') +
+            (components[0]?.transistorType != null ? (item.transistorType.name) + separator : '') +
+            (components[0]?.accuracy != null ? (item.accuracy) + "%" + separator : '') +
+            item.packaging.name + separator + item.count
+        ).join('\n');
+
+        const file = new Blob([result], { type: 'text/csv;charset=utf-8'});
+
+        const pseudoLink = document.createElement("a");
+        pseudoLink.href = URL.createObjectURL(file);
+        pseudoLink.download = "export_file.csv";
+        pseudoLink.click();
+        URL.revokeObjectURL(pseudoLink.href);
+    } catch (error) {
+        console.error(error);
+    }    
+}
+
+export function ImportComponent({component, onClose}){
     switch (component) {
-        case Components.resistor:
-           return <ResistorImport onClose={onClose} />     
-        default:
-            break;
+        case Components.resistor: return <ResistorImport onClose={onClose} /> 
+        case Components.capacitor: return <CapacitorImport onClose={onClose} />
+        default: return null;
     }
 }

@@ -9,49 +9,19 @@ import PdfViewer from './helpers/PdfViewer';
 import ComponentViewer from './radioComponentsWorkers/ComponentViewer';
 import AddingsComponentModalWindow from './radioComponentsWorkers/AddingsComponent';
 import FilterForComponent from './helpers/FilterForComponents';
-import ImportComponent from './helpers/DataTransferWorker';
+import { ExportComponents, ImportComponent } from './helpers/DataTransferWorker';
 
 const ComoponentEnumeration = {
-    resistor: {
-        path: 'resistor',
-        name: 'Резистори'
-    },
-    capacitor:{
-        path: "capacitor",
-        name: "Конденсатори"
-    } ,
-    chip: {
-        path: "chip",
-        name: "Мікросхеми"
-    },
-    diode: {
-        path: "diode",
-        name: "Діоди"
-    },
-    optocouple: {
-        path: "optocouple",
-        name: "Оптопари"
-    },
-    quartz: {
-        path: "quartz",
-        name: "Кварци"
-    },
-    stabilizer: {
-        path: "stabilizer",
-        name: "Стабілізатори"
-    },
-    transistor: {
-        path: "transistor",
-        name: "Транзистори"
-    },
-    zenerDiode: {
-        path: "zenerDiode",
-        name: "Стабілітрони"
-    },
-    other: {
-        path: "other",
-        name: "Інше"
-    }
+  resistor: { path: 'resistor', name: 'Резистори'},
+  capacitor:{ path: "capacitor", name: "Конденсатори"} ,
+  chip: { path: "chip", name: "Мікросхеми"},
+  diode: { path: "diode", name: "Діоди"},
+  optocouple: { path: "optocouple", name: "Оптопари" },
+  quartz: { path: "quartz", name: "Кварци" },
+  stabilizer: { path: "stabilizer", name: "Стабілізатори" },
+  transistor: { path: "transistor", name: "Транзистори" },
+  zenerDiode: { path: "zenerDiode", name: "Стабілітрони" },
+  other: { path: "other", name: "Інше"}
 }
 
 export default function Home(){
@@ -263,10 +233,10 @@ export default function Home(){
             }
         })
         .catch(error=>console.error(error));
-
-  }, [filters, components, choosenComponent])
-
-  return <>
+        
+      }, [filters, components, choosenComponent])
+      
+      return <>
     {message}
     <Row style={{margin: 0}}>
         {Object.values(ComoponentEnumeration).map((item, index) => 
@@ -283,6 +253,12 @@ export default function Home(){
                 component={choosenComponent.path} 
                 components={components} 
                 onChange={filter => setFilters(filter)} />
+        <Button className='w-100 mt-1' variant='outline-primary' onClick={
+          () => setMessage(<ImportComponent component={choosenComponent.path} onClose={clearMessage} />)}
+          >Імпорт "{choosenComponent.name}"</Button>
+        
+        <Button className='w-100 mt-1' variant='outline-primary' onClick={()=>{ExportComponents(sortedComponents, ',')}}
+          >Експорт результатів</Button>
       </Col>
       <Col md={8} lg={9} style={{padding: '0', margin: '0'}}>
       {
@@ -297,15 +273,14 @@ export default function Home(){
             <ListGroupItem><em>Не знайдено компонентів за даним фільтром</em></ListGroupItem>
           </ListGroup>}
           <Button variant='success' className='w-100' onClick={()=>{
-              setMessage(<AddingsComponentModalWindow component={choosenComponent.path} onAdd={()=>{
-                collectData();
-                setMessage(<Alert dismissible variant='success' onClose={clearMessage}>Додано новий компонент</Alert>)
-              }} onClose={clearMessage}/>)
-            }}>Додати новий компонент</Button>
+            setMessage(<AddingsComponentModalWindow component={choosenComponent.path} onAdd={()=>{
+              collectData();
+              setMessage(<Alert dismissible variant='success' onClose={clearMessage}>Додано новий компонент</Alert>)
+            }} onClose={clearMessage}/>)
+          }}>Додати новий компонент</Button>
         </>
       }
       </Col>
     </Row>
-    <button onClick={() => setMessage(<ImportComponent component={Components.resistor} onClose={clearMessage} />)}>Import button</button>
   </> 
 }

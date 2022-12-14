@@ -28,6 +28,9 @@
     background: #fff;
     border-radius: 0.25em;
     border: solid 1px #332;
+    min-width: 80%;
+    max-width: 100%;
+    padding: 0.2rem;
 }
 
 .--read-csv-background{
@@ -48,8 +51,30 @@
     background: #fff;
     border-radius: 0.25em;
     border: solid 1px #332;
-    width: 80%;
+    min-width: 80%;
+    max-width: 100%;
     margin: 2em;
     padding: 1rem;
     max-height: 90%;
+}
+
+.--progress-of-loading{
+    z-index: 3000;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(40, 40, 40, 0.5);
+}
+
+.--progress-background{
+    width: 90%;
+    background: #fff;
+    border: #332;
+    padding: 2rem;
+    border-radius: 10px;
 }
