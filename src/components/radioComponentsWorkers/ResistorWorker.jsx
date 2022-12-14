@@ -1,4 +1,3 @@
-﻿import { isNumeric } from 'jquery';
 import React, { useState, useEffect } from 'react'
 import {
     Table, Spinner, Alert, Button,
@@ -7,7 +6,7 @@ import {
 import { 
     Components as ComponentSelector, 
     showAllActiveComponent, removeComponent,
-    addComponent, OmToReadeble, getComponentInfo
+    addComponent, OmToReadeble
 } from '../helpers/api/ComponentsEditorWorker';
 import { PackagesWorker } from '../helpers/api/ComponentsWorker';
 import ComponentViewer from './ComponentViewer';
@@ -28,7 +27,7 @@ export function EditorResistor() {
         setLoading(true);
         
         showAllActiveComponent(ComponentSelector.resistor, localStorage.token, 
-            errorMessage,
+            (error)=>setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>),
             (result) => {
                 setResistors(result);
                 setLoading(false);
@@ -127,7 +126,15 @@ export function EditorResistor() {
     }
 
     useEffect(() => {
-        populateData(); 
+        setLoading(true);
+        
+        showAllActiveComponent(ComponentSelector.resistor, localStorage.token, 
+            (error)=>setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>),
+            (result) => {
+                setResistors(result);
+                setLoading(false);
+            }
+        ); 
     }, []);
 
     return <>
@@ -148,6 +155,7 @@ export function ResistorAddingModal({ onClose, onAdding }) {
     const [description, setDescriprion] = useState(null);
     const [notice, setNotice] = useState(null);
     const [multiplicator, setMultiplicator] = useState(1);
+    const [datasheet, setDatasheet] = useState(null);
     const [count, setCount] = useState(0);
 
     const close = () => setShow(false);
@@ -168,7 +176,8 @@ export function ResistorAddingModal({ onClose, onAdding }) {
             packagingId: packagingId,
             description: description,
             notice: notice,
-            count: count
+            count: count,
+            datasheet: datasheet
         }
 
         if(resistance == null){
@@ -189,7 +198,7 @@ export function ResistorAddingModal({ onClose, onAdding }) {
 
     useEffect(() =>{
         !show && onClose();
-    }, [show])
+    }, [show, onClose])
 
     return <Modal
         show={show}
@@ -209,7 +218,7 @@ export function ResistorAddingModal({ onClose, onAdding }) {
                     onChange={(e) => {
                         if (!isNaN(e.target.value)) {
                             setResistance(Number(e.target.value));
-                        } else if (e.target.value.length == 0) {
+                        } else if (e.target.value.length === 0) {
                             return;
                         } else {
                             errorMessage({message: 'Resistance is a number'})
@@ -234,7 +243,7 @@ export function ResistorAddingModal({ onClose, onAdding }) {
                     onChange={(e) => {
                         if (!isNaN(e.target.value)) {
                             setAccuracy(Number(e.target.value));
-                        } else if (e.target.value.length == 0) {
+                        } else if (e.target.value.length === 0) {
                             return;
                         } else {
                             errorMessage({message: 'Accuracy is a number'});
@@ -253,7 +262,7 @@ export function ResistorAddingModal({ onClose, onAdding }) {
                     onChange={(e) => {
                         if (!isNaN(e.target.value)) {
                            setPowerRating(Number(e.target.value));
-                        } else if (e.target.value.length == 0) {
+                        } else if (e.target.value.length === 0) {
                             return;
                         } else {
                             errorMessage({message: 'Power ratingis a number' });
@@ -306,7 +315,7 @@ export function ResistorAddingModal({ onClose, onAdding }) {
                     onChange={(e) => {
                         if (!isNaN(e.target.value)) {
                             setCount(Number(e.target.value));
-                        } else if (e.target.value.length == 0) {
+                        } else if (e.target.value.length === 0) {
                             return;
                         } else {
                             errorMessage({message: 'Кількість може бути лише в чисельній формі'});
@@ -315,6 +324,16 @@ export function ResistorAddingModal({ onClose, onAdding }) {
                     }}
                 />
                 <InputGroup.Text>Штук</InputGroup.Text>
+            </InputGroup>
+
+            <InputGroup className="mb-3">
+                <InputGroup.Text >Даташит</InputGroup.Text>
+                <Form.Control type="file" onChange={(event)=>{
+                    if(event.target.files){
+                        setDatasheet(event.target.files[0]);
+                    }
+                    
+                }}/>
             </InputGroup>
 
         </Modal.Body>

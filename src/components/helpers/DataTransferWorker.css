@@ -1,0 +1,55 @@
+.--container-background{
+    background: rgba(40, 40, 40, 0.5);
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.--close-button{
+    top: 0;
+    right: 0;
+    position: fixed;
+    margin: 10px;
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    z-index: 1010;
+}
+
+.--container{
+    background: #fff;
+    border-radius: 0.25em;
+    border: solid 1px #332;
+}
+
+.--read-csv-background{
+    background: rgba(40, 40, 40, 0.5);
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.--read-csv-container{
+    background: #fff;
+    border-radius: 0.25em;
+    border: solid 1px #332;
+    width: 80%;
+    margin: 2em;
+    padding: 1rem;
+    max-height: 90%;
+}

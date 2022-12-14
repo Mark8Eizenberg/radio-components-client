@@ -260,6 +260,92 @@ export class PackagesWorker{
             errorFunc(error.message ?? error.error ?? "Unknown error" );
             return false;
         }
-
     }
 } 
+
+export class MaterialWorker{
+
+    static #materials = [];
+    static #materialMap = new Map();
+
+    static getMaterials(){
+        return this.#materials;
+    }
+
+    static getMaterialById(id){
+        return this.#materialMap.get(id);
+    }
+
+    static async updateMaterials(token){
+        var myHeaders = new Headers();
+        myHeaders.append("Authorization", `Bearer ${token}`);
+
+        var requestOptions = {
+        method: 'GET',
+        headers: myHeaders,
+        redirect: 'follow'
+        };
+
+        let responce = await fetch("/api/storage/material", requestOptions);
+        
+        if(responce.ok){
+            let data = await responce.json();
+            this.#materials = data;
+            data.map(item => 
+                this.#materialMap.set(item.id, item.name)
+            )
+        } else {
+            let error = await responce.json();
+            console.error(error);
+        }
+    }
+
+    static async addNewMaterial(token, name, errorFunc){
+        var myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + token)
+        myHeaders.append("Content-Type", "application/json");
+
+        var raw = JSON.stringify({
+            name: name,
+        });
+
+        var requestOptions = {
+        method: 'PUT',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+        };
+
+        let responce = await fetch("/api/storage/material", requestOptions)
+        if(responce.ok){
+            await this.updateMaterials(token);
+            return true
+        } else {
+            let error = await responce.json();
+            errorFunc(error.message ?? error.error ?? "Unknown error" );
+            return false;
+        }
+    }
+
+    static async removeMaterial(token, id, errorFunc){
+        var myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + token);
+
+        var requestOptions = {
+        method: 'DELETE',
+        headers: myHeaders,
+        redirect: 'follow'
+        };
+    
+        let responce = await fetch("/api/storage/material/" + id, requestOptions)
+
+        if(responce.ok){
+            await this.updateMaterials(token);
+            return true
+        } else {
+            let error = await responce.json();
+            errorFunc(error.message ?? error.error ?? "Unknown error" );
+            return false;
+        }
+    }
+}

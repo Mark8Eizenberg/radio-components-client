@@ -1,4 +1,3 @@
-﻿import { isNumeric } from 'jquery';
 import React, { useState, useEffect } from 'react'
 import {
     Table, Spinner, Alert, Button,
@@ -7,9 +6,9 @@ import {
 import { 
     Components as ComponentSelector, 
     showAllActiveComponent, removeComponent,
-    addComponent, microFaradToReadeble, getComponentInfo,
+    addComponent, microFaradToReadeble
 } from '../helpers/api/ComponentsEditorWorker';
-import { PackagesWorker } from '../helpers/api/ComponentsWorker';
+import { MaterialWorker, PackagesWorker } from '../helpers/api/ComponentsWorker';
 import ComponentViewer from './ComponentViewer';
 
 export function EditorCapacitor() {
@@ -18,17 +17,12 @@ export function EditorCapacitor() {
     const [message, setMessage] = useState(null);
 
     const clearMessage = () => setMessage(null);
-    const errorMessage = (error) => {
-        setMessage(
-            <Alert dismissible onClose={clearMessage}> 
-                {error.message}
-            </Alert>);
-    }
+    const errorMessage = (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>);
     const populateData = () => {
         setLoading(true);
         
         showAllActiveComponent(ComponentSelector.capacitor, localStorage.token, 
-            errorMessage,
+            (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>),
             (result) => {
                 setComponents(result);
                 setLoading(false);
@@ -121,7 +115,15 @@ export function EditorCapacitor() {
     }
 
     useEffect(() => {
-        populateData(); 
+        setLoading(true);
+        
+        showAllActiveComponent(ComponentSelector.capacitor, localStorage.token, 
+            (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>),
+            (result) => {
+                setComponents(result);
+                setLoading(false);
+            }
+        ); 
     }, []);
 
 
@@ -142,6 +144,8 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
     const [description, setDescriprion] = useState(null);
     const [notice, setNotice] = useState(null);
     const [multiplicator, setMultiplicator] = useState(1);
+    const [datasheet, setDatasheet] = useState(null);
+    const [materialId, setMaterial] = useState(1);
     const [count, setCount] = useState(0);
 
     const close = () => setShow(false);
@@ -161,7 +165,9 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
             packagingId: packagingId,
             description: description,
             notice: notice,
-            count: count
+            count: count,
+            datasheet: datasheet,
+            materialId: materialId
         }
 
         if(capacity == null){
@@ -172,7 +178,7 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
             errorMessage({message: 'Назва конденсатору обов\'язкова' });
             return;
         }
-
+        
         addComponent(ComponentSelector.capacitor, capacitor, localStorage.token, errorMessage, (result)=>{
             setShow(false);
             onAdding(true);
@@ -182,7 +188,7 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
 
     useEffect(() =>{
         !show && onClose();
-    }, [show])
+    }, [show, onClose])
 
 
     return <Modal
@@ -202,7 +208,7 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
                     onChange={(e) => {
                         if (!isNaN(e.target.value)) {
                             setCapacity(Number(e.target.value));
-                        } else if (e.target.value.length == 0) {
+                        } else if (e.target.value.length === 0) {
                             return;
                         } else {
                             errorMessage({message: 'Ємність може бути лише в чисельній формі'})
@@ -229,7 +235,7 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
                     onChange={(e) => {
                         if (!isNaN(e.target.value)) {
                             setAccuracy(Number(e.target.value));
-                        } else if (e.target.value.length == 0) {
+                        } else if (e.target.value.length === 0) {
                             return;
                         } else {
                             errorMessage({message: 'Точність може бути лише в чисельній формі'});
@@ -262,6 +268,17 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
             </InputGroup>
 
             <InputGroup className="mb-3">
+                <InputGroup.Text >Тип матеріалу</InputGroup.Text>
+                <Form.Select onChange={(e) => {
+                    setMaterial(Number(e.target.value))
+                }}>
+                    {MaterialWorker.getMaterials().map((item, index)=>{
+                        return <option key={index} value={item.id}>{item.name}</option>
+                    })}
+                </Form.Select>
+            </InputGroup>
+
+            <InputGroup className="mb-3">
                 <InputGroup.Text>Опис</InputGroup.Text>
                 <Form.Control as='textarea' onChange={(e) => {
                     setDescriprion(e.target.value);
@@ -283,7 +300,7 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
                     onChange={(e) => {
                         if (!isNaN(e.target.value)) {
                             setCount(Number(e.target.value));
-                        } else if (e.target.value.length == 0) {
+                        } else if (e.target.value.length === 0) {
                             return;
                         } else {
                             errorMessage({message: 'Кількість може бути лише в чисельній формі'});
@@ -292,6 +309,16 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
                     }}
                 />
                 <InputGroup.Text>Штук</InputGroup.Text>
+            </InputGroup>
+
+            <InputGroup className="mb-3">
+                <InputGroup.Text >Даташит</InputGroup.Text>
+                <Form.Control type="file" onChange={(event)=>{
+                    if(event.target.files){
+                        setDatasheet(event.target.files[0]);
+                    }
+                    
+                }}/>
             </InputGroup>
 
         </Modal.Body>

@@ -9,31 +9,34 @@ import {
 } from "react-router-dom";
 import { Alert, Nav, Navbar } from 'react-bootstrap';
 import {userRolesLinks} from './utils/UserRoles'
+import { useState } from 'react';
 
 function App() {
-  var message = null;
+  const [message, setMessage] = useState(null);
 
-  if(localStorage.validTo !== undefined){
-    var today = new Date();
-    var validTokenDate = new Date(localStorage.validTo);
-    if(today > validTokenDate){
+  if(localStorage.token){
+    if(localStorage.validTo !== undefined){
+      var today = new Date();
+      var validTokenDate = new Date(localStorage.validTo);
+      if(today > validTokenDate){
+        localStorage.clear();
+        setMessage(<Alert 
+            className='w-100'
+            variant='danger' 
+            dismissible 
+            onClose={() => setMessage(null)}
+        >Час дії вашого токена вичерпаний увійдіть знову</Alert>)
+      }
+    } else {
       localStorage.clear();
-      message = <Alert 
-          className='w-100'
-          variant='danger' 
-          dismissible 
-          onClose={() => message = null}
-      >Час дії вашого токена вичерпаний увійдіть знову</Alert>
+      setMessage(<Alert 
+            className='w-100'
+            variant='danger' 
+            dismissible 
+            onClose={() => setMessage(null)}
+        >Для користування сайтом спочатку необхідно увійти, або отримати аккаунт у адміністратора</Alert>)
     }
-  } else {
-    localStorage.clear();
-    message = <Alert 
-          className='w-100'
-          variant='danger' 
-          dismissible 
-          onClose={() => message = null}
-      >Для користування сайтом спочатку необхідно увійти, або отримати аккаунт у адміністратора</Alert>
-  }
+  } 
 
   return  <div className="App">
       {message}

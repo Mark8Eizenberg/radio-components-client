@@ -20,19 +20,52 @@ export async function addComponent(component, componentBody, token, errorFunc, o
         return false;
     }
 
+    if(componentBody.datasheet){
+        var formData = null;
+        let numOfFileInDB = null;
+        
+        formData = new FormData();
+        formData.append('file', componentBody.datasheet, componentBody.datasheet.name);
+        
+        var addFileHeaders = new Headers();
+        addFileHeaders.append("Authorization", "Bearer " + token);
+        
+        var addFileRequestOption = {
+            method: 'POST',
+            headers: addFileHeaders,
+            body: formData,
+            redirect: 'follow'
+        }
+
+        let resultForAddingFile = await fetch(`/api/files/upload`, addFileRequestOption);
+        if(!resultForAddingFile.ok){
+            var error = await resultForAddingFile.json();
+            errorFunc(error);
+            return false;
+        } else {
+            var responce = await resultForAddingFile.json();
+            numOfFileInDB = responce?.fileId;
+        }
+        
+        componentBody.datasheet = null;
+        componentBody.datasheetId = numOfFileInDB;    
+        
+    }
+
     var myHeaders = new Headers();
     myHeaders.append("Authorization", "Bearer " + token);
     myHeaders.append("Content-Type", "application/json");
 
     var raw = JSON.stringify(componentBody);
-
+    
     var requestOptions = {
-    method: 'PUT',
-    headers: myHeaders,
-    body: raw,
-    redirect: 'follow'
+        method: 'PUT',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
     };
-
+    
+    
     let result = await fetch(`/api/storage/${Components[component]}/add`, requestOptions);
     
     if(result.ok){

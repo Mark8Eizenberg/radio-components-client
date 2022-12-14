@@ -23,6 +23,7 @@ export function ZenerDiodeWorker() {
                 {error.message}
             </Alert>);
     }
+
     const populateData = () => {
         setLoading(true);
         
@@ -116,7 +117,20 @@ export function ZenerDiodeWorker() {
     }
 
     useEffect(() => {
-        populateData(); 
+        setLoading(true);
+        
+        showAllActiveComponent(ComponentSelector.zenerDiode, localStorage.token,
+            (error)=>{
+                setMessage(
+                    <Alert dismissible onClose={clearMessage}> 
+                        {error.message}
+                    </Alert>);
+            },
+            (result) => {
+                setComponents(result);
+                setLoading(false);
+            }
+        );
     }, []);
 
 
@@ -135,6 +149,7 @@ export function ZenerDiodeAddingModal({ onClose, onAdding }) {
     const [packagingId, setPackaging] = useState(1);
     const [description, setDescriprion] = useState(null);
     const [notice, setNotice] = useState(null);
+    const [datasheet, setDatasheet] = useState(null);
     const [count, setCount] = useState(0);
 
     const close = () => setShow(false);
@@ -169,7 +184,8 @@ export function ZenerDiodeAddingModal({ onClose, onAdding }) {
             packagingId: packagingId,
             description: description,
             notice: notice,
-            count: count
+            count: count,
+            datasheet: datasheet
         }
         
         addComponent(ComponentSelector.zenerDiode, zenerDiode, localStorage.token, errorMessage, (result)=>{
@@ -181,7 +197,7 @@ export function ZenerDiodeAddingModal({ onClose, onAdding }) {
 
     useEffect(() =>{
         !show && onClose();
-    }, [show])
+    }, [show, onClose])
 
 
     return <Modal
@@ -246,7 +262,7 @@ export function ZenerDiodeAddingModal({ onClose, onAdding }) {
                     onChange={(e) => {
                         if (!isNaN(e.target.value)) {
                             setCount(Number(e.target.value));
-                        } else if (e.target.value.length == 0) {
+                        } else if (e.target.value.length === 0) {
                             return;
                         } else {
                             errorMessage({message: 'Кількість може бути лише в чисельній формі'});
@@ -255,6 +271,16 @@ export function ZenerDiodeAddingModal({ onClose, onAdding }) {
                     }}
                 />
                 <InputGroup.Text>Штук</InputGroup.Text>
+            </InputGroup>
+
+            <InputGroup className="mb-3">
+                <InputGroup.Text >Даташит</InputGroup.Text>
+                <Form.Control type="file" onChange={(event)=>{
+                    if(event.target.files){
+                        setDatasheet(event.target.files[0]);
+                    }
+                    
+                }}/>
             </InputGroup>
 
         </Modal.Body>

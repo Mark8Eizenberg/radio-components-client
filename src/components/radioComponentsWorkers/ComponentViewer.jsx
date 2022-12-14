@@ -1,10 +1,12 @@
 import React, {useEffect, useState} from 'react'
-import { Table, Modal, Button, InputGroup, Form, Alert } from 'react-bootstrap';
+import { Table, Modal, Button, InputGroup, Form, Alert, Row } from 'react-bootstrap';
 import { 
     getComponentInfo, microFaradToReadeble, 
     OmToReadeble, HzToReadeble, editComponentInfo 
 } from '../helpers/api/ComponentsEditorWorker';
-import {ChipTypeWorker, TransistorTypeWorker, PackagesWorker} from '../helpers/api/ComponentsWorker'
+import {ChipTypeWorker, TransistorTypeWorker, PackagesWorker, MaterialWorker} from '../helpers/api/ComponentsWorker'
+import { AddDatasheetForEmpty, ChangeDatasheet, DeleteDatasheetFromComponent } from '../helpers/DatasheetWorker';
+import PdfViewer from '../helpers/PdfViewer';
 
 const localString = new Map([
     ["resistance" , "Опір"],
@@ -42,11 +44,18 @@ export default function ComponentViewer({id, onClose, title, enableEditor=true, 
                 setLoading(false); 
             });
         
+        if(PackagesWorker.getPackages().length < 1){
             PackagesWorker.updatePackages(localStorage.token);
+        }
+
+        if(TransistorTypeWorker.getTransistorTypes().length < 1){
             TransistorTypeWorker.updateTransistorTypes(localStorage.token);
+        }
+
+        if(ChipTypeWorker.getChipTypes().length < 1){
             ChipTypeWorker.updateChipTypes(localStorage.token);
-// eslint-disable-next-line
-    },[])
+        }
+    },[id])
 
     const getMicroFaradWithMult = (mF) => {
         if(mF > 1){
@@ -167,6 +176,20 @@ export default function ComponentViewer({id, onClose, title, enableEditor=true, 
                                             <p>{microFaradToReadeble(item[1])}</p>}
                                         </td>
                                 </tr>
+                            case 'materialId':
+                                return <tr><td>Матеріал</td>
+                                    <td onClick={()=>enableEditor && setEditorMode(true)}>
+                                        {editorMode ? <>
+                                            <Form.Select defaultValue={item[1]} id='materialId'>
+                                                {MaterialWorker.getMaterials().map(material => 
+                                                    <option key={material.id} value={material.id}>{material.name}</option>    
+                                                )}
+                                            </Form.Select>
+                                        </> : <>
+                                        {MaterialWorker.getMaterialById(item[1])}
+                                        </>}
+                                    </td>
+                                </tr>
                             case 'id':
                                 return <tr key={index}>
                                     <td>ID</td>
@@ -202,6 +225,68 @@ export default function ComponentViewer({id, onClose, title, enableEditor=true, 
                                         </>}
                                     </td>
                                 </tr>
+                            case 'datasheetId':
+                                return <tr><td>Даташит</td>
+                                    {item[1] ? 
+                                        <td>
+                                            <Row className='w-100 m-0'>
+                                                <Button
+                                                    className='col'
+                                                    variant='outline-success' 
+                                                    onClick={()=>{
+                                                        setMessage(<PdfViewer 
+                                                            fileId={Number(item[1])}
+                                                            onClose={()=>setMessage(null)}
+                                                            />)}}
+                                                            >Переглянути</Button>
+                                                <Button
+                                                    className='col'
+                                                    variant='outline-info'
+                                                    onClick={()=>{setMessage(<ChangeDatasheet 
+                                                        componentId={component.component?.id}
+                                                        oldFileId={Number(item[1])} 
+                                                        onClose={
+                                                            ()=>{
+                                                                setShow(false);
+                                                                if(onUpdateCallback)onUpdateCallback(true);
+                                                                onClose();
+                                                            }
+                                                        }/>)}}
+                                                    >Змінити</Button>
+                                                <Button
+                                                    className='col'
+                                                    variant='outline-danger'
+                                                    onClick={()=>{setMessage(
+                                                        <DeleteDatasheetFromComponent
+                                                            componentId={component.component?.id}
+                                                            fileId={Number(item[1])}
+                                                            onClose={()=>{
+                                                                setShow(false);
+                                                                if(onUpdateCallback)onUpdateCallback(true);
+                                                                onClose();
+                                                            }}
+                                                        />
+                                                    )}}
+                                                >Видалити</Button>
+                                            </Row>
+                                        </td>
+                                    :
+                                        <td>
+                                            <p>Відсутній даташит</p>
+                                            <Button variant="outline-success"
+                                                onClick={()=>setMessage(<AddDatasheetForEmpty
+                                                    componentId={component.component?.id}
+                                                    onClose={()=>{
+                                                        setShow(false);
+                                                        if(onUpdateCallback)onUpdateCallback(true);
+                                                        onClose();
+                                                    }}
+                                                />)}
+                                            >Додати</Button>
+                                        </td>
+                                    }
+                                    
+                                </tr>
                             default:
                                 return <tr key={index}>
                                     <td>{localString.get(item[0]) ?? item[0]}</td>
@@ -228,7 +313,7 @@ export default function ComponentViewer({id, onClose, title, enableEditor=true, 
                     </tr>
                     <tr>
                         <td>Ким додано</td>
-                        <td>{component.creator.fullName}</td>
+                        <td>{component?.creator?.fullName ?? "Невідомо"}</td>
                     </tr>
                 </tbody>
             </Table>

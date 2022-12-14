@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import DropDownCard from './helpers/DropDownCard';
-import { ChipTypeWorker, PackagesWorker, TransistorTypeWorker } from './helpers/api/ComponentsWorker'
+import { ChipTypeWorker, MaterialWorker, PackagesWorker, TransistorTypeWorker } from './helpers/api/ComponentsWorker'
 import { EditorCapacitor } from './radioComponentsWorkers/CapacitorWorker ';
 import { EditorResistor } from './radioComponentsWorkers/ResistorWorker';
 import { ChipWorker } from './radioComponentsWorkers/ChipWorker'
@@ -62,6 +62,9 @@ export default function RadioComponents() {
         </DropDownCard>
         <DropDownCard name={"Типи мікросхем"}>
             <ChipTypeEditor/>
+        </DropDownCard>
+        <DropDownCard name={"Матеріали"}>
+            <MaterialEditor/>
         </DropDownCard>
 
     </>
@@ -356,6 +359,103 @@ const ChipTypeEditor = () => {
                             setMessage(
                                 <Alert dismissible variant='success' onClose={clearMessage}> 
                                     Тип мікросхеми додано
+                                </Alert>);
+                            setNeedUpdate(true);
+                        }
+                    });
+                }}>
+                    Додати
+                </Button>
+        </InputGroup>
+    </>
+}
+
+const MaterialEditor = () => {
+    const [message, setMessage] = useState(null);
+    const clearMessage = () => setMessage(null);
+    const errorMessage = (error) => {
+        setMessage(
+            <Alert dismissible variant='danger' onClose={clearMessage}> 
+                {error}
+            </Alert>);
+    }
+
+    const [loading, setLoading] = useState(true);
+    const [materials, setMaterials] = useState([]);    
+    const [needUpdate, setNeedUpdate] = useState(false);
+
+    const [id, setId] = useState(1);
+    const [name, setName] = useState(null);
+    
+    useEffect(()=>{
+        if(MaterialWorker.getMaterials().length < 1){
+            MaterialWorker.updateMaterials(localStorage.token)
+                .then(() => {
+                    setMaterials(MaterialWorker.getMaterials());
+                    setLoading(false);
+                });
+        } else {
+            setMaterials(MaterialWorker.getMaterials());
+            setLoading(false);
+        }
+    }, [])
+
+    useEffect(()=>{
+        if(needUpdate){
+            setLoading(true);
+            MaterialWorker.updateMaterials(localStorage.token)
+                .then(() => {
+                    setMaterials(MaterialWorker.getMaterials());
+                    setLoading(false);
+                    setNeedUpdate(false);
+                });
+        }
+    }, [needUpdate] )
+
+    return loading ? <>
+        <em>Триває завантаження</em>
+    </> : 
+    
+    <>
+        {message}
+        <InputGroup className='mb-3'>
+            <InputGroup.Text>Оберіть матеріал для видалення</InputGroup.Text>
+            <Form.Select onChange={e => {
+                setId(e.target.value);
+            }}>
+                {materials.map((item) => 
+                    <option key={item.id} value={item.id}>#{item.id} {item.name}</option>    
+            )}
+            </Form.Select>
+            <Button variant='danger' onClick={(e)=>{
+                if(window.confirm("Ви впевнені що бажаєте видалити обраний тип корпусу ?")){
+                    MaterialWorker.removeChipType(localStorage.token, id, errorMessage).then(result =>{
+                        if(result){
+                            setMessage(
+                                <Alert dismissible variant='success' onClose={clearMessage}> 
+                                    Матеріал видалено
+                                </Alert>);
+                            setNeedUpdate(true);
+                        }
+                    });
+                }
+            }}>Видалити</Button>
+        </InputGroup>
+
+        <InputGroup className='mb-3'>
+            <InputGroup.Text>Назва нового матеріалу</InputGroup.Text>
+            <Form.Control placeholder='Назва' onChange={e => setName(e.target.value)}></Form.Control>
+            <Button variant='success'
+                onClick={(e)=>{
+                    if(name == null){
+                        errorMessage("Необхідно ввести назву нового типу мікросхеми");
+                        return;
+                    }
+                    MaterialWorker.addNewMaterial(localStorage.token, name, errorMessage).then(result =>{
+                        if(result){
+                            setMessage(
+                                <Alert dismissible variant='success' onClose={clearMessage}> 
+                                    Матеріал додано
                                 </Alert>);
                             setNeedUpdate(true);
                         }

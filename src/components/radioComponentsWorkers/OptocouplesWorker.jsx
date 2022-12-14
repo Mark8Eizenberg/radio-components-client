@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     Table, Spinner, Alert, Button,
     Modal, InputGroup, Form
@@ -6,9 +6,9 @@ import {
 import { 
     Components as ComponentSelector, 
     showAllActiveComponent, removeComponent,
-    addComponent, getComponentInfo,
+    addComponent
 } from '../helpers/api/ComponentsEditorWorker';
-import { ChipTypeWorker, PackagesWorker } from '../helpers/api/ComponentsWorker';
+import { PackagesWorker } from '../helpers/api/ComponentsWorker';
 import ComponentViewer from './ComponentViewer';
 
 export function OptocouplesWorker() {
@@ -17,17 +17,12 @@ export function OptocouplesWorker() {
     const [message, setMessage] = useState(null);
 
     const clearMessage = () => setMessage(null);
-    const errorMessage = (error) => {
-        setMessage(
-            <Alert dismissible onClose={clearMessage}> 
-                {error.message}
-            </Alert>);
-    }
+    const errorMessage = (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>);
     const populateData = () => {
         setLoading(true);
         
         showAllActiveComponent(ComponentSelector.optocouple, localStorage.token, 
-            errorMessage,
+            (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>),
             (result) => {
                 setComponents(result);
                 setLoading(false);
@@ -110,7 +105,15 @@ export function OptocouplesWorker() {
     }
 
     useEffect(() => {
-        populateData(); 
+        setLoading(true);
+        
+        showAllActiveComponent(ComponentSelector.optocouple, localStorage.token, 
+            (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>),
+            (result) => {
+                setComponents(result);
+                setLoading(false);
+            }
+        ); 
     }, []);
 
 
@@ -128,6 +131,7 @@ export function OptocoupleAddingModal({ onClose, onAdding }) {
     const [packagingId, setPackaging] = useState(1);
     const [description, setDescriprion] = useState(null);
     const [notice, setNotice] = useState(null);
+    const [datasheet, setDatasheet] = useState(null);
     const [count, setCount] = useState(0);
 
     const close = () => setShow(false);
@@ -145,7 +149,8 @@ export function OptocoupleAddingModal({ onClose, onAdding }) {
             packagingId: packagingId,
             description: description,
             notice: notice,
-            count: count
+            count: count,
+            datasheet: datasheet
         }
         
         if(name == null){
@@ -162,7 +167,7 @@ export function OptocoupleAddingModal({ onClose, onAdding }) {
 
     useEffect(() =>{
         !show && onClose();
-    }, [show])
+    }, [show, onClose])
 
 
     return <Modal
@@ -217,7 +222,7 @@ export function OptocoupleAddingModal({ onClose, onAdding }) {
                     onChange={(e) => {
                         if (!isNaN(e.target.value)) {
                             setCount(Number(e.target.value));
-                        } else if (e.target.value.length == 0) {
+                        } else if (e.target.value.length === 0) {
                             return;
                         } else {
                             errorMessage({message: 'Кількість може бути лише в чисельній формі'});
@@ -226,6 +231,16 @@ export function OptocoupleAddingModal({ onClose, onAdding }) {
                     }}
                 />
                 <InputGroup.Text>Штук</InputGroup.Text>
+            </InputGroup>
+
+            <InputGroup className="mb-3">
+                <InputGroup.Text >Даташит</InputGroup.Text>
+                <Form.Control type="file" onChange={(event)=>{
+                    if(event.target.files){
+                        setDatasheet(event.target.files[0]);
+                    }
+                    
+                }}/>
             </InputGroup>
 
         </Modal.Body>

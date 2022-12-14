@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     Table, Spinner, Alert, Button,
     Modal, InputGroup, Form
@@ -6,7 +6,7 @@ import {
 import { 
     Components as ComponentSelector, 
     showAllActiveComponent, removeComponent,
-    addComponent, getComponentInfo,
+    addComponent,
 } from '../helpers/api/ComponentsEditorWorker';
 import { ChipTypeWorker, PackagesWorker } from '../helpers/api/ComponentsWorker';
 import ComponentViewer from './ComponentViewer';
@@ -17,17 +17,12 @@ export function ChipWorker() {
     const [message, setMessage] = useState(null);
 
     const clearMessage = () => setMessage(null);
-    const errorMessage = (error) => {
-        setMessage(
-            <Alert dismissible onClose={clearMessage}> 
-                {error.message}
-            </Alert>);
-    }
+    const errorMessage = (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>);
     const populateData = () => {
         setLoading(true);
         
         showAllActiveComponent(ComponentSelector.chip, localStorage.token, 
-            errorMessage,
+            (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>),
             (result) => {
                 setComponents(result);
                 setLoading(false);
@@ -115,7 +110,15 @@ export function ChipWorker() {
     }
 
     useEffect(() => {
-        populateData(); 
+        setLoading(true);
+        
+        showAllActiveComponent(ComponentSelector.chip, localStorage.token, 
+            (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>),
+            (result) => {
+                setComponents(result);
+                setLoading(false);
+            }
+        ); 
     }, []);
 
 
@@ -135,15 +138,10 @@ export function ChipAddingModal({ onClose, onAdding }) {
     const [description, setDescriprion] = useState(null);
     const [notice, setNotice] = useState(null);
     const [count, setCount] = useState(0);
+    const [datasheet, setDatasheet] = useState(null);
 
     const close = () => setShow(false);
-    const errorMessage = (error) => {
-        setMessage(
-            <Alert variant='danger' dismissible onClose={()=>{setMessage(null)}}>
-                {error?.message ?? "Невідома помилка" }
-            </Alert>
-        )
-    }
+    const errorMessage = (error) => setMessage(<Alert variant='danger' dismissible onClose={()=>{setMessage(null)}}>{error?.message ?? "Невідома помилка" }</Alert>);
 
     const addChip = () =>{
         var chip = {
@@ -152,11 +150,10 @@ export function ChipAddingModal({ onClose, onAdding }) {
             packagingId: packagingId,
             description: description,
             notice: notice,
-            count: count
+            count: count,
+            datasheet: datasheet
         }
         
-        console.log(chip);
-
         if(name == null){
             errorMessage({message: 'Назва мікросхеми обов\'язкова' });
             return;
@@ -171,7 +168,7 @@ export function ChipAddingModal({ onClose, onAdding }) {
 
     useEffect(() =>{
         !show && onClose();
-    }, [show])
+    }, [show, onClose])
 
 
     return <Modal
@@ -235,7 +232,7 @@ export function ChipAddingModal({ onClose, onAdding }) {
                     onChange={(e) => {
                         if (!isNaN(e.target.value)) {
                             setCount(Number(e.target.value));
-                        } else if (e.target.value.length == 0) {
+                        } else if (e.target.value.length === 0) {
                             return;
                         } else {
                             errorMessage({message: 'Кількість може бути лише в чисельній формі'});
@@ -244,6 +241,16 @@ export function ChipAddingModal({ onClose, onAdding }) {
                     }}
                 />
                 <InputGroup.Text>Штук</InputGroup.Text>
+            </InputGroup>
+
+            <InputGroup className="mb-3">
+                <InputGroup.Text >Даташит</InputGroup.Text>
+                <Form.Control type="file" onChange={(event)=>{
+                    if(event.target.files){
+                        setDatasheet(event.target.files[0]);
+                    }
+                    
+                }}/>
             </InputGroup>
 
         </Modal.Body>
