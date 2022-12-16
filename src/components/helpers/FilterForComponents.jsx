@@ -580,7 +580,7 @@ function QuartzFilter({onChange, components}){
             packaging: [],
             frequency: [],
         }
-
+        
         components.map(item=>{
             variants.packaging.push(item.packaging.id);
             variants.frequency.push(item.frequency);
@@ -724,7 +724,7 @@ function StabilizerFilter({onChange, components}){
                                     })
                                 }
                             })}/>
-                        {HzToReadeble(item)}
+                        {item}
                     </ListGroupItem>)}
                 </ListGroup>
             </ListGroupItem>}
@@ -774,10 +774,10 @@ function TransistorFilter({onChange, components}){
             packaging: [],
             transistorType: [],
         }
-
+        
         components.map(item=>{
             variants.packaging.push(item.packaging.id);
-            variants.transistorType.push(item.transistorType.id);
+            variants.transistorType.push(item.transistorType?.id);
             return null;
         })
 
@@ -918,7 +918,7 @@ function ZenerDiodeFilter({onChange, components}){
                                     })
                                 }
                             })}/>
-                        {HzToReadeble(item)}
+                        {item}
                     </ListGroupItem>)}
                 </ListGroup>
             </ListGroupItem>}

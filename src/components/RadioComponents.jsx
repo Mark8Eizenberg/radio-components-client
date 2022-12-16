@@ -429,7 +429,7 @@ const MaterialEditor = () => {
             </Form.Select>
             <Button variant='danger' onClick={(e)=>{
                 if(window.confirm("Ви впевнені що бажаєте видалити обраний тип корпусу ?")){
-                    MaterialWorker.removeChipType(localStorage.token, id, errorMessage).then(result =>{
+                    MaterialWorker.removeMaterial(localStorage.token, id, errorMessage).then(result =>{
                         if(result){
                             setMessage(
                                 <Alert dismissible variant='success' onClose={clearMessage}> 

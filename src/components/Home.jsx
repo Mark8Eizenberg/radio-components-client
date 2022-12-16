@@ -91,17 +91,18 @@ export default function Home(){
                 <tr>
                   <th>#</th>
                   <th>Id</th>
-                  {choosenComponent.path !== Components.resistor && choosenComponent.path !== Components.quartz &&  <th>назва</th>}
-                  <th>даташит</th>
+                  {choosenComponent.path !== Components.resistor && choosenComponent.path !== Components.quartz &&  <th>Назва</th>}
+                  <th>Даташит</th>
                   {components[0]?.frequency != null && <th>Частота</th>}
-                  {components[0]?.current != null && <th>Струм</th>}
+                  {components[0]?.current != null && <th>Струм A</th>}
                   {components[0]?.resistance != null && <th>Опір</th>}
                   {components[0]?.capacity != null && <th>Ємність</th>}
                   {components[0]?.chipType != null && <th>Тип мікросхеми</th>}
-                  {components[0]?.powerRating != null && <th>Потужність</th>}
-                  {components[0]?.voltage != null && <th>Напруга</th>}
+                  {components[0]?.powerRating != null && <th>Потужність W</th>}
+                  {components[0]?.voltage != null && <th>Напруга V</th>}
                   {components[0]?.transistorType != null && <th>Тип транзистора</th>}
-                  {components[0]?.accuracy != null && <th>Точність</th>}
+                  {components[0]?.accuracy != null && <th>Точність</th>} 
+                  {components[0]?.materialId != null && <th>Матеріал</th>}
                   <th>Корпус</th>
                   <th>Кількість</th>
                   <th>Додати</th>
@@ -132,7 +133,7 @@ export default function Home(){
                   }>{HzToReadeble(item.frequency)}</td>}
                    {components[0]?.current != null && <td onClick={()=>{
                     setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={collectData}/>)}
-                  }>{HzToReadeble(item.current)}</td>}
+                  }>{item.current}</td>}
                   {components[0]?.resistance != null && <td onClick={()=>{
                     setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={collectData}/>)}
                   }>{OmToReadeble(item.resistance)}</td>}
@@ -154,6 +155,9 @@ export default function Home(){
                   {components[0]?.accuracy != null && <td onClick={()=>{
                     setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={collectData}/>)}
                   }>{item.accuracy}</td>}
+                  {components[0]?.materialId != null && <td onClick={()=>{
+                    setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={collectData}/>)}
+                  }>{MaterialWorker.getMaterialById(item?.materialId ?? 1)}</td>}
                   <td onClick={()=>{
                     setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={collectData}/>)}
                   }>{item.packaging.name}</td>
@@ -254,7 +258,10 @@ export default function Home(){
                 components={components} 
                 onChange={filter => setFilters(filter)} />
         <Button className='w-100 mt-1' variant='outline-primary' onClick={
-          () => setMessage(<ImportComponent component={choosenComponent.path} onClose={clearMessage} />)}
+          () => setMessage(<ImportComponent component={choosenComponent.path} onClose={()=>{
+            clearMessage();
+            collectData();
+          }} />)}
           >Імпорт "{choosenComponent.name}"</Button>
         
         <Button className='w-100 mt-1' variant='outline-primary' onClick={()=>{ExportComponents(sortedComponents, ',')}}
