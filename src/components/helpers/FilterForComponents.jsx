@@ -26,9 +26,9 @@ function ResistorFilter({onChange, components}){
         })
 
         variants.packaging = [ ...new Set(variants.packaging)];
-        variants.resistance = [ ...new Set(variants.resistance)];
-        variants.accuracy = [ ...new Set(variants.accuracy)];
-        variants.powerRating = [ ...new Set(variants.powerRating)];
+        variants.resistance = [ ...new Set(variants.resistance)].sort((a,b)=>a-b);
+        variants.accuracy = [ ...new Set(variants.accuracy)].sort((a,b)=>a-b);
+        variants.powerRating = [ ...new Set(variants.powerRating)].sort((a,b)=>a-b);
 
         setVariations(variants);
         setLoading(false);
@@ -195,10 +195,10 @@ function CapacitorFilter({onChange, components}){
         })
 
         variants.packaging = [ ...new Set(variants.packaging)];
-        variants.capacity = [ ...new Set(variants.capacity)];
+        variants.capacity = [ ...new Set(variants.capacity)].sort((a,b)=>a-b);
         variants.materialId = [ ...new Set(variants.materialId)];
-        variants.accuracy = [ ...new Set(variants.accuracy)];
-        variants.powerRating = [ ...new Set(variants.powerRating)];
+        variants.accuracy = [ ...new Set(variants.accuracy)].sort((a,b)=>a-b);
+        variants.powerRating = [ ...new Set(variants.powerRating)].sort((a,b)=>a-b);
 
         setVariations(variants);
         setLoading(false);
@@ -458,8 +458,8 @@ function DiodeFilter({onChange, components}){
         })
 
         variants.packaging = [ ...new Set(variants.packaging)];
-        variants.voltage = [ ...new Set(variants.voltage)];
-        variants.current = [ ...new Set(variants.current)];
+        variants.voltage = [ ...new Set(variants.voltage)].sort((a,b)=>a-b);
+        variants.current = [ ...new Set(variants.current)].sort((a,b)=>a-b);
 
         setVariations(variants);
         setLoading(false);
@@ -588,7 +588,7 @@ function QuartzFilter({onChange, components}){
         })
 
         variants.packaging = [ ...new Set(variants.packaging)];
-        variants.frequency = [ ...new Set(variants.frequency)];
+        variants.frequency = [ ...new Set(variants.frequency)].sort((a,b)=>a-b);
 
         setVariations(variants);
         setLoading(false);
@@ -685,7 +685,7 @@ function StabilizerFilter({onChange, components}){
         })
 
         variants.packaging = [ ...new Set(variants.packaging)];
-        variants.voltage = [ ...new Set(variants.voltage)];
+        variants.voltage = [ ...new Set(variants.voltage)].sort((a,b)=>a-b);
 
         setVariations(variants);
         setLoading(false);
@@ -879,7 +879,7 @@ function ZenerDiodeFilter({onChange, components}){
         })
 
         variants.packaging = [ ...new Set(variants.packaging)];
-        variants.voltage = [ ...new Set(variants.voltage)];
+        variants.voltage = [ ...new Set(variants.voltage)].sort((a,b)=>a-b);
 
         setVariations(variants);
         setLoading(false);

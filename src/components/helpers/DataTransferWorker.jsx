@@ -66,7 +66,7 @@ function ReadCSV({onRead, onClose}){
             var data = fileContext.split('\n');
             data = data.map(item => item.substr(item.length - 1) === '\r' ? item.substr(0, item.length - 1) : item);
             data = data.map(item => item.split(separator));
-            if(data[data.length - 1] === ''){
+            if(data[data.length - 1][0] === ''){
                 data.pop();
             }
 
@@ -127,7 +127,7 @@ function ReadCSV({onRead, onClose}){
 function ParsePercent(percent){
     if(!isNaN(percent)) return Number(percent);
     if(percent[percent.length - 1] === '%'){
-        return Number(percent.substr(0, percent.length - 1))
+        return Number(percent.substr(0, percent.length - 1).replace(',','.'))
     }
     return null;
 }
@@ -146,10 +146,10 @@ function ComponentsToTable({components, onClose}){
             {components[0]?.capacity != null && <th>Ємність</th>}
             {components[0]?.chipType != null && <th>Тип мікросхеми</th>}
             {components[0]?.powerRating != null && <th>Потужність</th>}
-            {components[0]?.voltage != null && <th>Напруга</th>}
+            {(components[0]?.voltage != null || components[0]?.capacity) && <th>Напруга</th>}
             {components[0]?.transistorType != null && <th>Тип транзистора</th>}
             {components[0]?.accuracy != null && <th>Точність</th>}
-            {components[0]?.material != null && <th>Матеріал</th>}
+            {components[0]?.material != null && <th>Матеріал/Тип</th>}
             <th>Корпус</th>
             <th>Кількість</th>
           </tr>
@@ -160,12 +160,12 @@ function ComponentsToTable({components, onClose}){
             <td>{index}</td>
             <td>{item.name}</td>
             {components[0]?.frequency != null && <td  >{HzToReadeble(item.frequency)}</td>}
-             {components[0]?.current != null && <td  >{HzToReadeble(item.current)}</td>}
+             {components[0]?.current != null && <td  >{item.current}</td>}
             {components[0]?.resistance != null && <td  >{OmToReadeble(item.resistance)}</td>}
             {components[0]?.capacity != null && <td  >{microFaradToReadeble(item.capacity)}</td>}
             {components[0]?.chipType != null && <td  >{item.chipType}</td>}
             {components[0]?.powerRating != null && <td  >{item.powerRating}</td>}
-            {components[0]?.voltage != null && <td  >{item.voltage}</td>}
+            {(components[0]?.voltage != null || components[0]?.capacity) && <td  >{item.voltage ?? "Unknown"}</td>}
             {components[0]?.transistorType != null && <td  >{item.transistorType}</td>}
             {components[0]?.accuracy != null && <td  >{item.accuracy}</td>}
             {components[0]?.material != null && <td>{item.material}</td>}
@@ -201,17 +201,17 @@ function ResistorImport({onClose}){
                     return null;
                 case 2:
                     switch (OmArr[1].toLowerCase()){
-                        case 'r': return Number(OmArr[0]);
-                        case 'om': return Number(OmArr[0]);
-                        case 'ом': return Number(OmArr[0]);
-                        case 'k': return Number(OmArr[0]) * 1000;
-                        case 'kom': return Number(OmArr[0]) * 1000;
-                        case 'к': return Number(OmArr[0]) * 1000;
-                        case 'ком': return Number(OmArr[0]) * 1000;
-                        case 'мом': return Number(OmArr[0]) * 1000000;
-                        case 'м': return Number(OmArr[0]) * 1000000;
-                        case 'm': return Number(OmArr[0]) * 1000000;
-                        case 'mom': return Number(OmArr[0]) * 1000000;
+                        case 'r': return Number(OmArr[0].replace(',','.'));
+                        case 'om': return Number(OmArr[0].replace(',','.'));
+                        case 'ом': return Number(OmArr[0].replace(',','.'));
+                        case 'k': return Number(OmArr[0].replace(',','.')) * 1000;
+                        case 'kom': return Number(OmArr[0].replace(',','.')) * 1000;
+                        case 'к': return Number(OmArr[0].replace(',','.')) * 1000;
+                        case 'ком': return Number(OmArr[0].replace(',','.')) * 1000;
+                        case 'мом': return Number(OmArr[0].replace(',','.')) * 1000000;
+                        case 'м': return Number(OmArr[0].replace(',','.')) * 1000000;
+                        case 'm': return Number(OmArr[0].replace(',','.')) * 1000000;
+                        case 'mom': return Number(OmArr[0].replace(',','.')) * 1000000;
                         default: return null;
                     }            
                 default:
@@ -279,14 +279,15 @@ function ResistorImport({onClose}){
     useEffect(()=>{
         if(dataFromFile){
             try {
+                console.log(dataFromFile);
                 const components = dataFromFile.map(o => {
                     return {
                         name: o[0].length < 1 ? 'Resistor_' + o[1] + '_' + o[2] + '_' : o[0],
                         resistance: ParseOm(o[1]),
-                        powerRating: o[2] ? Number(o[2].replace(',', '.')) : null,
-                        accurancy: ParsePercent(o[3]),
+                        powerRating: o[2] ? Number(o[2].replace(',', '.')) : 0,
+                        accuracy: ParsePercent(o[3]),
                         packaging: o[4],
-                        count: o[5] ? Number(o[5].replace(',', '.')) : null,
+                        count: o[5] ? Number(o[5].replace(',', '.')) : 0,
                     }
                 })
                 setComponentsArray(components);
@@ -349,17 +350,17 @@ function CapacitorImport({onClose}){
                     return null;
                 case 2:
                     switch (faradArray[1].toLowerCase()){
-                        case 'p': return Number(faradArray[0] * 0.000001);
-                        case 'pf': return Number(faradArray[0] * 0.000001);
-                        case 'n': return Number(faradArray[0]) * 0.001;
-                        case 'nf': return Number(faradArray[0]) * 0.001;
-                        case 'u': return Number(faradArray[0]);
-                        case 'uf': return Number(faradArray[0]);
-                        case 'µ': return Number(faradArray[0]);
-                        case 'µf': return Number(faradArray[0]);
-                        case 'm': return Number(faradArray[0]) * 1000;
-                        case 'mf': return Number(faradArray[0]) * 1000;
-                        case 'f': return Number(faradArray[0]) * 1000000;
+                        case 'p': return Number(faradArray[0].replace(',','.') * 0.000001);
+                        case 'pf': return Number(faradArray[0].replace(',','.') * 0.000001);
+                        case 'n': return Number(faradArray[0].replace(',','.')) * 0.001;
+                        case 'nf': return Number(faradArray[0].replace(',','.')) * 0.001;
+                        case 'u': return Number(faradArray[0].replace(',','.'));
+                        case 'uf': return Number(faradArray[0].replace(',','.'));
+                        case 'µ': return Number(faradArray[0].replace(',','.'));
+                        case 'µf': return Number(faradArray[0].replace(',','.'));
+                        case 'm': return Number(faradArray[0].replace(',','.')) * 1000;
+                        case 'mf': return Number(faradArray[0].replace(',','.')) * 1000;
+                        case 'f': return Number(faradArray[0].replace(',','.')) * 1000000;
                         default: return null;
                     }            
                 default:
@@ -442,12 +443,14 @@ function CapacitorImport({onClose}){
             try {
                 const components = dataFromFile.map(o => {
                     return {
-                        capacity: ParseMicroFarad(o[0]),
-                        accuracy: ParsePercent(o[1]),
-                        packaging: o[2],
-                        material: o[3],
-                        count: o[4] ? Number(o[4].replace(',', '.')) : null,
-                        name: o[0] + '_' + o[1] + '_' + o[2]
+                        //Назва	Ємність	Напруга	Точність	Матеріал	Корпус	Кількість
+                        name: o[0]?.length < 1 ? ''+ o[1] + '_' + o[2] : o[0],
+                        capacity: ParseMicroFarad(o[1]),
+                        voltage: o[2] !== 'null' && 0[2].length > 0 ? Number(o[2].replace(',','.')) : null,  
+                        accuracy: ParsePercent(o[3]),
+                        material: o[4],
+                        packaging: o[5],
+                        count: o[6] ? Number(o[6].replace(',', '.')) : 0,
                     }
                 })
                 setComponentsArray(components);
@@ -858,15 +861,15 @@ function QuartzImport({onClose}){
                     return null;
                 case 2:
                     switch (parseArray[1].toLowerCase()){
-                        case 'hz': return Number(parseArray[0]);
-                        case 'гц': return Number(parseArray[0]);
-                        case 'k': return Number(parseArray[0]) * 1000;
-                        case 'khz': return Number(parseArray[0]) * 1000;
-                        case 'кгц': return Number(parseArray[0]) * 1000;
-                        case 'мгц': return Number(parseArray[0]) * 1000000;
-                        case 'м': return Number(parseArray[0]) * 1000000;
-                        case 'm': return Number(parseArray[0]) * 1000000;
-                        case 'mhz': return Number(parseArray[0]) * 1000000;
+                        case 'hz': return Number(parseArray[0].replace(',','.'));
+                        case 'гц': return Number(parseArray[0].replace(',','.'));
+                        case 'k': return Number(parseArray[0].replace(',','.')) * 1000;
+                        case 'khz': return Number(parseArray[0].replace(',','.')) * 1000;
+                        case 'кгц': return Number(parseArray[0].replace(',','.')) * 1000;
+                        case 'мгц': return Number(parseArray[0].replace(',','.')) * 1000000;
+                        case 'м': return Number(parseArray[0].replace(',','.')) * 1000000;
+                        case 'm': return Number(parseArray[0].replace(',','.')) * 1000000;
+                        case 'mhz': return Number(parseArray[0].replace(',','.')) * 1000000;
                         default: return null;
                     }            
                 default:
@@ -936,10 +939,11 @@ function QuartzImport({onClose}){
             try {
                 const components = dataFromFile.map(o => {
                     return {
-                        frequency: ParseHz(o[0]),
-                        packaging: o[1],
-                        count: o[2] ? Number(o[2].replace(',', '.')) : null,
-                        name: 'quartz_' + o[0]
+                        //Назва,Частота,Корпус,Кількість
+                        name: o[0]?.length < 1 ?? true ? 'quartz_' + o[1] : o[0],
+                        frequency: ParseHz(o[1]),
+                        packaging: o[2],
+                        count: o[3] ? Number(o[3].replace(',', '.')) : null,
                     }
                 })
                 setComponentsArray(components);
@@ -1451,10 +1455,10 @@ export function ExportComponents(components, separator){
         (components[0]?.capacity != null ? "Ємність" + separator : '') +
         (components[0]?.chipType != null ? "Тип мікросхеми" + separator : '') +
         (components[0]?.powerRating != null ? "Потужність" + separator : '') +
-        (components[0]?.voltage != null ? "Напруга" + separator : '') +
+        (components[0]?.voltage != null || components[0].capacity ? "Напруга" + separator : '') +
         (components[0]?.transistorType != null ? "Тип транзистора" + separator : '') +
         (components[0]?.accuracy != null ? "Точність" + separator : '') +
-        (components[0]?.material != null ? "Матеріал" + separator : '') +
+        (components[0]?.materialId != null ? "Матеріал/Тип" + separator : '') +
         "Корпус" + separator + "Кількість\n";
 
         result += components.map((item)=>
@@ -1465,10 +1469,10 @@ export function ExportComponents(components, separator){
             (components[0]?.capacity != null ? microFaradToReadeble(item.capacity) + separator : '') +
             (components[0]?.chipType != null ? (item.chipType.name) + separator : '') +
             (components[0]?.powerRating != null ? (item.powerRating) + separator : '') +
-            (components[0]?.voltage != null ? (item.voltage) + separator : '') +
+            (components[0]?.voltage != null || components[0].capacity ? (item.voltage) + separator : '') +
             (components[0]?.transistorType != null ? (item.transistorType.name) + separator : '') +
             (components[0]?.accuracy != null ? (item.accuracy) + "%" + separator : '') +
-            (components[0]?.material != null ? item.material + separator : '') +
+            (components[0]?.materialId != null ? MaterialWorker.getMaterialById(item.materialId) + separator : '') +
             item.packaging.name + separator + item.count
         ).join('\n');
 

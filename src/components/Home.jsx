@@ -86,6 +86,7 @@ export default function Home(){
   }
 
   const componentsToTable = (components)=>{
+    console.log(components)
     return <Table striped bordered hover responsive>
               <thead>
                 <tr>
@@ -99,10 +100,10 @@ export default function Home(){
                   {components[0]?.capacity != null && <th>Ємність</th>}
                   {components[0]?.chipType != null && <th>Тип мікросхеми</th>}
                   {components[0]?.powerRating != null && <th>Потужність W</th>}
-                  {components[0]?.voltage != null && <th>Напруга V</th>}
+                  {(components[0]?.voltage != null || components[0].capacity != null) && <th>Напруга V</th>}
                   {components[0]?.transistorType != null && <th>Тип транзистора</th>}
-                  {components[0]?.accuracy != null && <th>Точність</th>} 
-                  {components[0]?.materialId != null && <th>Матеріал</th>}
+                  {components[0]?.accuracy != null && <th>Точність %</th>} 
+                  {components[0]?.materialId != null && <th>Матеріал/Тип</th>}
                   <th>Корпус</th>
                   <th>Кількість</th>
                   <th>Додати</th>
@@ -146,9 +147,9 @@ export default function Home(){
                   {components[0]?.powerRating != null && <td onClick={()=>{
                     setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={collectData}/>)}
                   }>{item.powerRating}</td>}
-                  {components[0]?.voltage != null && <td onClick={()=>{
+                  {(components[0]?.voltage || components[0]?.capacity) && <td onClick={()=>{
                     setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={collectData}/>)}
-                  }>{item.voltage}</td>}
+                  }>{item.voltage ?? "Unknown"}</td>}
                   {components[0]?.transistorType != null && <td onClick={()=>{
                     setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={collectData}/>)}
                   }>{item.transistorType.name}</td>}

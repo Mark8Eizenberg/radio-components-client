@@ -146,6 +146,7 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
     const [multiplicator, setMultiplicator] = useState(1);
     const [datasheet, setDatasheet] = useState(null);
     const [materialId, setMaterial] = useState(1);
+    const [voltage, setVoltage] = useState(null);
     const [count, setCount] = useState(0);
 
     const close = () => setShow(false);
@@ -167,7 +168,8 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
             notice: notice,
             count: count,
             datasheet: datasheet,
-            materialId: materialId
+            materialId: materialId,
+            voltage: voltage,
         }
 
         if(capacity == null){
@@ -244,6 +246,25 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
                     }}
                 />
                 <InputGroup.Text>%</InputGroup.Text>
+            </InputGroup>
+
+            <InputGroup className="mb-3">
+                <InputGroup.Text >Напруга конденсатору</InputGroup.Text>
+                <Form.Control
+                    placeholder="0"
+                    aria-label="Напруга конденсатору"
+                    onChange={(e) => {
+                        if (!isNaN(e.target.value)) {
+                            setVoltage(Number(e.target.value));
+                        } else if (e.target.value.length === 0) {
+                            return;
+                        } else {
+                            errorMessage({message: 'Напруга може бути лише в чисельній формі'});
+                            e.target.value = 0;
+                        }
+                    }}
+                />
+                <InputGroup.Text>V</InputGroup.Text>
             </InputGroup>
 
             <InputGroup className="mb-3">
