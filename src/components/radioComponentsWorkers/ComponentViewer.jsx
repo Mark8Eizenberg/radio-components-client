@@ -17,6 +17,8 @@ const localString = new Map([
     ["description" , "Опис"],
     ["notice" , "Примітки"],
     ["count" , "Кількість"],
+    ["voltage", "Напруга (V)"],
+    ["current", "Струм (A)"],
     ["chipTypeId", "Id типу мікросхеми"]
 ]);
 
@@ -89,7 +91,6 @@ export default function ComponentViewer({id, onClose, title, enableEditor=true, 
             if(key === 'frequency' || key === 'resistance' || key === 'capacity'){
                 const valueEnterElement = document.getElementById('converter-number');
                 newInfo *= valueEnterElement?.value;
-
             }
             newOBject[key] = newInfo;
             return true;

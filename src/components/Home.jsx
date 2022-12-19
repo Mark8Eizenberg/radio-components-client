@@ -86,7 +86,6 @@ export default function Home(){
   }
 
   const componentsToTable = (components)=>{
-    console.log(components)
     return <Table striped bordered hover responsive>
               <thead>
                 <tr>
@@ -105,6 +104,7 @@ export default function Home(){
                   {components[0]?.accuracy != null && <th>Точність %</th>} 
                   {components[0]?.materialId != null && <th>Матеріал/Тип</th>}
                   <th>Корпус</th>
+                  <th>Опис</th>
                   <th>Кількість</th>
                   <th>Додати</th>
                   <th>Взяти</th>
@@ -162,6 +162,7 @@ export default function Home(){
                   <td onClick={()=>{
                     setMessage(<ComponentViewer id={item.id} onClose={()=>setMessage(null)} title={item.name} onUpdateCallback={collectData}/>)}
                   }>{item.packaging.name}</td>
+                  <td>{item.description}</td>
                   <td>{item.count}</td>
                   <td><Button className='w-100' variant='outline-success' onClick={()=>{addComponent(item.id)}}>+</Button></td>
                   <td><Button className='w-100' variant='outline-danger' onClick={()=>{takeComponent(item.id)}}>-</Button></td>
@@ -204,7 +205,7 @@ export default function Home(){
     showAllActiveComponent(choosenComponent.path, localStorage.token, 
         (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error}</Alert>),
         (result) => {
-            const filtersParameters = Object.entries(filters);
+            const filtersParameters = Object.entries(filters ?? {});
             var filteredComponent = result;
 
             for(var i = 0; i < filtersParameters.length; i++ ){
@@ -222,6 +223,9 @@ export default function Home(){
                     break;
                   case 'transistorType':
                     filteredComponent = filteredComponent.filter(item => filterVariables.includes(item[filterParameter].id));
+                    break;
+                  case 'nameSearch':
+                    filteredComponent = filteredComponent.filter(item => item?.name.toLowerCase().indexOf(filterVariables) !== -1);
                     break;
                   default:
                     filteredComponent = filteredComponent.filter(item => filterVariables.includes(item[filterParameter]));
