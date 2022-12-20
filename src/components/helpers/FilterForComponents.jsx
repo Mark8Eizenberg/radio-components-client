@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef} from "react";
 import { Button, Form, InputGroup, ListGroup, ListGroupItem, Spinner } from "react-bootstrap";
 import { Components, HzToReadeble, microFaradToReadeble, OmToReadeble } from "./api/ComponentsEditorWorker";
 import { ChipTypeWorker, MaterialWorker, PackagesWorker, TransistorTypeWorker } from "./api/ComponentsWorker";
@@ -1019,17 +1019,41 @@ function DefaultFilter({onChange, components}){
         </ListGroup>)
 }
 
+function getComponentUniqueFilter(component, components, onChange){
+
+    switch (component) {
+        case Components.resistor:
+            return <ResistorFilter components={components} onChange={onChange}/>
+        case Components.capacitor:
+            return <CapacitorFilter components={components} onChange={onChange}/>
+        case Components.chip:
+            return <ChipFilter components={components} onChange={onChange} />
+        case Components.diode:
+            return <DiodeFilter components={components} onChange={onChange} />
+        case Components.quartz:
+            return <QuartzFilter components={components} onChange={onChange} />
+        case Components.stabilizer:
+            return <StabilizerFilter components={components} onChange={onChange} />
+        case Components.zenerDiode:
+            return <ZenerDiodeFilter components={components} onChange={onChange} />
+        case Components.transistor:
+            return <TransistorFilter components={components} onChange={onChange} />
+        default:
+            return <DefaultFilter components={components} onChange={onChange} />
+    }
+}
+
 export default function FilterForComponent({component, components, onChange}){
     const [filter, setFilter] = useState(null);
     const [childFilter, setChildFilter] = useState(null);
-    const[searchedComponents, setSearchedComponents] = useState(components);
+    const [filterComponent, setFilterComponent] = useState(null);
     const searchFieldRef = useRef(null);
-
+    
     function clearSearch(){
         if(searchFieldRef.current){
             searchFieldRef.current.value = null;
-            setFilter(prevFilters => ({...prevFilters, nameSearch: null}));
-            setSearchedComponents(components);
+            setFilter({nameSearch: null});
+            setFilterComponent(null);
         }
     }
 
@@ -1037,14 +1061,17 @@ export default function FilterForComponent({component, components, onChange}){
         if(searchFieldRef.current){
             const name = searchFieldRef.current.value;
             const searchedResult = components.filter(c=>c.name?.toLowerCase().indexOf(name) > -1);
-            setSearchedComponents(searchedResult);
             setFilter(prevFilters => ({...prevFilters, nameSearch: name}));
+            setFilterComponent(getComponentUniqueFilter(component, searchedResult, changeFilterInChild));
         }
     }
 
     function changeFilterInChild(filter){
-        console.log(filter);
         setChildFilter(filter);
+    }
+
+    function clearFilters(){
+        clearSearch();
     }
 
     useEffect(()=>{
@@ -1052,43 +1079,28 @@ export default function FilterForComponent({component, components, onChange}){
     }, [childFilter])
 
     useEffect(()=>{
-        console.log(filter);
         onChange(filter);
-    },[filter]);
+    },[filter, onChange]);
 
     useEffect(()=>{
-        if(components){
-            setSearchedComponents(components)
+        if(component && components){
+            setFilterComponent(getComponentUniqueFilter(component, components, changeFilterInChild));
         }
-    }, [components])
+    }, [component, components, setFilterComponent])
 
-
-    function getComponentUniqueFilter(component, components, onChange){
-        switch (component) {
-            case Components.resistor:
-                return <ResistorFilter components={components} onChange={onChange}/>
-            case Components.capacitor:
-                return <CapacitorFilter components={components} onChange={onChange}/>
-            case Components.chip:
-                return <ChipFilter components={components} onChange={onChange} />
-            case Components.diode:
-                return <DiodeFilter components={components} onChange={onChange} />
-            case Components.quartz:
-                return <QuartzFilter components={components} onChange={onChange} />
-            case Components.stabilizer:
-                return <StabilizerFilter components={components} onChange={onChange} />
-            case Components.zenerDiode:
-                return <ZenerDiodeFilter components={components} onChange={onChange} />
-            case Components.transistor:
-                return <TransistorFilter components={components} onChange={onChange} />
-            default:
-                return <DefaultFilter components={components} onChange={onChange} />
+    useEffect(()=>{
+        if(!filterComponent){
+            setFilterComponent(getComponentUniqueFilter(component, components, changeFilterInChild));
         }
-    }
+    },[filterComponent, component, components, setFilterComponent])
 
     return <div>
         <ListGroup>
             <ListGroupItem >
+                <Form onSubmit={(e)=>{
+                    searchComponentsByName();
+                    e.preventDefault();
+                }}>
                 <InputGroup>
                     <Form.Control ref={searchFieldRef}/>
                     <Button variant="outline-success" onClick={searchComponentsByName}>
@@ -1096,8 +1108,12 @@ export default function FilterForComponent({component, components, onChange}){
                     </Button>
                     <Button variant="outline-danger" onClick={clearSearch}>X</Button>
                 </InputGroup>
+                </Form>
+            </ListGroupItem>
+            <ListGroupItem>
+                <Button className="w-100" variant="outline-danger" onClick={clearFilters}>Скинути фільтри</Button>
             </ListGroupItem>
         </ListGroup>
-        {getComponentUniqueFilter(component, searchedComponents, changeFilterInChild)}
+        {filterComponent ?? <Spinner animation="grow"></Spinner>}
     </div>
 }

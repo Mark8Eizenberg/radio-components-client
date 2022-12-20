@@ -42,14 +42,19 @@ function App() {
       {message}
       {localStorage.token ? <Router>
         <Navbar collapseOnSelect bg='light' expand='lg'>
-        <Navbar.Brand href="#">Облік радіокомпонентів</Navbar.Brand>
+        <Navbar.Brand href="/">Каталог радіокомпонентів</Navbar.Brand>
           <Navbar.Toggle aria-controls="responsive-navbar-nav" />
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav className='pills-from-navbar' defaultActiveKey="/home">
-              {userRolesLinks[localStorage.userRole].map((link, index) => 
-                <Nav.Item key={index}>
-                  <Nav.Link as={NavLink} to={link.link} end >{link.name}</Nav.Link>
-                </Nav.Item>  
+              {userRolesLinks[localStorage.userRole].map((link, index) =>
+                {
+                  if(link.link !== '/'){
+                    return <Nav.Item key={index}>
+                      <Nav.Link as={NavLink} to={link.link} end >{link.name}</Nav.Link>
+                    </Nav.Item>  
+                  }
+                  return null;
+                }
               )}
               <Nav.Item>
                 <Nav.Link className="exit-btn" onClick={()=>{localStorage.clear(); window.location.href = '/';}}>Вихід</Nav.Link>

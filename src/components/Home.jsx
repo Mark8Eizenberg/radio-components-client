@@ -262,15 +262,6 @@ export default function Home(){
                 component={choosenComponent.path} 
                 components={components} 
                 onChange={filter => setFilters(filter)} />
-        <Button className='w-100 mt-1' variant='outline-primary' onClick={
-          () => setMessage(<ImportComponent component={choosenComponent.path} onClose={()=>{
-            clearMessage();
-            collectData();
-          }} />)}
-          >Імпорт "{choosenComponent.name}"</Button>
-        
-        <Button className='w-100 mt-1' variant='outline-primary' onClick={()=>{ExportComponents(sortedComponents, ',')}}
-          >Експорт результатів</Button>
       </Col>
       <Col md={8} lg={9} style={{padding: '0', margin: '0'}}>
       {
@@ -284,12 +275,28 @@ export default function Home(){
           <ListGroup>
             <ListGroupItem><em>Не знайдено компонентів за даним фільтром</em></ListGroupItem>
           </ListGroup>}
-          <Button variant='success' className='w-100' onClick={()=>{
-            setMessage(<AddingsComponentModalWindow component={choosenComponent.path} onAdd={()=>{
-              collectData();
-              setMessage(<Alert dismissible variant='success' onClose={clearMessage}>Додано новий компонент</Alert>)
-            }} onClose={clearMessage}/>)
-          }}>Додати новий компонент</Button>
+          <Row>
+            <div className='col-8'>
+              <Button variant='success' className='w-100' onClick={()=>{
+                setMessage(<AddingsComponentModalWindow component={choosenComponent.path} onAdd={()=>{
+                  collectData();
+                  setMessage(<Alert dismissible variant='success' onClose={clearMessage}>Додано новий компонент</Alert>)
+                }} onClose={clearMessage}/>)
+              }}>Додати новий компонент</Button>
+            </div>
+            <div className='col-2'>
+              <Button className='w-100' variant='outline-primary' onClick={
+              () => setMessage(<ImportComponent component={choosenComponent.path} onClose={()=>{
+                clearMessage();
+                collectData();
+              }} />)}
+              >Імпорт</Button>
+            </div>
+            <div className='col-2'>
+              <Button className='w-100' variant='outline-primary' onClick={()=>{ExportComponents(sortedComponents, ',')}}
+              >Експорт</Button>
+            </div>
+          </Row>
         </>
       }
       </Col>

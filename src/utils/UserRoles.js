@@ -1,4 +1,4 @@
-﻿import AdminPanel from '../components/AdminPanel'
+import AdminPanel from '../components/AdminPanel'
 import OperationReport from '../components/OperationReport'
 import RadioComponents from '../components/RadioComponents'
 import Home from '../components/Home'
@@ -18,18 +18,18 @@ const userRolesName = {
 export const userRolesLinks = {
     1: [
         { name: 'Головна', link:'/', element: <Home/>  }, 
-        { name: 'Звіти', link: '/reports' , element: <OperationReport/> }, 
-        { name: 'Керування аккаунтами', link: '/admin-panel', element: <AdminPanel/> },
         { name: 'Редагування компонентів', link: '/radiocomponents-editor', element: <RadioComponents/>},
+        { name: 'Журнал', link: '/reports' , element: <OperationReport/> }, 
+        { name: 'Керування аккаунтами', link: '/admin-panel', element: <AdminPanel/> },
     ],
     2: [
         { name: 'Головна', link:'/', element: <Home/>  }, 
-        { name: 'Звіти', link: '/reports' , element: <OperationReport/> }, 
         { name: 'Редагування компонентів', link: '/radiocomponents-editor', element: <RadioComponents/>},
+        { name: 'Журнал', link: '/reports' , element: <OperationReport/> }, 
     ],
     3: [
         { name: 'Головна', link:'/', element: <Home/>  }, 
-        { name: 'Звіти', link: '/reports' , element: <OperationReport/> }, 
+        { name: 'Журнал', link: '/reports' , element: <OperationReport/> }, 
     ],
 }
 
