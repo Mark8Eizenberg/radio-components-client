@@ -3,8 +3,8 @@ import {
     Table, Spinner, Alert, Button,
     Modal, InputGroup, Form
 } from 'react-bootstrap';
-import { 
-    Components as ComponentSelector, 
+import {
+    Components as ComponentSelector,
     showAllActiveComponent, removeComponent,
     addComponent, microFaradToReadeble
 } from '../helpers/api/ComponentsEditorWorker';
@@ -20,8 +20,8 @@ export function EditorCapacitor() {
     const errorMessage = (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>);
     const populateData = () => {
         setLoading(true);
-        
-        showAllActiveComponent(ComponentSelector.capacitor, localStorage.token, 
+
+        showAllActiveComponent(ComponentSelector.capacitor, localStorage.token,
             (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>),
             (result) => {
                 setComponents(result);
@@ -37,11 +37,11 @@ export function EditorCapacitor() {
                     <Alert dismissible onClose={clearMessage}>
                         {`Конденсатор ${id} було видалено`}
                     </Alert>);
-                    populateData();
-            }    
+                populateData();
+            }
         )
-        if(!isRemoved){
-            errorMessage({message: "Помилка видалення компоненту"});
+        if (!isRemoved) {
+            errorMessage({ message: "Помилка видалення компоненту" });
         }
     }
 
@@ -63,51 +63,64 @@ export function EditorCapacitor() {
                 <tbody>
                     {components.map(component =>
                         <tr key={component.id}>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.id}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.name}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.packaging.name}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{microFaradToReadeble(component.capacity)}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.accuracy}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.count}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.id}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.name}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.packaging.name}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{microFaradToReadeble(component.capacity)}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.accuracy}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.count}</td>
                             <td>
-                                <Button style={{ zIndex: '1000' }} variant='outline-danger' 
-                                    onClick={ () => {if(window.confirm(`Видалити конденсатор: "${component.name}"?`))deleteCapacitor(component.id)} 
-                                }>Видалити компонент</Button>
+                                <Button style={{ zIndex: '1000' }} variant='outline-danger'
+                                    onClick={() => { if (window.confirm(`Видалити конденсатор: "${component.name}"?`)) deleteCapacitor(component.id) }
+                                    }>Видалити компонент</Button>
                             </td>
                         </tr>)}
                 </tbody>
             </Table>
-            <Button 
-                variant="outline-success" 
-                className='w-100' 
+            <Button
+                variant="outline-success"
+                className='w-100'
                 onClick={() => setMessage(
-                    <CapacitorAddingModal 
-                        onClose={clearMessage} 
-                        onAdding={(isOk)=>{setMessage(
-                            <Alert dismissible variant='success'
-                                onClose={clearMessage}>Додати компонент
-                            </Alert>);
+                    <CapacitorAddingModal
+                        onClose={clearMessage}
+                        onAdding={(isOk) => {
+                            setMessage(
+                                <Alert dismissible variant='success'
+                                    onClose={clearMessage}>Додати компонент
+                                </Alert>);
                             populateData();
-                        }}/>
-                    )}
+                        }} />
+                )}
             >
                 Додати конденсатор
             </Button>
@@ -116,20 +129,20 @@ export function EditorCapacitor() {
 
     useEffect(() => {
         setLoading(true);
-        
-        showAllActiveComponent(ComponentSelector.capacitor, localStorage.token, 
+
+        showAllActiveComponent(ComponentSelector.capacitor, localStorage.token,
             (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>),
             (result) => {
                 setComponents(result);
                 setLoading(false);
             }
-        ); 
+        );
     }, []);
 
 
     return <>
-        { message }
-        {loading ? <><p>Триває завантаження...</p><Spinner animation="border" size="sm" /></> : showTable() }
+        {message}
+        {loading ? <><p>Триває завантаження...</p><Spinner animation="border" size="sm" /></> : showTable()}
     </>
 }
 
@@ -152,13 +165,13 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
     const close = () => setShow(false);
     const errorMessage = (error) => {
         setMessage(
-            <Alert variant='danger' dismissible onClose={()=>{setMessage(null)}}>
-                {error?.message ?? "Невідома помилка" }
+            <Alert variant='danger' dismissible onClose={() => { setMessage(null) }}>
+                {error?.message ?? "Невідома помилка"}
             </Alert>
         )
     }
 
-    const addCapacitor = () =>{
+    const addCapacitor = () => {
         var capacitor = {
             capacity: capacity * multiplicator,
             accuracy: accuracy,
@@ -172,23 +185,23 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
             voltage: voltage,
         }
 
-        if(capacity == null){
-            errorMessage({message: 'Необхідно ввести ємність при додаванні нового конденсатору' });
+        if (capacity == null) {
+            errorMessage({ message: 'Необхідно ввести ємність при додаванні нового конденсатору' });
             return;
         }
-        if(name == null){
-            errorMessage({message: 'Назва конденсатору обов\'язкова' });
+        if (name == null) {
+            errorMessage({ message: 'Назва конденсатору обов\'язкова' });
             return;
         }
-        
-        addComponent(ComponentSelector.capacitor, capacitor, localStorage.token, errorMessage, (result)=>{
+
+        addComponent(ComponentSelector.capacitor, capacitor, localStorage.token, errorMessage, (result) => {
             setShow(false);
             onAdding(true);
         });
-        
+
     }
 
-    useEffect(() =>{
+    useEffect(() => {
         !show && onClose();
     }, [show, onClose])
 
@@ -213,7 +226,7 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
                         } else if (e.target.value.length === 0) {
                             return;
                         } else {
-                            errorMessage({message: 'Ємність може бути лише в чисельній формі'})
+                            errorMessage({ message: 'Ємність може бути лише в чисельній формі' })
                             e.target.value = 0;
                         }
                     }}
@@ -240,7 +253,7 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
                         } else if (e.target.value.length === 0) {
                             return;
                         } else {
-                            errorMessage({message: 'Точність може бути лише в чисельній формі'});
+                            errorMessage({ message: 'Точність може бути лише в чисельній формі' });
                             e.target.value = 0;
                         }
                     }}
@@ -259,7 +272,7 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
                         } else if (e.target.value.length === 0) {
                             return;
                         } else {
-                            errorMessage({message: 'Напруга може бути лише в чисельній формі'});
+                            errorMessage({ message: 'Напруга може бути лише в чисельній формі' });
                             e.target.value = 0;
                         }
                     }}
@@ -272,7 +285,7 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
                 <Form.Control
                     placeholder="Назва конденсатору"
                     onChange={(e) => {
-                        setName(e.target.value); 
+                        setName(e.target.value);
                     }}
                 />
             </InputGroup>
@@ -282,7 +295,7 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
                 <Form.Select onChange={(e) => {
                     setPackaging(Number(e.target.value))
                 }}>
-                    {PackagesWorker.getPackages().map((item, index)=>{
+                    {PackagesWorker.getPackages().map((item, index) => {
                         return <option key={index} value={item.id}>{item.name}</option>
                     })}
                 </Form.Select>
@@ -293,7 +306,7 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
                 <Form.Select onChange={(e) => {
                     setMaterial(Number(e.target.value))
                 }}>
-                    {MaterialWorker.getMaterials().map((item, index)=>{
+                    {MaterialWorker.getMaterials().map((item, index) => {
                         return <option key={index} value={item.id}>{item.name}</option>
                     })}
                 </Form.Select>
@@ -303,14 +316,14 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
                 <InputGroup.Text>Опис</InputGroup.Text>
                 <Form.Control as='textarea' onChange={(e) => {
                     setDescriprion(e.target.value);
-                }}/>
+                }} />
             </InputGroup>
 
             <InputGroup className='mb-3'>
                 <InputGroup.Text>Примітки</InputGroup.Text>
                 <Form.Control as='textarea' onChange={(e) => {
                     setNotice(e.target.value);
-                }}/>
+                }} />
             </InputGroup>
 
             <InputGroup className="mb-3">
@@ -324,7 +337,7 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
                         } else if (e.target.value.length === 0) {
                             return;
                         } else {
-                            errorMessage({message: 'Кількість може бути лише в чисельній формі'});
+                            errorMessage({ message: 'Кількість може бути лише в чисельній формі' });
                             e.target.value = 0;
                         }
                     }}
@@ -334,12 +347,12 @@ export function CapacitorAddingModal({ onClose, onAdding }) {
 
             <InputGroup className="mb-3">
                 <InputGroup.Text >Даташит</InputGroup.Text>
-                <Form.Control type="file" onChange={(event)=>{
-                    if(event.target.files){
+                <Form.Control type="file" onChange={(event) => {
+                    if (event.target.files) {
                         setDatasheet(event.target.files[0]);
                     }
-                    
-                }}/>
+
+                }} />
             </InputGroup>
 
         </Modal.Body>

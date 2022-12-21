@@ -11,25 +11,25 @@ export const Components = {
     other: "other"
 }
 
-export async function addComponent(component, componentBody, token, errorFunc, okFunc){
-    
-    if(Components[component] == null){
+export async function addComponent(component, componentBody, token, errorFunc, okFunc) {
+
+    if (Components[component] == null) {
         errorFunc({
             message: `Component ${component} does not exixts`
         })
         return false;
     }
 
-    if(componentBody.datasheet){
+    if (componentBody.datasheet) {
         var formData = null;
         let numOfFileInDB = null;
-        
+
         formData = new FormData();
         formData.append('file', componentBody.datasheet, componentBody.datasheet.name);
-        
+
         var addFileHeaders = new Headers();
         addFileHeaders.append("Authorization", "Bearer " + token);
-        
+
         var addFileRequestOption = {
             method: 'POST',
             headers: addFileHeaders,
@@ -38,18 +38,18 @@ export async function addComponent(component, componentBody, token, errorFunc, o
         }
 
         let resultForAddingFile = await fetch(`/api/files/upload`, addFileRequestOption);
-        if(!resultForAddingFile.ok){
-            var error = await resultForAddingFile.json();
+        if (!resultForAddingFile.ok) {
+            let error = await resultForAddingFile.json();
             errorFunc(error);
             return false;
         } else {
             var responce = await resultForAddingFile.json();
             numOfFileInDB = responce?.fileId;
         }
-        
+
         componentBody.datasheet = null;
-        componentBody.datasheetId = numOfFileInDB;    
-        
+        componentBody.datasheetId = numOfFileInDB;
+
     }
 
     var myHeaders = new Headers();
@@ -57,22 +57,22 @@ export async function addComponent(component, componentBody, token, errorFunc, o
     myHeaders.append("Content-Type", "application/json");
 
     var raw = JSON.stringify(componentBody);
-    
+
     var requestOptions = {
         method: 'PUT',
         headers: myHeaders,
         body: raw,
         redirect: 'follow'
     };
-    
-    
+
+
     let result = await fetch(`/api/storage/${Components[component]}/add`, requestOptions);
-    
-    if(result.ok){
+
+    if (result.ok) {
         var data = await result.json();
         okFunc(data);
     } else {
-        var error = await result.json();
+        let error = await result.json();
         errorFunc(error);
         return false;
     }
@@ -80,9 +80,9 @@ export async function addComponent(component, componentBody, token, errorFunc, o
     return true;
 }
 
-export async function removeComponent(component, id, token, errorFunc, okFunc){
-    
-    if(Components[component] == null){
+export async function removeComponent(component, id, token, errorFunc, okFunc) {
+
+    if (Components[component] == null) {
         errorFunc({
             message: `Component ${component} does not exixts`
         })
@@ -100,8 +100,8 @@ export async function removeComponent(component, id, token, errorFunc, okFunc){
     };
 
     let result = await fetch(`/api/storage/${Components[component]}/delete/${id}`, requestOptions);
-    
-    if(!result.ok){
+
+    if (!result.ok) {
         var error = await result.json();
         errorFunc(error);
         return false;
@@ -111,9 +111,9 @@ export async function removeComponent(component, id, token, errorFunc, okFunc){
     return true;
 }
 
-export async function showAllComponent(component, token, errorFunc, okFunc){
-    
-    if(Components[component] == null){
+export async function showAllComponent(component, token, errorFunc, okFunc) {
+
+    if (Components[component] == null) {
         errorFunc({
             message: `Component ${component} does not exixts`
         })
@@ -128,10 +128,10 @@ export async function showAllComponent(component, token, errorFunc, okFunc){
         headers: myHeaders,
         redirect: 'follow'
     };
-    
+
     let result = await fetch(`/api/storage/${Components[component]}/all`, requestOptions);
-    
-    if(result.ok){
+
+    if (result.ok) {
         var data = await result.json();
         okFunc(data);
     } else {
@@ -143,9 +143,9 @@ export async function showAllComponent(component, token, errorFunc, okFunc){
     return true;
 }
 
-export async function showAllActiveComponent(component, token, errorFunc, okFunc){
-    
-    if(Components[component] == null){
+export async function showAllActiveComponent(component, token, errorFunc, okFunc) {
+
+    if (Components[component] == null) {
         errorFunc({
             message: `Component ${component} does not exixts`
         })
@@ -162,8 +162,8 @@ export async function showAllActiveComponent(component, token, errorFunc, okFunc
     };
 
     let result = await fetch(`/api/storage/${Components[component]}/active`, requestOptions);
-    
-    if(result.ok){
+
+    if (result.ok) {
         var data = await result.json();
         okFunc(data);
     } else {
@@ -175,18 +175,18 @@ export async function showAllActiveComponent(component, token, errorFunc, okFunc
     return true;
 }
 
-export async function editComponentInfo(token, component){
+export async function editComponentInfo(token, component) {
     var componentPath = null;
 
-    if(component.resistance){
+    if (component.resistance) {
         componentPath = 'resistor';
-    } else if(component.capacity){
+    } else if (component.capacity) {
         componentPath = 'capacitor';
-    } else if(component.frequency){
+    } else if (component.frequency) {
         componentPath = 'quartz';
-    } else if(component.chipTypeId){
+    } else if (component.chipTypeId) {
         componentPath = 'chip';
-    } else if(component.transistorTypeId){
+    } else if (component.transistorTypeId) {
         componentPath = 'transistor';
     } else {
         componentPath = 'other';
@@ -195,9 +195,9 @@ export async function editComponentInfo(token, component){
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${token}`);
     myHeaders.append("Content-Type", "application/json");
-    
+
     var raw = JSON.stringify(component);
-    
+
     var requestOptions = {
         method: 'PUT',
         headers: myHeaders,
@@ -205,25 +205,25 @@ export async function editComponentInfo(token, component){
         redirect: 'follow'
     };
 
-    
+
     var response = await fetch(`/api/storage/${componentPath}/Edit`, requestOptions);
 
-    if(!response.ok){
-        try{
+    if (!response.ok) {
+        try {
             var error = await response.json();
             return {
                 isOk: false,
                 error: error.message,
             };
         }
-        catch{
+        catch {
             return {
                 isOk: false,
                 error: null,
             };
         }
     }
-    
+
     var result = await response.json();
     return {
         isOk: true,
@@ -232,122 +232,122 @@ export async function editComponentInfo(token, component){
 }
 
 
-export async function getComponentInfo(id, token){
+export async function getComponentInfo(id, token) {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${token}`);
-    
+
     var requestOptions = {
         method: 'GET',
         headers: myHeaders,
-    redirect: 'follow'
+        redirect: 'follow'
     };
-    
+
     var response = await fetch(`/api/storage/info/${id}`, requestOptions);
-    if(!response.ok){
-        try{
+    if (!response.ok) {
+        try {
             var error = await response.json();
             return {
                 isOk: false,
                 error: error.message,
             };
         }
-        catch{
+        catch {
             return {
                 isOk: false,
                 error: null,
             };
         }
     }
-    
+
     var result = await response.json();
-    
+
     return {
         isOk: true,
         data: result,
     }
 }
 
-export async function addComponentToStorage(token, id, count){
+export async function addComponentToStorage(token, id, count) {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${token}`);
     myHeaders.append("Content-Type", "application/json");
 
     var raw = JSON.stringify({
-    "componentId": id,
-    "count": count
+        "componentId": id,
+        "count": count
     });
 
     var requestOptions = {
-    method: 'POST',
-    headers: myHeaders,
-    body: raw,
-    redirect: 'follow'
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
     };
 
     let responce = await fetch("/api/storage/add", requestOptions);
-    if(responce.ok){
+    if (responce.ok) {
         return true;
     } else {
         return false;
     }
 }
 
-export async function takeComponentFromStorage(token, id, count){
+export async function takeComponentFromStorage(token, id, count) {
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Bearer ${token}`);
     myHeaders.append("Content-Type", "application/json");
 
     var raw = JSON.stringify({
-    "componentId": id,
-    "count": count
+        "componentId": id,
+        "count": count
     });
 
     var requestOptions = {
-    method: 'POST',
-    headers: myHeaders,
-    body: raw,
-    redirect: 'follow'
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
     };
 
     let responce = await fetch("/api/storage/remove", requestOptions);
-    if(responce.ok){
+    if (responce.ok) {
         return true;
     } else {
         return false;
     }
 }
 
-export function OmToReadeble(om){
-    if(om / 1000 < 1){
+export function OmToReadeble(om) {
+    if (om / 1000 < 1) {
         return `${om} Om`;
-    } else if(om / 1000000 < 1){
-        return `${om / 1000} kOm`; 
+    } else if (om / 1000000 < 1) {
+        return `${om / 1000} kOm`;
     } else {
-        return `${om / 1000000 } MOm`
+        return `${om / 1000000} MOm`
     }
 }
 
-export function HzToReadeble(om){
-    if(om / 1000 < 1){
+export function HzToReadeble(om) {
+    if (om / 1000 < 1) {
         return `${om} Hz`;
-    } else if(om / 1000000 < 1){
-        return `${om / 1000} kHz`; 
+    } else if (om / 1000000 < 1) {
+        return `${om / 1000} kHz`;
     } else {
-        return `${om / 1000000 } MHz`
+        return `${om / 1000000} MHz`
     }
 }
 
-export function microFaradToReadeble(mF){
-    if(mF > 1){
-        if(mF / 1000 < 1){
-            return `${mF} µF` 
-        } else if(mF / 1000000 < 1){
-            return `${mF/1000} mF`
+export function microFaradToReadeble(mF) {
+    if (mF > 1) {
+        if (mF / 1000 < 1) {
+            return `${mF} µF`
+        } else if (mF / 1000000 < 1) {
+            return `${mF / 1000} mF`
         } else {
             return `${mF / 1000000} F`
         }
     } else {
-        if(mF * 1000 < 1){
+        if (mF * 1000 < 1) {
             return `${mF * 1000000} pF`
         }
         return `${mF * 1000} nF`

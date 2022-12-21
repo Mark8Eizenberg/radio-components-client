@@ -3,8 +3,8 @@ import {
     Table, Spinner, Alert, Button,
     Modal, InputGroup, Form
 } from 'react-bootstrap';
-import { 
-    Components as ComponentSelector, 
+import {
+    Components as ComponentSelector,
     showAllActiveComponent, removeComponent,
     addComponent
 } from '../helpers/api/ComponentsEditorWorker';
@@ -20,15 +20,15 @@ export function TransistorWorker() {
 
     const errorMessage = (error) => {
         setMessage(
-            <Alert dismissible onClose={clearMessage}> 
+            <Alert dismissible onClose={clearMessage}>
                 {error.message}
             </Alert>);
     }
 
     const populateData = () => {
         setLoading(true);
-        
-        showAllActiveComponent(ComponentSelector.transistor, localStorage.token, 
+
+        showAllActiveComponent(ComponentSelector.transistor, localStorage.token,
             errorMessage,
             (result) => {
                 setComponents(result);
@@ -44,11 +44,11 @@ export function TransistorWorker() {
                     <Alert dismissible onClose={clearMessage}>
                         {`Стабілізатор ${id} було видалено`}
                     </Alert>);
-                    populateData();
-            }    
+                populateData();
+            }
         )
-        if(!isRemoved){
-            errorMessage({message: "Помилка видалення компоненту"});
+        if (!isRemoved) {
+            errorMessage({ message: "Помилка видалення компоненту" });
         }
     }
 
@@ -69,47 +69,58 @@ export function TransistorWorker() {
                 <tbody>
                     {components.map(component =>
                         <tr key={component.id}>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.id}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.name}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.transistorType.name} </td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.packaging.name}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.count}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.id}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.name}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.transistorType.name} </td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.packaging.name}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.count}</td>
                             <td>
-                            <Button style={{ zIndex: '1000' }} variant='outline-danger' 
-                                    onClick={ () => {if(window.confirm(`Видалити транзистор: "${component.name}"?`))deleteTransistor(component.id)} }
+                                <Button style={{ zIndex: '1000' }} variant='outline-danger'
+                                    onClick={() => { if (window.confirm(`Видалити транзистор: "${component.name}"?`)) deleteTransistor(component.id) }}
                                 >Видалити компонент</Button>
                             </td>
                         </tr>)}
                 </tbody>
             </Table>
-            <Button 
-                variant="outline-success" 
-                className='w-100' 
+            <Button
+                variant="outline-success"
+                className='w-100'
                 onClick={() => setMessage(
-                    <TransistorAddingModal 
-                        onClose={clearMessage} 
-                        onAdding={(isOk)=>{setMessage(
-                            <Alert dismissible variant='success'
-                                onClose={clearMessage}>Транзистор успішно додано
-                            </Alert>);
+                    <TransistorAddingModal
+                        onClose={clearMessage}
+                        onAdding={(isOk) => {
+                            setMessage(
+                                <Alert dismissible variant='success'
+                                    onClose={clearMessage}>Транзистор успішно додано
+                                </Alert>);
                             populateData();
-                        }}/>
-                    )}
+                        }} />
+                )}
             >
                 Додати транзистор
             </Button>
@@ -118,11 +129,11 @@ export function TransistorWorker() {
 
     useEffect(() => {
         setLoading(true);
-        
-        showAllActiveComponent(ComponentSelector.transistor, localStorage.token, 
-            (error)=>{
+
+        showAllActiveComponent(ComponentSelector.transistor, localStorage.token,
+            (error) => {
                 setMessage(
-                    <Alert dismissible onClose={clearMessage}> 
+                    <Alert dismissible onClose={clearMessage}>
                         {error.message}
                     </Alert>);
             },
@@ -130,13 +141,13 @@ export function TransistorWorker() {
                 setComponents(result);
                 setLoading(false);
             }
-        ); 
+        );
     }, []);
 
 
     return <>
-        { message }
-        {loading ? <><p>Триває завантаження...</p><Spinner animation="border" size="sm" /></> : showTable() }
+        {message}
+        {loading ? <><p>Триває завантаження...</p><Spinner animation="border" size="sm" /></> : showTable()}
     </>
 }
 
@@ -155,24 +166,24 @@ export function TransistorAddingModal({ onClose, onAdding }) {
     const close = () => setShow(false);
     const errorMessage = (error) => {
         setMessage(
-            <Alert variant='danger' dismissible onClose={()=>{setMessage(null)}}>
-                {error?.message ?? "Невідома помилка" }
+            <Alert variant='danger' dismissible onClose={() => { setMessage(null) }}>
+                {error?.message ?? "Невідома помилка"}
             </Alert>
         )
     }
 
-    const addTransistor = () =>{
-        
-        if(name === null){
-            errorMessage({message: 'Назва транзистора обов\'язкова' });
+    const addTransistor = () => {
+
+        if (name === null) {
+            errorMessage({ message: 'Назва транзистора обов\'язкова' });
             return;
         }
 
-        if(transistorTypeId == null || isNaN(transistorTypeId)){
-            errorMessage({ message: "Необхідно вказати тип транзистору"});
+        if (transistorTypeId == null || isNaN(transistorTypeId)) {
+            errorMessage({ message: "Необхідно вказати тип транзистору" });
             return;
         }
-        
+
         var transistor = {
             name: name,
             transistorTypeId: transistorTypeId,
@@ -182,15 +193,15 @@ export function TransistorAddingModal({ onClose, onAdding }) {
             count: count,
             datasheet: datasheet
         }
-        
-        addComponent(ComponentSelector.transistor, transistor, localStorage.token, errorMessage, (result)=>{
+
+        addComponent(ComponentSelector.transistor, transistor, localStorage.token, errorMessage, (result) => {
             setShow(false);
             onAdding(true);
         });
-        
+
     }
 
-    useEffect(() =>{
+    useEffect(() => {
         !show && onClose();
     }, [show, onClose])
 
@@ -209,7 +220,7 @@ export function TransistorAddingModal({ onClose, onAdding }) {
                 <Form.Control
                     placeholder="Назва транзистора"
                     onChange={(e) => {
-                        setName(e.target.value); 
+                        setName(e.target.value);
                     }}
                 />
             </InputGroup>
@@ -219,10 +230,10 @@ export function TransistorAddingModal({ onClose, onAdding }) {
                 <Form.Select
                     placeholder="Тип транзистора"
                     onChange={(e) => {
-                        setTransistorTypeId(e.target.value); 
+                        setTransistorTypeId(e.target.value);
                     }}
                 >
-                    {TransistorTypeWorker.getTransistorTypes().map((type) => 
+                    {TransistorTypeWorker.getTransistorTypes().map((type) =>
                         <option key={type.id} value={type.id}>{type.name}</option>
                     )}
                 </Form.Select>
@@ -233,7 +244,7 @@ export function TransistorAddingModal({ onClose, onAdding }) {
                 <Form.Select onChange={(e) => {
                     setPackaging(Number(e.target.value))
                 }}>
-                    {PackagesWorker.getPackages().map((item, index)=>{
+                    {PackagesWorker.getPackages().map((item, index) => {
                         return <option key={index} value={item.id}>{item.name}</option>
                     })}
                 </Form.Select>
@@ -243,14 +254,14 @@ export function TransistorAddingModal({ onClose, onAdding }) {
                 <InputGroup.Text>Опис</InputGroup.Text>
                 <Form.Control as='textarea' onChange={(e) => {
                     setDescriprion(e.target.value);
-                }}/>
+                }} />
             </InputGroup>
 
             <InputGroup className='mb-3'>
                 <InputGroup.Text>Примітки</InputGroup.Text>
                 <Form.Control as='textarea' onChange={(e) => {
                     setNotice(e.target.value);
-                }}/>
+                }} />
             </InputGroup>
 
             <InputGroup className="mb-3">
@@ -264,7 +275,7 @@ export function TransistorAddingModal({ onClose, onAdding }) {
                         } else if (e.target.value.length === 0) {
                             return;
                         } else {
-                            errorMessage({message: 'Кількість може бути лише в чисельній формі'});
+                            errorMessage({ message: 'Кількість може бути лише в чисельній формі' });
                             e.target.value = 0;
                         }
                     }}
@@ -274,12 +285,12 @@ export function TransistorAddingModal({ onClose, onAdding }) {
 
             <InputGroup className="mb-3">
                 <InputGroup.Text >Даташит</InputGroup.Text>
-                <Form.Control type="file" onChange={(event)=>{
-                    if(event.target.files){
+                <Form.Control type="file" onChange={(event) => {
+                    if (event.target.files) {
                         setDatasheet(event.target.files[0]);
                     }
-                    
-                }}/>
+
+                }} />
             </InputGroup>
 
         </Modal.Body>

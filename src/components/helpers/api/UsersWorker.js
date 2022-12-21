@@ -1,6 +1,4 @@
-import apiUrl from "./apiSettings";
-
-export async function signIn(username, password){
+export async function signIn(username, password) {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
 
@@ -25,13 +23,13 @@ export async function signIn(username, password){
                 localStorage.setItem('userName', data.userName);
                 localStorage.setItem('userFullName', data.userFullName);
                 localStorage.setItem('validTo', data.validTo);
-                return {isOk: true};
+                return { isOk: true };
             } else {
-                return {isOk: false, error: data};
+                return { isOk: false, error: data };
             }
 
         })
         .catch(error => {
-            return {isOk: false, error: error}
+            return { isOk: false, error: error }
         });
 }

@@ -3,8 +3,8 @@ import {
     Table, Spinner, Alert, Button,
     Modal, InputGroup, Form
 } from 'react-bootstrap';
-import { 
-    Components as ComponentSelector, 
+import {
+    Components as ComponentSelector,
     showAllActiveComponent, removeComponent,
     addComponent, OmToReadeble
 } from '../helpers/api/ComponentsEditorWorker';
@@ -19,15 +19,15 @@ export function EditorResistor() {
     const clearMessage = () => setMessage(null);
     const errorMessage = (error) => {
         setMessage(
-            <Alert dismissible onClose={clearMessage}> 
+            <Alert dismissible onClose={clearMessage}>
                 {error.message}
             </Alert>);
     }
     const populateData = () => {
         setLoading(true);
-        
-        showAllActiveComponent(ComponentSelector.resistor, localStorage.token, 
-            (error)=>setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>),
+
+        showAllActiveComponent(ComponentSelector.resistor, localStorage.token,
+            (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>),
             (result) => {
                 setResistors(result);
                 setLoading(false);
@@ -42,11 +42,11 @@ export function EditorResistor() {
                     <Alert dismissible onClose={clearMessage}>
                         {`Resistor with id ${id} was deleted`}
                     </Alert>);
-                    populateData();
-            }    
+                populateData();
+            }
         )
-        if(!isRemoved){
-            errorMessage({message: "Error when deleting resistor"});
+        if (!isRemoved) {
+            errorMessage({ message: "Error when deleting resistor" });
         }
     }
 
@@ -69,56 +69,71 @@ export function EditorResistor() {
                 <tbody>
                     {resistors.map(component =>
                         <tr key={component.id}>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.id}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.name}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.packaging.name}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{OmToReadeble(component.resistance)}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.accuracy}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.powerRating}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.count}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.id}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.name}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.packaging.name}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{OmToReadeble(component.resistance)}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.accuracy}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.powerRating}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.count}</td>
                             <td>
-                                <Button style={{ zIndex: '1000' }} variant='outline-danger' 
-                                    onClick={ () => {if(window.confirm(`Видалити резистор: "${component.name}"?`))deleteResistor(component.id)} }
+                                <Button style={{ zIndex: '1000' }} variant='outline-danger'
+                                    onClick={() => { if (window.confirm(`Видалити резистор: "${component.name}"?`)) deleteResistor(component.id) }}
                                 >Видалити елемент
                                 </Button>
                             </td>
                         </tr>)}
                 </tbody>
             </Table>
-            <Button 
-                variant="outline-success" 
-                className='w-100' 
+            <Button
+                variant="outline-success"
+                className='w-100'
                 onClick={() => setMessage(
-                    <ResistorAddingModal 
-                        onClose={clearMessage} 
-                        onAdding={(isOk)=>{setMessage(
-                            <Alert dismissible variant='success'
-                                onClose={clearMessage}>Додано нові компоненти
-                            </Alert>);
+                    <ResistorAddingModal
+                        onClose={clearMessage}
+                        onAdding={(isOk) => {
+                            setMessage(
+                                <Alert dismissible variant='success'
+                                    onClose={clearMessage}>Додано нові компоненти
+                                </Alert>);
                             populateData();
-                        }}/>
-                    )}
+                        }} />
+                )}
             >
                 Add resistor
             </Button>
@@ -127,19 +142,19 @@ export function EditorResistor() {
 
     useEffect(() => {
         setLoading(true);
-        
-        showAllActiveComponent(ComponentSelector.resistor, localStorage.token, 
-            (error)=>setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>),
+
+        showAllActiveComponent(ComponentSelector.resistor, localStorage.token,
+            (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>),
             (result) => {
                 setResistors(result);
                 setLoading(false);
             }
-        ); 
+        );
     }, []);
 
     return <>
-        { message }
-        {loading ? <><p>Завантаження даних...</p><Spinner animation="border" size="sm" /></> : showTable(resistors) }
+        {message}
+        {loading ? <><p>Завантаження даних...</p><Spinner animation="border" size="sm" /></> : showTable(resistors)}
     </>
 }
 
@@ -161,13 +176,13 @@ export function ResistorAddingModal({ onClose, onAdding }) {
     const close = () => setShow(false);
     const errorMessage = (error) => {
         setMessage(
-            <Alert variant='danger' dismissible onClose={()=>{setMessage(null)}}>
-                {error?.message ?? "Unknown error" }
+            <Alert variant='danger' dismissible onClose={() => { setMessage(null) }}>
+                {error?.message ?? "Unknown error"}
             </Alert>
         )
     }
 
-    const addResistor = () =>{
+    const addResistor = () => {
         var resistor = {
             resistance: resistance * multiplicator,
             accuracy: accuracy,
@@ -180,23 +195,23 @@ export function ResistorAddingModal({ onClose, onAdding }) {
             datasheet: datasheet
         }
 
-        if(resistance == null){
-            errorMessage({message: 'Resistance is required' });
+        if (resistance == null) {
+            errorMessage({ message: 'Resistance is required' });
             return;
         }
-        if(name == null){
-            errorMessage({message: 'Name is required' });
+        if (name == null) {
+            errorMessage({ message: 'Name is required' });
             return;
         }
 
-        addComponent(ComponentSelector.resistor, resistor, localStorage.token, errorMessage, (result)=>{
+        addComponent(ComponentSelector.resistor, resistor, localStorage.token, errorMessage, (result) => {
             setShow(false);
             onAdding(true);
         });
-        
+
     }
 
-    useEffect(() =>{
+    useEffect(() => {
         !show && onClose();
     }, [show, onClose])
 
@@ -221,7 +236,7 @@ export function ResistorAddingModal({ onClose, onAdding }) {
                         } else if (e.target.value.length === 0) {
                             return;
                         } else {
-                            errorMessage({message: 'Resistance is a number'})
+                            errorMessage({ message: 'Resistance is a number' })
                             e.target.value = 0;
                         }
                     }}
@@ -246,7 +261,7 @@ export function ResistorAddingModal({ onClose, onAdding }) {
                         } else if (e.target.value.length === 0) {
                             return;
                         } else {
-                            errorMessage({message: 'Accuracy is a number'});
+                            errorMessage({ message: 'Accuracy is a number' });
                             e.target.value = 0;
                         }
                     }}
@@ -261,11 +276,11 @@ export function ResistorAddingModal({ onClose, onAdding }) {
                     aria-label="Power rating of resistor"
                     onChange={(e) => {
                         if (!isNaN(e.target.value)) {
-                           setPowerRating(Number(e.target.value));
+                            setPowerRating(Number(e.target.value));
                         } else if (e.target.value.length === 0) {
                             return;
                         } else {
-                            errorMessage({message: 'Power ratingis a number' });
+                            errorMessage({ message: 'Power ratingis a number' });
                             e.target.value = 0;
                         }
                     }}
@@ -279,15 +294,15 @@ export function ResistorAddingModal({ onClose, onAdding }) {
                     placeholder="Resistor name"
                     aria-label="Name of resistor"
                     onChange={(e) => {
-                        setName(e.target.value); 
+                        setName(e.target.value);
                     }}
                 />
             </InputGroup>
 
             <InputGroup className="mb-3">
                 <InputGroup.Text >Тип корпусу</InputGroup.Text>
-                <Form.Select onChange={(e) => {setPackaging(e.target.value)}}>
-                {PackagesWorker.getPackages().map((item, index)=>{
+                <Form.Select onChange={(e) => { setPackaging(e.target.value) }}>
+                    {PackagesWorker.getPackages().map((item, index) => {
                         return <option key={index} value={item.id}>{item.name}</option>
                     })}
                 </Form.Select>
@@ -297,14 +312,14 @@ export function ResistorAddingModal({ onClose, onAdding }) {
                 <InputGroup.Text>Опис</InputGroup.Text>
                 <Form.Control as='textarea' onChange={(e) => {
                     setDescriprion(e.target.value);
-                }}/>
+                }} />
             </InputGroup>
 
             <InputGroup className='mb-3'>
                 <InputGroup.Text>Примітки</InputGroup.Text>
                 <Form.Control as='textarea' onChange={(e) => {
                     setNotice(e.target.value);
-                }}/>
+                }} />
             </InputGroup>
 
             <InputGroup className="mb-3">
@@ -318,7 +333,7 @@ export function ResistorAddingModal({ onClose, onAdding }) {
                         } else if (e.target.value.length === 0) {
                             return;
                         } else {
-                            errorMessage({message: 'Кількість може бути лише в чисельній формі'});
+                            errorMessage({ message: 'Кількість може бути лише в чисельній формі' });
                             e.target.value = 0;
                         }
                     }}
@@ -328,12 +343,12 @@ export function ResistorAddingModal({ onClose, onAdding }) {
 
             <InputGroup className="mb-3">
                 <InputGroup.Text >Даташит</InputGroup.Text>
-                <Form.Control type="file" onChange={(event)=>{
-                    if(event.target.files){
+                <Form.Control type="file" onChange={(event) => {
+                    if (event.target.files) {
                         setDatasheet(event.target.files[0]);
                     }
-                    
-                }}/>
+
+                }} />
             </InputGroup>
 
         </Modal.Body>

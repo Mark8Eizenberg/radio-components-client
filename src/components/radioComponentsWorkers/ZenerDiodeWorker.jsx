@@ -3,8 +3,8 @@ import {
     Table, Spinner, Alert, Button,
     Modal, InputGroup, Form
 } from 'react-bootstrap';
-import { 
-    Components as ComponentSelector, 
+import {
+    Components as ComponentSelector,
     showAllActiveComponent, removeComponent,
     addComponent
 } from '../helpers/api/ComponentsEditorWorker';
@@ -19,15 +19,15 @@ export function ZenerDiodeWorker() {
     const clearMessage = () => setMessage(null);
     const errorMessage = (error) => {
         setMessage(
-            <Alert dismissible onClose={clearMessage}> 
+            <Alert dismissible onClose={clearMessage}>
                 {error.message}
             </Alert>);
     }
 
     const populateData = () => {
         setLoading(true);
-        
-        showAllActiveComponent(ComponentSelector.zenerDiode, localStorage.token, 
+
+        showAllActiveComponent(ComponentSelector.zenerDiode, localStorage.token,
             errorMessage,
             (result) => {
                 setComponents(result);
@@ -43,11 +43,11 @@ export function ZenerDiodeWorker() {
                     <Alert dismissible onClose={clearMessage}>
                         {`Стабілізатор ${id} було видалено`}
                     </Alert>);
-                    populateData();
-            }    
+                populateData();
+            }
         )
-        if(!isRemoved){
-            errorMessage({message: "Помилка видалення компоненту"});
+        if (!isRemoved) {
+            errorMessage({ message: "Помилка видалення компоненту" });
         }
     }
 
@@ -68,48 +68,59 @@ export function ZenerDiodeWorker() {
                 <tbody>
                     {components.map(component =>
                         <tr key={component.id} >
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.id}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.name}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.voltage} V</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.packaging.name}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.count}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.id}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.name}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.voltage} V</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.packaging.name}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.count}</td>
                             <td>
-                            <Button style={{ zIndex: '1000' }} variant='outline-danger' 
-                                    onClick={ () => {if(window.confirm(`Видалити стабілітрон: "${component.name}"?`))deleteZenerDiode(component.id)} }
+                                <Button style={{ zIndex: '1000' }} variant='outline-danger'
+                                    onClick={() => { if (window.confirm(`Видалити стабілітрон: "${component.name}"?`)) deleteZenerDiode(component.id) }}
                                 >Видалити компонент
-                            </Button>
+                                </Button>
                             </td>
                         </tr>)}
                 </tbody>
             </Table>
-            <Button 
-                variant="outline-success" 
-                className='w-100' 
+            <Button
+                variant="outline-success"
+                className='w-100'
                 onClick={() => setMessage(
-                    <ZenerDiodeAddingModal 
-                        onClose={clearMessage} 
-                        onAdding={(isOk)=>{setMessage(
-                            <Alert dismissible variant='success'
-                                onClose={clearMessage}>Стабілітрон успішно додано
-                            </Alert>);
+                    <ZenerDiodeAddingModal
+                        onClose={clearMessage}
+                        onAdding={(isOk) => {
+                            setMessage(
+                                <Alert dismissible variant='success'
+                                    onClose={clearMessage}>Стабілітрон успішно додано
+                                </Alert>);
                             populateData();
-                        }}/>
-                    )}
+                        }} />
+                )}
             >
                 Додати стабілітрон
             </Button>
@@ -118,11 +129,11 @@ export function ZenerDiodeWorker() {
 
     useEffect(() => {
         setLoading(true);
-        
+
         showAllActiveComponent(ComponentSelector.zenerDiode, localStorage.token,
-            (error)=>{
+            (error) => {
                 setMessage(
-                    <Alert dismissible onClose={clearMessage}> 
+                    <Alert dismissible onClose={clearMessage}>
                         {error.message}
                     </Alert>);
             },
@@ -135,8 +146,8 @@ export function ZenerDiodeWorker() {
 
 
     return <>
-        { message }
-        {loading ? <><p>Триває завантаження...</p><Spinner animation="border" size="sm" /></> : showTable() }
+        {message}
+        {loading ? <><p>Триває завантаження...</p><Spinner animation="border" size="sm" /></> : showTable()}
     </>
 }
 
@@ -155,29 +166,29 @@ export function ZenerDiodeAddingModal({ onClose, onAdding }) {
     const close = () => setShow(false);
     const errorMessage = (error) => {
         setMessage(
-            <Alert variant='danger' dismissible onClose={()=>{setMessage(null)}}>
-                {error?.message ?? "Невідома помилка" }
+            <Alert variant='danger' dismissible onClose={() => { setMessage(null) }}>
+                {error?.message ?? "Невідома помилка"}
             </Alert>
         )
     }
 
-    const addZenerDiode = () =>{
-        
-        if(name === null){
-            errorMessage({message: 'Назва стабілітрона обов\'язкова' });
+    const addZenerDiode = () => {
+
+        if (name === null) {
+            errorMessage({ message: 'Назва стабілітрона обов\'язкова' });
             return;
         }
 
-        if(voltage === null){
-            errorMessage({message: 'Необхідно вказати напругу стабілітрона'})
+        if (voltage === null) {
+            errorMessage({ message: 'Необхідно вказати напругу стабілітрона' })
             return;
         }
 
-        if(isNaN(voltage)){
-            errorMessage({message:'Напруга має містити лише числа'});
+        if (isNaN(voltage)) {
+            errorMessage({ message: 'Напруга має містити лише числа' });
             return;
         }
-        
+
         var zenerDiode = {
             name: name,
             voltage: Number(voltage),
@@ -187,15 +198,15 @@ export function ZenerDiodeAddingModal({ onClose, onAdding }) {
             count: count,
             datasheet: datasheet
         }
-        
-        addComponent(ComponentSelector.zenerDiode, zenerDiode, localStorage.token, errorMessage, (result)=>{
+
+        addComponent(ComponentSelector.zenerDiode, zenerDiode, localStorage.token, errorMessage, (result) => {
             setShow(false);
             onAdding(true);
         });
-        
+
     }
 
-    useEffect(() =>{
+    useEffect(() => {
         !show && onClose();
     }, [show, onClose])
 
@@ -214,7 +225,7 @@ export function ZenerDiodeAddingModal({ onClose, onAdding }) {
                 <Form.Control
                     placeholder="Назва стабілітрон"
                     onChange={(e) => {
-                        setName(e.target.value); 
+                        setName(e.target.value);
                     }}
                 />
             </InputGroup>
@@ -224,7 +235,7 @@ export function ZenerDiodeAddingModal({ onClose, onAdding }) {
                 <Form.Control
                     placeholder="напруга стабілітрона"
                     onChange={(e) => {
-                        setVoltage(e.target.value); 
+                        setVoltage(e.target.value);
                     }}
                 />
             </InputGroup>
@@ -234,7 +245,7 @@ export function ZenerDiodeAddingModal({ onClose, onAdding }) {
                 <Form.Select onChange={(e) => {
                     setPackaging(Number(e.target.value))
                 }}>
-                    {PackagesWorker.getPackages().map((item, index)=>{
+                    {PackagesWorker.getPackages().map((item, index) => {
                         return <option key={index} value={item.id}>{item.name}</option>
                     })}
                 </Form.Select>
@@ -244,14 +255,14 @@ export function ZenerDiodeAddingModal({ onClose, onAdding }) {
                 <InputGroup.Text>Опис</InputGroup.Text>
                 <Form.Control as='textarea' onChange={(e) => {
                     setDescriprion(e.target.value);
-                }}/>
+                }} />
             </InputGroup>
 
             <InputGroup className='mb-3'>
                 <InputGroup.Text>Примітки</InputGroup.Text>
                 <Form.Control as='textarea' onChange={(e) => {
                     setNotice(e.target.value);
-                }}/>
+                }} />
             </InputGroup>
 
             <InputGroup className="mb-3">
@@ -265,7 +276,7 @@ export function ZenerDiodeAddingModal({ onClose, onAdding }) {
                         } else if (e.target.value.length === 0) {
                             return;
                         } else {
-                            errorMessage({message: 'Кількість може бути лише в чисельній формі'});
+                            errorMessage({ message: 'Кількість може бути лише в чисельній формі' });
                             e.target.value = 0;
                         }
                     }}
@@ -275,12 +286,12 @@ export function ZenerDiodeAddingModal({ onClose, onAdding }) {
 
             <InputGroup className="mb-3">
                 <InputGroup.Text >Даташит</InputGroup.Text>
-                <Form.Control type="file" onChange={(event)=>{
-                    if(event.target.files){
+                <Form.Control type="file" onChange={(event) => {
+                    if (event.target.files) {
                         setDatasheet(event.target.files[0]);
                     }
-                    
-                }}/>
+
+                }} />
             </InputGroup>
 
         </Modal.Body>

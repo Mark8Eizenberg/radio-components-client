@@ -1,5 +1,5 @@
-﻿import React, { Component } from 'react'
-import Alert  from 'react-bootstrap/Alert'
+import React, { Component } from 'react'
+import Alert from 'react-bootstrap/Alert'
 import Table from 'react-bootstrap/Table'
 import Card from 'react-bootstrap/Card'
 import userRoles, { getUserRoleName } from '../utils/UserRoles'
@@ -34,7 +34,8 @@ export default class AdminPanel extends Component {
             this.setState({
                 message: (<Alert variant="danger" onClose={() => this.setState({ message: null })} dismissible>
                     {data.message}
-                </Alert>) })
+                </Alert>)
+            })
         }
 
     }
@@ -49,7 +50,7 @@ export default class AdminPanel extends Component {
             redirect: 'follow'
         };
 
-        fetch("api/users/" + id , requestOptions)
+        fetch("api/users/" + id, requestOptions)
             .then(response => {
                 !response.ok && this.setState({
                     message: (<Alert variant="danger" onClose={() => this.setState({ message: null })} dismissible>
@@ -157,7 +158,7 @@ export default class AdminPanel extends Component {
                                                 Видалити користувача
                                             </button>
                                         </td>
-                                    </tr> 
+                                    </tr>
                                 )}
                             </tbody>
                         </Table>
@@ -169,58 +170,58 @@ export default class AdminPanel extends Component {
                     </Card.Header>
                     <Card.Body>
                         <InputGroup className='mb-1'>
-                        <InputGroup.Text >Нікнейм</InputGroup.Text>
-                        <Form.Control
-                            aria-label="Nickname"
-                            placeholder='Нікнейм'
-                            onChange={(e) => {
-                                userName = e.target.value
-                            }}
-                        />
+                            <InputGroup.Text >Нікнейм</InputGroup.Text>
+                            <Form.Control
+                                aria-label="Nickname"
+                                placeholder='Нікнейм'
+                                onChange={(e) => {
+                                    userName = e.target.value
+                                }}
+                            />
                         </InputGroup>
                         <InputGroup className='mb-1'>
-                        <InputGroup.Text >Пароль</InputGroup.Text>
-                        <Form.Control
-                            type = "password" 
-                            aria-label="capacity"
-                            placeholder='Password'
-                            onChange={(e) => {
-                                userPassword = e.target.value
-                            }}
-                        />
+                            <InputGroup.Text >Пароль</InputGroup.Text>
+                            <Form.Control
+                                type="password"
+                                aria-label="capacity"
+                                placeholder='Password'
+                                onChange={(e) => {
+                                    userPassword = e.target.value
+                                }}
+                            />
                         </InputGroup>
                         <InputGroup className='mb-1'>
-                        <InputGroup.Text >Повне ім'я</InputGroup.Text>
-                        <Form.Control
-                            aria-label="capacity"
-                            placeholder='Full Name'
-                            onChange={(e) => {
-                                userFullName = e.target.value
-                            }}
-                        />
+                            <InputGroup.Text >Повне ім'я</InputGroup.Text>
+                            <Form.Control
+                                aria-label="capacity"
+                                placeholder='Full Name'
+                                onChange={(e) => {
+                                    userFullName = e.target.value
+                                }}
+                            />
                         </InputGroup>
                         <InputGroup className='mb-1'>
-                        <InputGroup.Text >Тип користувача</InputGroup.Text>
-                        <Form.Select
-                            onChange={(e) => {
-                                roleId = Number(e.target.value);
-                            }}
-                        >
-                            {userRoles.map((role, index) => <option key={role.id} value={role.id}>{role.role}</option>)}
-                        </Form.Select>
+                            <InputGroup.Text >Тип користувача</InputGroup.Text>
+                            <Form.Select
+                                onChange={(e) => {
+                                    roleId = Number(e.target.value);
+                                }}
+                            >
+                                {userRoles.map((role, index) => <option key={role.id} value={role.id}>{role.role}</option>)}
+                            </Form.Select>
                         </InputGroup>
                         <Button variant="outline-success" className='w-100' onClick={() => { this.addUser(userName, userPassword, userFullName, roleId); }}>Додати користувача</Button>
                     </Card.Body>
                 </Card>
             </div>
-            )
+        )
     }
 
     render() {
-        return(
-        <div>
-            {this.state.message != null && this.state.message}
-                {this.state.loading ? <p>Триває завантаження ...</p> : this.createUsersViews(this.state.users) }
+        return (
+            <div>
+                {this.state.message != null && this.state.message}
+                {this.state.loading ? <p>Триває завантаження ...</p> : this.createUsersViews(this.state.users)}
             </div>
         )
     }

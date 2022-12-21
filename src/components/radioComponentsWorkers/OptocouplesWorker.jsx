@@ -3,8 +3,8 @@ import {
     Table, Spinner, Alert, Button,
     Modal, InputGroup, Form
 } from 'react-bootstrap';
-import { 
-    Components as ComponentSelector, 
+import {
+    Components as ComponentSelector,
     showAllActiveComponent, removeComponent,
     addComponent
 } from '../helpers/api/ComponentsEditorWorker';
@@ -20,8 +20,8 @@ export function OptocouplesWorker() {
     const errorMessage = (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>);
     const populateData = () => {
         setLoading(true);
-        
-        showAllActiveComponent(ComponentSelector.optocouple, localStorage.token, 
+
+        showAllActiveComponent(ComponentSelector.optocouple, localStorage.token,
             (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>),
             (result) => {
                 setComponents(result);
@@ -37,11 +37,11 @@ export function OptocouplesWorker() {
                     <Alert dismissible onClose={clearMessage}>
                         {`Оптопару ${id} було видалено`}
                     </Alert>);
-                    populateData();
-            }    
+                populateData();
+            }
         )
-        if(!isRemoved){
-            errorMessage({message: "Помилка видалення компоненту"});
+        if (!isRemoved) {
+            errorMessage({ message: "Помилка видалення компоненту" });
         }
     }
 
@@ -61,43 +61,52 @@ export function OptocouplesWorker() {
                 <tbody>
                     {components.map(component =>
                         <tr key={component.id} >
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.id}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.name}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.packaging.name}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.count}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.id}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.name}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.packaging.name}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.count}</td>
                             <td>
-                            <Button style={{ zIndex: '1000' }} variant='outline-danger' 
-                                    onClick={ () => {if(window.confirm(`Видалити оптопару: "${component.name}"?`))deleteOptocouple(component.id)} }
+                                <Button style={{ zIndex: '1000' }} variant='outline-danger'
+                                    onClick={() => { if (window.confirm(`Видалити оптопару: "${component.name}"?`)) deleteOptocouple(component.id) }}
                                 >Видалити компонент</Button>
                             </td>
                         </tr>)}
                 </tbody>
             </Table>
-            <Button 
-                variant="outline-success" 
-                className='w-100' 
+            <Button
+                variant="outline-success"
+                className='w-100'
                 onClick={() => setMessage(
-                    <OptocoupleAddingModal 
-                        onClose={clearMessage} 
-                        onAdding={(isOk)=>{setMessage(
-                            <Alert dismissible variant='success'
-                                onClose={clearMessage}>Оптопару успішно додано
-                            </Alert>);
+                    <OptocoupleAddingModal
+                        onClose={clearMessage}
+                        onAdding={(isOk) => {
+                            setMessage(
+                                <Alert dismissible variant='success'
+                                    onClose={clearMessage}>Оптопару успішно додано
+                                </Alert>);
                             populateData();
-                        }}/>
-                    )}
+                        }} />
+                )}
             >
                 Додати оптопару
             </Button>
@@ -106,20 +115,20 @@ export function OptocouplesWorker() {
 
     useEffect(() => {
         setLoading(true);
-        
-        showAllActiveComponent(ComponentSelector.optocouple, localStorage.token, 
+
+        showAllActiveComponent(ComponentSelector.optocouple, localStorage.token,
             (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>),
             (result) => {
                 setComponents(result);
                 setLoading(false);
             }
-        ); 
+        );
     }, []);
 
 
     return <>
-        { message }
-        {loading ? <><p>Триває завантаження...</p><Spinner animation="border" size="sm" /></> : showTable() }
+        {message}
+        {loading ? <><p>Триває завантаження...</p><Spinner animation="border" size="sm" /></> : showTable()}
     </>
 }
 
@@ -137,13 +146,13 @@ export function OptocoupleAddingModal({ onClose, onAdding }) {
     const close = () => setShow(false);
     const errorMessage = (error) => {
         setMessage(
-            <Alert variant='danger' dismissible onClose={()=>{setMessage(null)}}>
-                {error?.message ?? "Невідома помилка" }
+            <Alert variant='danger' dismissible onClose={() => { setMessage(null) }}>
+                {error?.message ?? "Невідома помилка"}
             </Alert>
         )
     }
 
-    const addOptocouple = () =>{
+    const addOptocouple = () => {
         var optocouple = {
             name: name,
             packagingId: packagingId,
@@ -152,20 +161,20 @@ export function OptocoupleAddingModal({ onClose, onAdding }) {
             count: count,
             datasheet: datasheet
         }
-        
-        if(name == null){
-            errorMessage({message: 'Назва оптопари обов\'язкова' });
+
+        if (name == null) {
+            errorMessage({ message: 'Назва оптопари обов\'язкова' });
             return;
         }
 
-        addComponent(ComponentSelector.optocouple, optocouple, localStorage.token, errorMessage, (result)=>{
+        addComponent(ComponentSelector.optocouple, optocouple, localStorage.token, errorMessage, (result) => {
             setShow(false);
             onAdding(true);
         });
-        
+
     }
 
-    useEffect(() =>{
+    useEffect(() => {
         !show && onClose();
     }, [show, onClose])
 
@@ -184,7 +193,7 @@ export function OptocoupleAddingModal({ onClose, onAdding }) {
                 <Form.Control
                     placeholder="Назва оптопари"
                     onChange={(e) => {
-                        setName(e.target.value); 
+                        setName(e.target.value);
                     }}
                 />
             </InputGroup>
@@ -194,7 +203,7 @@ export function OptocoupleAddingModal({ onClose, onAdding }) {
                 <Form.Select onChange={(e) => {
                     setPackaging(Number(e.target.value))
                 }}>
-                    {PackagesWorker.getPackages().map((item, index)=>{
+                    {PackagesWorker.getPackages().map((item, index) => {
                         return <option key={index} value={item.id}>{item.name}</option>
                     })}
                 </Form.Select>
@@ -204,14 +213,14 @@ export function OptocoupleAddingModal({ onClose, onAdding }) {
                 <InputGroup.Text>Опис</InputGroup.Text>
                 <Form.Control as='textarea' onChange={(e) => {
                     setDescriprion(e.target.value);
-                }}/>
+                }} />
             </InputGroup>
 
             <InputGroup className='mb-3'>
                 <InputGroup.Text>Примітки</InputGroup.Text>
                 <Form.Control as='textarea' onChange={(e) => {
                     setNotice(e.target.value);
-                }}/>
+                }} />
             </InputGroup>
 
             <InputGroup className="mb-3">
@@ -225,7 +234,7 @@ export function OptocoupleAddingModal({ onClose, onAdding }) {
                         } else if (e.target.value.length === 0) {
                             return;
                         } else {
-                            errorMessage({message: 'Кількість може бути лише в чисельній формі'});
+                            errorMessage({ message: 'Кількість може бути лише в чисельній формі' });
                             e.target.value = 0;
                         }
                     }}
@@ -235,12 +244,12 @@ export function OptocoupleAddingModal({ onClose, onAdding }) {
 
             <InputGroup className="mb-3">
                 <InputGroup.Text >Даташит</InputGroup.Text>
-                <Form.Control type="file" onChange={(event)=>{
-                    if(event.target.files){
+                <Form.Control type="file" onChange={(event) => {
+                    if (event.target.files) {
                         setDatasheet(event.target.files[0]);
                     }
-                    
-                }}/>
+
+                }} />
             </InputGroup>
 
         </Modal.Body>

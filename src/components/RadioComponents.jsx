@@ -15,56 +15,56 @@ import { Button, Form, InputGroup, Alert } from 'react-bootstrap';
 
 export default function RadioComponents() {
 
-    useEffect(()=>{
+    useEffect(() => {
         PackagesWorker.updatePackages(localStorage.token);
         ChipTypeWorker.updateChipTypes(localStorage.token);
         TransistorTypeWorker.updateTransistorTypes(localStorage.token);
     }, []);
-    
+
     return <>
         <DropDownCard name="Редагування радіокомпонентів">
             <DropDownCard name={"Резистори"}>
-                <EditorResistor/>
+                <EditorResistor />
             </DropDownCard>
             <DropDownCard name={"Конденсатори"}>
-                <EditorCapacitor/>
+                <EditorCapacitor />
             </DropDownCard>
             <DropDownCard name={"Мікросхеми"}>
-                <ChipWorker/>
+                <ChipWorker />
             </DropDownCard>
             <DropDownCard name={"Діоди"}>
-                <DiodeWorker/>
+                <DiodeWorker />
             </DropDownCard>
             <DropDownCard name={"Оптопара"}>
-                <OptocouplesWorker/>
+                <OptocouplesWorker />
             </DropDownCard>
             <DropDownCard name={"Кварци"}>
-                <QuartzWorker/>
+                <QuartzWorker />
             </DropDownCard>
             <DropDownCard name={"Стабілізатор"}>
-                <StabilizerWorker/>
+                <StabilizerWorker />
             </DropDownCard>
             <DropDownCard name={"Транзистори"}>
-                <TransistorWorker/>
+                <TransistorWorker />
             </DropDownCard>
             <DropDownCard name={"Стабілітрони"}>
-                <ZenerDiodeWorker/>
+                <ZenerDiodeWorker />
             </DropDownCard>
             <DropDownCard name={"Інше"}>
-                <OtherWorker/>
+                <OtherWorker />
             </DropDownCard>
         </DropDownCard>
         <DropDownCard name={"Типи корпусу"}>
-            <PackageEditor/>
+            <PackageEditor />
         </DropDownCard>
         <DropDownCard name={"Типи транзисторів"}>
-            <TransistorTypeEditor/>
+            <TransistorTypeEditor />
         </DropDownCard>
         <DropDownCard name={"Типи мікросхем"}>
-            <ChipTypeEditor/>
+            <ChipTypeEditor />
         </DropDownCard>
         <DropDownCard name={"Матеріали"}>
-            <MaterialEditor/>
+            <MaterialEditor />
         </DropDownCard>
 
     </>
@@ -75,23 +75,23 @@ const PackageEditor = () => {
     const clearMessage = () => setMessage(null);
     const errorMessage = (error) => {
         setMessage(
-            <Alert dismissible variant='danger' onClose={clearMessage}> 
+            <Alert dismissible variant='danger' onClose={clearMessage}>
                 {error}
             </Alert>);
     }
 
     const [loading, setLoading] = useState(true);
-    const [packages, setPackages] = useState([]);    
+    const [packages, setPackages] = useState([]);
     const [needUpdate, setNeedUpdate] = useState(false);
 
     const [id, setId] = useState(1);
     const [name, setName] = useState(null);
     const [description, setDescription] = useState(null);
-    
-    useEffect(()=>{
-        if(PackagesWorker.getPackages().length < 1){
+
+    useEffect(() => {
+        if (PackagesWorker.getPackages().length < 1) {
             PackagesWorker.updatePackages(localStorage.token)
-                .then(result =>{
+                .then(result => {
                     setPackages(PackagesWorker.getPackages());
                     setLoading(false);
                 })
@@ -101,12 +101,12 @@ const PackageEditor = () => {
         }
     }, [])
 
-    useEffect(()=>{
-        if(needUpdate){
+    useEffect(() => {
+        if (needUpdate) {
             setLoading(true);
-            if(PackagesWorker.getPackages().length < 1){
+            if (PackagesWorker.getPackages().length < 1) {
                 PackagesWorker.updatePackages(localStorage.token)
-                    .then(result =>{
+                    .then(result => {
                         setPackages(PackagesWorker.getPackages());
                         setLoading(false);
                         setNeedUpdate(false);
@@ -117,65 +117,65 @@ const PackageEditor = () => {
                 setNeedUpdate(false);
             }
         }
-    }, [needUpdate] )
+    }, [needUpdate])
 
     return loading ? <>
         <em>Триває завантаження</em>
-    </> : 
-    
-    <>
-        {message}
-        <InputGroup className='mb-3'>
-            <InputGroup.Text>Оберіть корпус для видалення</InputGroup.Text>
-            <Form.Select onChange={e => {
-                setId(e.target.value);
-            }}>
-                {packages.map((item) => 
-                    <option key={item.id} value={item.id}>#{item.id} {item.name}</option>    
-            )}
-            </Form.Select>
-            <Button variant='danger' onClick={(e)=>{
-                if(window.confirm("Ви впевнені що бажаєте видалити обраний тип корпусу ?")){
-                    PackagesWorker.removePackage(localStorage.token, id, errorMessage)
-                        .then(result => {
-                            if(result){
-                                setMessage(
-                                    <Alert dismissible variant='success' onClose={clearMessage}> 
-                                        Тип корпусу видалено
-                                    </Alert>);
-                                setNeedUpdate(true);
-                            }
-                    });
-                }
-            }}>Видалити</Button>
-        </InputGroup>
+    </> :
 
-        <InputGroup className='mb-3'>
-            <InputGroup.Text>Назва нового корпусу</InputGroup.Text>
-            <Form.Control placeholder='Назва' onChange={e => setName(e.target.value)}></Form.Control>
-            <InputGroup.Text>Короткий опис нового корпусу</InputGroup.Text>
-            <Form.Control placeholder='опис' onChange={e=>setDescription(e.target.value)}></Form.Control>
-            <Button variant='success'
-                onClick={(e)=>{
-                    if(name == null){
-                        errorMessage("Необхідно ввести назву нового типу корпусу");
-                        return;
-                    }
-                    PackagesWorker.addNewPackages(localStorage.token, name, description, errorMessage)
-                        .then(result => {
-                            if(result){
-                                setMessage(
-                                    <Alert dismissible variant='success' onClose={clearMessage}> 
-                                        Тип корпусу додано
-                                    </Alert>);
-                                setNeedUpdate(true);
-                            }
-                        });
+        <>
+            {message}
+            <InputGroup className='mb-3'>
+                <InputGroup.Text>Оберіть корпус для видалення</InputGroup.Text>
+                <Form.Select onChange={e => {
+                    setId(e.target.value);
                 }}>
+                    {packages.map((item) =>
+                        <option key={item.id} value={item.id}>#{item.id} {item.name}</option>
+                    )}
+                </Form.Select>
+                <Button variant='danger' onClick={(e) => {
+                    if (window.confirm("Ви впевнені що бажаєте видалити обраний тип корпусу ?")) {
+                        PackagesWorker.removePackage(localStorage.token, id, errorMessage)
+                            .then(result => {
+                                if (result) {
+                                    setMessage(
+                                        <Alert dismissible variant='success' onClose={clearMessage}>
+                                            Тип корпусу видалено
+                                        </Alert>);
+                                    setNeedUpdate(true);
+                                }
+                            });
+                    }
+                }}>Видалити</Button>
+            </InputGroup>
+
+            <InputGroup className='mb-3'>
+                <InputGroup.Text>Назва нового корпусу</InputGroup.Text>
+                <Form.Control placeholder='Назва' onChange={e => setName(e.target.value)}></Form.Control>
+                <InputGroup.Text>Короткий опис нового корпусу</InputGroup.Text>
+                <Form.Control placeholder='опис' onChange={e => setDescription(e.target.value)}></Form.Control>
+                <Button variant='success'
+                    onClick={(e) => {
+                        if (name == null) {
+                            errorMessage("Необхідно ввести назву нового типу корпусу");
+                            return;
+                        }
+                        PackagesWorker.addNewPackages(localStorage.token, name, description, errorMessage)
+                            .then(result => {
+                                if (result) {
+                                    setMessage(
+                                        <Alert dismissible variant='success' onClose={clearMessage}>
+                                            Тип корпусу додано
+                                        </Alert>);
+                                    setNeedUpdate(true);
+                                }
+                            });
+                    }}>
                     Додати
                 </Button>
-        </InputGroup>
-    </>
+            </InputGroup>
+        </>
 }
 
 const TransistorTypeEditor = () => {
@@ -183,20 +183,20 @@ const TransistorTypeEditor = () => {
     const clearMessage = () => setMessage(null);
     const errorMessage = (error) => {
         setMessage(
-            <Alert dismissible variant='danger' onClose={clearMessage}> 
+            <Alert dismissible variant='danger' onClose={clearMessage}>
                 {error}
             </Alert>);
     }
 
     const [loading, setLoading] = useState(true);
-    const [transistorTypes, setTransistorTypes] = useState([]);    
+    const [transistorTypes, setTransistorTypes] = useState([]);
     const [needUpdate, setNeedUpdate] = useState(false);
 
     const [id, setId] = useState(1);
     const [name, setName] = useState(null);
-    
-    useEffect(()=>{
-        if(TransistorTypeWorker.getTransistorTypes().length < 1){
+
+    useEffect(() => {
+        if (TransistorTypeWorker.getTransistorTypes().length < 1) {
             TransistorTypeWorker.updateTransistorTypes(localStorage.token)
                 .then(() => {
                     setTransistorTypes(TransistorTypeWorker.getTransistorTypes());
@@ -208,8 +208,8 @@ const TransistorTypeEditor = () => {
         }
     }, [])
 
-    useEffect(()=>{
-        if(needUpdate){
+    useEffect(() => {
+        if (needUpdate) {
             setLoading(true);
             TransistorTypeWorker.updateTransistorTypes(localStorage.token)
                 .then(() => {
@@ -218,59 +218,59 @@ const TransistorTypeEditor = () => {
                     setNeedUpdate(false);
                 });
         }
-    }, [needUpdate] )
+    }, [needUpdate])
 
     return loading ? <>
         <em>Триває завантаження</em>
-    </> : 
-    
-    <>
-        {message}
-        <InputGroup className='mb-3'>
-            <InputGroup.Text>Оберіть тип транзистору для видалення</InputGroup.Text>
-            <Form.Select onChange={e => {
-                setId(e.target.value);
-            }}>
-                {transistorTypes.map((item) => 
-                    <option key={item.id} value={item.id}>#{item.id} {item.name}</option>    
-            )}
-            </Form.Select>
-            <Button variant='danger' onClick={(e)=>{
-                if(window.confirm("Ви впевнені що бажаєте видалити обраний тип транзистору?")){
-                    TransistorTypeWorker.removeTransistorType(localStorage.token, id, errorMessage)
-                        .then(result =>{
-                            if(result){
-                                setMessage(
-                                    <Alert dismissible variant='success' onClose={clearMessage}> 
-                                        Тип транзистору видалено
-                                    </Alert>);
-                                setNeedUpdate(true);
-                            }
-                        })
-                }
-            }}>Видалити</Button>
-        </InputGroup>
+    </> :
 
-        <InputGroup className='mb-3'>
-            <InputGroup.Text>Назва нового типу транзисторв</InputGroup.Text>
-            <Form.Control placeholder='Назва' onChange={e => setName(e.target.value)}></Form.Control>
-            <Button variant='success'
-                onClick={(e)=>{
-                    if(name == null){
-                        errorMessage("Необхідно ввести назву нового типу транзистору");
-                        return;
-                    }
-                    TransistorTypeWorker.addNewTransistorType(localStorage.token, name, errorMessage);
-                    setMessage(
-                        <Alert dismissible variant='success' onClose={clearMessage}> 
-                            Тип транзистору додано
-                        </Alert>);
-                    setNeedUpdate(true);
+        <>
+            {message}
+            <InputGroup className='mb-3'>
+                <InputGroup.Text>Оберіть тип транзистору для видалення</InputGroup.Text>
+                <Form.Select onChange={e => {
+                    setId(e.target.value);
                 }}>
+                    {transistorTypes.map((item) =>
+                        <option key={item.id} value={item.id}>#{item.id} {item.name}</option>
+                    )}
+                </Form.Select>
+                <Button variant='danger' onClick={(e) => {
+                    if (window.confirm("Ви впевнені що бажаєте видалити обраний тип транзистору?")) {
+                        TransistorTypeWorker.removeTransistorType(localStorage.token, id, errorMessage)
+                            .then(result => {
+                                if (result) {
+                                    setMessage(
+                                        <Alert dismissible variant='success' onClose={clearMessage}>
+                                            Тип транзистору видалено
+                                        </Alert>);
+                                    setNeedUpdate(true);
+                                }
+                            })
+                    }
+                }}>Видалити</Button>
+            </InputGroup>
+
+            <InputGroup className='mb-3'>
+                <InputGroup.Text>Назва нового типу транзисторв</InputGroup.Text>
+                <Form.Control placeholder='Назва' onChange={e => setName(e.target.value)}></Form.Control>
+                <Button variant='success'
+                    onClick={(e) => {
+                        if (name == null) {
+                            errorMessage("Необхідно ввести назву нового типу транзистору");
+                            return;
+                        }
+                        TransistorTypeWorker.addNewTransistorType(localStorage.token, name, errorMessage);
+                        setMessage(
+                            <Alert dismissible variant='success' onClose={clearMessage}>
+                                Тип транзистору додано
+                            </Alert>);
+                        setNeedUpdate(true);
+                    }}>
                     Додати
                 </Button>
-        </InputGroup>
-    </>
+            </InputGroup>
+        </>
 }
 
 const ChipTypeEditor = () => {
@@ -278,20 +278,20 @@ const ChipTypeEditor = () => {
     const clearMessage = () => setMessage(null);
     const errorMessage = (error) => {
         setMessage(
-            <Alert dismissible variant='danger' onClose={clearMessage}> 
+            <Alert dismissible variant='danger' onClose={clearMessage}>
                 {error}
             </Alert>);
     }
 
     const [loading, setLoading] = useState(true);
-    const [chipTypes, setChipTypes] = useState([]);    
+    const [chipTypes, setChipTypes] = useState([]);
     const [needUpdate, setNeedUpdate] = useState(false);
 
     const [id, setId] = useState(1);
     const [name, setName] = useState(null);
-    
-    useEffect(()=>{
-        if(ChipTypeWorker.getChipTypes().length < 1){
+
+    useEffect(() => {
+        if (ChipTypeWorker.getChipTypes().length < 1) {
             ChipTypeWorker.updateChipTypes(localStorage.token)
                 .then(() => {
                     setChipTypes(ChipTypeWorker.getChipTypes());
@@ -303,8 +303,8 @@ const ChipTypeEditor = () => {
         }
     }, [])
 
-    useEffect(()=>{
-        if(needUpdate){
+    useEffect(() => {
+        if (needUpdate) {
             setLoading(true);
             ChipTypeWorker.updateChipTypes(localStorage.token)
                 .then(() => {
@@ -313,61 +313,61 @@ const ChipTypeEditor = () => {
                     setNeedUpdate(false);
                 });
         }
-    }, [needUpdate] )
+    }, [needUpdate])
 
     return loading ? <>
         <em>Триває завантаження</em>
-    </> : 
-    
-    <>
-        {message}
-        <InputGroup className='mb-3'>
-            <InputGroup.Text>Оберіть тип мікросхеми для видалення</InputGroup.Text>
-            <Form.Select onChange={e => {
-                setId(e.target.value);
-            }}>
-                {chipTypes.map((item) => 
-                    <option key={item.id} value={item.id}>#{item.id} {item.name}</option>    
-            )}
-            </Form.Select>
-            <Button variant='danger' onClick={(e)=>{
-                if(window.confirm("Ви впевнені що бажаєте видалити обраний тип корпусу ?")){
-                    ChipTypeWorker.removeChipType(localStorage.token, id, errorMessage).then(result =>{
-                        if(result){
-                            setMessage(
-                                <Alert dismissible variant='success' onClose={clearMessage}> 
-                                    Тип мікросхеми видалено
-                                </Alert>);
-                            setNeedUpdate(true);
-                        }
-                    });
-                }
-            }}>Видалити</Button>
-        </InputGroup>
+    </> :
 
-        <InputGroup className='mb-3'>
-            <InputGroup.Text>Назва нового типу мікросхеми</InputGroup.Text>
-            <Form.Control placeholder='Назва' onChange={e => setName(e.target.value)}></Form.Control>
-            <Button variant='success'
-                onClick={(e)=>{
-                    if(name == null){
-                        errorMessage("Необхідно ввести назву нового типу мікросхеми");
-                        return;
-                    }
-                    ChipTypeWorker.addNewChipType(localStorage.token, name, errorMessage).then(result =>{
-                        if(result){
-                            setMessage(
-                                <Alert dismissible variant='success' onClose={clearMessage}> 
-                                    Тип мікросхеми додано
-                                </Alert>);
-                            setNeedUpdate(true);
-                        }
-                    });
+        <>
+            {message}
+            <InputGroup className='mb-3'>
+                <InputGroup.Text>Оберіть тип мікросхеми для видалення</InputGroup.Text>
+                <Form.Select onChange={e => {
+                    setId(e.target.value);
                 }}>
+                    {chipTypes.map((item) =>
+                        <option key={item.id} value={item.id}>#{item.id} {item.name}</option>
+                    )}
+                </Form.Select>
+                <Button variant='danger' onClick={(e) => {
+                    if (window.confirm("Ви впевнені що бажаєте видалити обраний тип корпусу ?")) {
+                        ChipTypeWorker.removeChipType(localStorage.token, id, errorMessage).then(result => {
+                            if (result) {
+                                setMessage(
+                                    <Alert dismissible variant='success' onClose={clearMessage}>
+                                        Тип мікросхеми видалено
+                                    </Alert>);
+                                setNeedUpdate(true);
+                            }
+                        });
+                    }
+                }}>Видалити</Button>
+            </InputGroup>
+
+            <InputGroup className='mb-3'>
+                <InputGroup.Text>Назва нового типу мікросхеми</InputGroup.Text>
+                <Form.Control placeholder='Назва' onChange={e => setName(e.target.value)}></Form.Control>
+                <Button variant='success'
+                    onClick={(e) => {
+                        if (name == null) {
+                            errorMessage("Необхідно ввести назву нового типу мікросхеми");
+                            return;
+                        }
+                        ChipTypeWorker.addNewChipType(localStorage.token, name, errorMessage).then(result => {
+                            if (result) {
+                                setMessage(
+                                    <Alert dismissible variant='success' onClose={clearMessage}>
+                                        Тип мікросхеми додано
+                                    </Alert>);
+                                setNeedUpdate(true);
+                            }
+                        });
+                    }}>
                     Додати
                 </Button>
-        </InputGroup>
-    </>
+            </InputGroup>
+        </>
 }
 
 const MaterialEditor = () => {
@@ -375,20 +375,20 @@ const MaterialEditor = () => {
     const clearMessage = () => setMessage(null);
     const errorMessage = (error) => {
         setMessage(
-            <Alert dismissible variant='danger' onClose={clearMessage}> 
+            <Alert dismissible variant='danger' onClose={clearMessage}>
                 {error}
             </Alert>);
     }
 
     const [loading, setLoading] = useState(true);
-    const [materials, setMaterials] = useState([]);    
+    const [materials, setMaterials] = useState([]);
     const [needUpdate, setNeedUpdate] = useState(false);
 
     const [id, setId] = useState(1);
     const [name, setName] = useState(null);
-    
-    useEffect(()=>{
-        if(MaterialWorker.getMaterials().length < 1){
+
+    useEffect(() => {
+        if (MaterialWorker.getMaterials().length < 1) {
             MaterialWorker.updateMaterials(localStorage.token)
                 .then(() => {
                     setMaterials(MaterialWorker.getMaterials());
@@ -400,8 +400,8 @@ const MaterialEditor = () => {
         }
     }, [])
 
-    useEffect(()=>{
-        if(needUpdate){
+    useEffect(() => {
+        if (needUpdate) {
             setLoading(true);
             MaterialWorker.updateMaterials(localStorage.token)
                 .then(() => {
@@ -410,59 +410,59 @@ const MaterialEditor = () => {
                     setNeedUpdate(false);
                 });
         }
-    }, [needUpdate] )
+    }, [needUpdate])
 
     return loading ? <>
         <em>Триває завантаження</em>
-    </> : 
-    
-    <>
-        {message}
-        <InputGroup className='mb-3'>
-            <InputGroup.Text>Оберіть матеріал для видалення</InputGroup.Text>
-            <Form.Select onChange={e => {
-                setId(e.target.value);
-            }}>
-                {materials.map((item) => 
-                    <option key={item.id} value={item.id}>#{item.id} {item.name}</option>    
-            )}
-            </Form.Select>
-            <Button variant='danger' onClick={(e)=>{
-                if(window.confirm("Ви впевнені що бажаєте видалити обраний тип корпусу ?")){
-                    MaterialWorker.removeMaterial(localStorage.token, id, errorMessage).then(result =>{
-                        if(result){
-                            setMessage(
-                                <Alert dismissible variant='success' onClose={clearMessage}> 
-                                    Матеріал видалено
-                                </Alert>);
-                            setNeedUpdate(true);
-                        }
-                    });
-                }
-            }}>Видалити</Button>
-        </InputGroup>
+    </> :
 
-        <InputGroup className='mb-3'>
-            <InputGroup.Text>Назва нового матеріалу</InputGroup.Text>
-            <Form.Control placeholder='Назва' onChange={e => setName(e.target.value)}></Form.Control>
-            <Button variant='success'
-                onClick={(e)=>{
-                    if(name == null){
-                        errorMessage("Необхідно ввести назву нового типу мікросхеми");
-                        return;
-                    }
-                    MaterialWorker.addNewMaterial(localStorage.token, name, errorMessage).then(result =>{
-                        if(result){
-                            setMessage(
-                                <Alert dismissible variant='success' onClose={clearMessage}> 
-                                    Матеріал додано
-                                </Alert>);
-                            setNeedUpdate(true);
-                        }
-                    });
+        <>
+            {message}
+            <InputGroup className='mb-3'>
+                <InputGroup.Text>Оберіть матеріал для видалення</InputGroup.Text>
+                <Form.Select onChange={e => {
+                    setId(e.target.value);
                 }}>
+                    {materials.map((item) =>
+                        <option key={item.id} value={item.id}>#{item.id} {item.name}</option>
+                    )}
+                </Form.Select>
+                <Button variant='danger' onClick={(e) => {
+                    if (window.confirm("Ви впевнені що бажаєте видалити обраний тип корпусу ?")) {
+                        MaterialWorker.removeMaterial(localStorage.token, id, errorMessage).then(result => {
+                            if (result) {
+                                setMessage(
+                                    <Alert dismissible variant='success' onClose={clearMessage}>
+                                        Матеріал видалено
+                                    </Alert>);
+                                setNeedUpdate(true);
+                            }
+                        });
+                    }
+                }}>Видалити</Button>
+            </InputGroup>
+
+            <InputGroup className='mb-3'>
+                <InputGroup.Text>Назва нового матеріалу</InputGroup.Text>
+                <Form.Control placeholder='Назва' onChange={e => setName(e.target.value)}></Form.Control>
+                <Button variant='success'
+                    onClick={(e) => {
+                        if (name == null) {
+                            errorMessage("Необхідно ввести назву нового типу мікросхеми");
+                            return;
+                        }
+                        MaterialWorker.addNewMaterial(localStorage.token, name, errorMessage).then(result => {
+                            if (result) {
+                                setMessage(
+                                    <Alert dismissible variant='success' onClose={clearMessage}>
+                                        Матеріал додано
+                                    </Alert>);
+                                setNeedUpdate(true);
+                            }
+                        });
+                    }}>
                     Додати
                 </Button>
-        </InputGroup>
-    </>
+            </InputGroup>
+        </>
 }

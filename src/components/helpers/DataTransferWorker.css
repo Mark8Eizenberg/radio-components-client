@@ -1,4 +1,4 @@
-.--container-background{
+.--container-background {
     background: rgba(40, 40, 40, 0.5);
     width: 100%;
     height: 100%;
@@ -12,13 +12,13 @@
     flex-direction: column;
 }
 
-.--close-button{
+.--close-button {
     top: 0;
     right: 0;
     position: fixed;
     margin: 10px;
     background: rgba(255, 0, 0, 0.7);
-    color: rgba(255,255,255,0.9);
+    color: rgba(255, 255, 255, 0.9);
     border: none;
     font-size: 2rem;
     width: 5rem;
@@ -27,7 +27,7 @@
     z-index: 1010;
 }
 
-.--container{
+.--container {
     background: #fff;
     border-radius: 0.25em;
     border: solid 1px #332;
@@ -36,7 +36,7 @@
     padding: 0.2rem;
 }
 
-.--read-csv-background{
+.--read-csv-background {
     background: rgba(40, 40, 40, 0.5);
     width: 100%;
     height: 100%;
@@ -50,7 +50,7 @@
     flex-direction: column;
 }
 
-.--read-csv-container{
+.--read-csv-container {
     background: #fff;
     border-radius: 0.25em;
     border: solid 1px #332;
@@ -61,7 +61,7 @@
     max-height: 90%;
 }
 
-.--progress-of-loading{
+.--progress-of-loading {
     z-index: 3000;
     width: 100%;
     height: 100%;
@@ -74,7 +74,7 @@
     background: rgba(40, 40, 40, 0.5);
 }
 
-.--progress-background{
+.--progress-background {
     width: 90%;
     background: #fff;
     border: #332;

@@ -1,4 +1,4 @@
-﻿.arrow-down{
+﻿.arrow-down {
     animation: 0.5s down-to-up-rotate;
     transform: rotate(0deg);
 }
@@ -8,10 +8,11 @@
     transform: rotate(180deg);
 }
 
-@keyframes up-to-down-rotate{
-    0%{
+@keyframes up-to-down-rotate {
+    0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(180deg);
     }
@@ -27,36 +28,38 @@
     }
 }
 
-.collapse-card-header h4{
+.collapse-card-header h4 {
     text-decoration: none;
-    -webkit-touch-callout: none; 
-      -webkit-user-select: none; 
-       -khtml-user-select: none; 
-         -moz-user-select: none; 
-          -ms-user-select: none; 
-              user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
-@keyframes drop-card-body{
-    0%{
+@keyframes drop-card-body {
+    0% {
         height: 0px;
         margin: 0;
         padding: 0;
         content: none;
         visibility: hidden;
     }
-    100%{
+
+    100% {
         height: auto;
         visibility: visible;
     }
 }
 
-@keyframes collapse-card-body{
+@keyframes collapse-card-body {
 
     0% {
         height: auto;
         visibility: visible;
     }
+
     100% {
         content: none;
         height: 0px;

@@ -1,4 +1,4 @@
-.--pdf-viewer-container{
+.--pdf-viewer-container {
     z-index: 100;
     position: fixed;
     display: flex;
@@ -11,7 +11,7 @@
     align-items: center;
 }
 
-.--pdf-viewer{
+.--pdf-viewer {
     width: 90%;
     height: 100%;
 }

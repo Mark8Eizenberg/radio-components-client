@@ -1,23 +1,23 @@
-import { useEffect, useState, useRef} from "react";
+import { useEffect, useState, useRef } from "react";
 import { Button, Form, InputGroup, ListGroup, ListGroupItem, Spinner } from "react-bootstrap";
 import { Components, HzToReadeble, microFaradToReadeble, OmToReadeble } from "./api/ComponentsEditorWorker";
 import { ChipTypeWorker, MaterialWorker, PackagesWorker, TransistorTypeWorker } from "./api/ComponentsWorker";
 
-function ResistorFilter({onChange, components}){
+function ResistorFilter({ onChange, components }) {
     const [filters, setFilters] = useState({});
     const [variation, setVariations] = useState({});
     const [loading, setLoading] = useState(true);
 
-    useEffect(()=>{
-        
+    useEffect(() => {
+
         let variants = {
             packaging: [],
             resistance: [],
             accuracy: [],
             powerRating: [],
         }
-        
-        components.map(item=>{
+
+        components.map(item => {
             variants.packaging.push(item.packaging.id);
             variants.resistance.push(item.resistance);
             variants.accuracy.push(item.accuracy);
@@ -25,48 +25,48 @@ function ResistorFilter({onChange, components}){
             return null;
         })
 
-        variants.packaging = [ ...new Set(variants.packaging)];
-        variants.resistance = [ ...new Set(variants.resistance)].sort((a,b)=>a-b);
-        variants.accuracy = [ ...new Set(variants.accuracy)].sort((a,b)=>a-b);
-        variants.powerRating = [ ...new Set(variants.powerRating)].sort((a,b)=>a-b);
+        variants.packaging = [...new Set(variants.packaging)];
+        variants.resistance = [...new Set(variants.resistance)].sort((a, b) => a - b);
+        variants.accuracy = [...new Set(variants.accuracy)].sort((a, b) => a - b);
+        variants.powerRating = [...new Set(variants.powerRating)].sort((a, b) => a - b);
 
         setVariations(variants);
         setLoading(false);
-    },[components])
+    }, [components])
 
-    useEffect(()=>{
+    useEffect(() => {
         onChange(filters);
-    },[filters, onChange])
-    
-    return (loading ? <div style={{width: '100%', justifyContent: 'center', verticalAlign: 'center', display: 'flex'}}><Spinner animation='grow'/></div> : 
+    }, [filters, onChange])
+
+    return (loading ? <div style={{ width: '100%', justifyContent: 'center', verticalAlign: 'center', display: 'flex' }}><Spinner animation='grow' /></div> :
         <ListGroup>
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, resistance: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, resistance: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Опір
             </ListGroupItem>
-            {filters.resistance && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.resistance && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.resistance.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, resistance: [...prevFilters.resistance, item]}))
-                                } else{
+                    {variation.resistance.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, resistance: [...prevFilters.resistance, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newResistance = prevFilters.resistance;
                                         const indexOfElement = newResistance.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newResistance.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, resistance: newResistance};
+                                        return { ...prevFilters, resistance: newResistance };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {OmToReadeble(item)}
                     </ListGroupItem>)}
                 </ListGroup>
@@ -74,31 +74,31 @@ function ResistorFilter({onChange, components}){
 
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, packaging: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, packaging: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Корпус
             </ListGroupItem>
-            {filters.packaging && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.packaging && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.packaging.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, packaging: [...prevFilters.packaging, item]}))
-                                } else{
+                    {variation.packaging.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, packaging: [...prevFilters.packaging, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newPackaging = prevFilters.packaging;
                                         const indexOfElement = newPackaging.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newPackaging.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, packaging: newPackaging};
+                                        return { ...prevFilters, packaging: newPackaging };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {PackagesWorker.getPackagesById(item)}
                     </ListGroupItem>)}
                 </ListGroup>
@@ -106,31 +106,31 @@ function ResistorFilter({onChange, components}){
 
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, accuracy: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, accuracy: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Точність
             </ListGroupItem>
-            {filters.accuracy && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.accuracy && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.accuracy.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, accuracy: [...prevFilters.accuracy, item]}))
-                                } else{
+                    {variation.accuracy.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, accuracy: [...prevFilters.accuracy, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newAccuracy = prevFilters.accuracy;
                                         const indexOfElement = newAccuracy.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newAccuracy.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, accuracy: newAccuracy};
+                                        return { ...prevFilters, accuracy: newAccuracy };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {item}
                     </ListGroupItem>)}
                 </ListGroup>
@@ -138,31 +138,31 @@ function ResistorFilter({onChange, components}){
 
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, powerRating: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, powerRating: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Потужність
             </ListGroupItem>
-            {filters.powerRating && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.powerRating && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.powerRating.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, powerRating: [...prevFilters.powerRating, item]}))
-                                } else{
+                    {variation.powerRating.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, powerRating: [...prevFilters.powerRating, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newData = prevFilters.powerRating;
                                         const indexOfElement = newData.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newData.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, powerRating: newData};
+                                        return { ...prevFilters, powerRating: newData };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {item}
                     </ListGroupItem>)}
                 </ListGroup>
@@ -170,13 +170,13 @@ function ResistorFilter({onChange, components}){
         </ListGroup>)
 }
 
-function CapacitorFilter({onChange, components}){
+function CapacitorFilter({ onChange, components }) {
     const [filters, setFilters] = useState({});
     const [variation, setVariations] = useState({});
     const [loading, setLoading] = useState(true);
 
-    useEffect(()=>{
-        
+    useEffect(() => {
+
         let variants = {
             packaging: [],
             capacity: [],
@@ -185,7 +185,7 @@ function CapacitorFilter({onChange, components}){
             powerRating: [],
         }
 
-        components.map(item=>{
+        components.map(item => {
             variants.packaging.push(item.packaging.id);
             variants.capacity.push(item.capacity);
             variants.materialId.push(item.materialId);
@@ -194,49 +194,49 @@ function CapacitorFilter({onChange, components}){
             return null;
         })
 
-        variants.packaging = [ ...new Set(variants.packaging)];
-        variants.capacity = [ ...new Set(variants.capacity)].sort((a,b)=>a-b);
-        variants.materialId = [ ...new Set(variants.materialId)];
-        variants.accuracy = [ ...new Set(variants.accuracy)].sort((a,b)=>a-b);
-        variants.powerRating = [ ...new Set(variants.powerRating)].sort((a,b)=>a-b);
+        variants.packaging = [...new Set(variants.packaging)];
+        variants.capacity = [...new Set(variants.capacity)].sort((a, b) => a - b);
+        variants.materialId = [...new Set(variants.materialId)];
+        variants.accuracy = [...new Set(variants.accuracy)].sort((a, b) => a - b);
+        variants.powerRating = [...new Set(variants.powerRating)].sort((a, b) => a - b);
 
         setVariations(variants);
         setLoading(false);
-    },[components])
+    }, [components])
 
-    useEffect(()=>{
+    useEffect(() => {
         onChange(filters);
-    },[filters, onChange])
-    
-    return (loading ? <div style={{width: '100%', justifyContent: 'center', verticalAlign: 'center', display: 'flex'}}><Spinner animation='grow'/></div> : 
+    }, [filters, onChange])
+
+    return (loading ? <div style={{ width: '100%', justifyContent: 'center', verticalAlign: 'center', display: 'flex' }}><Spinner animation='grow' /></div> :
         <ListGroup>
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, capacity: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, capacity: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Ємність
             </ListGroupItem>
-            {filters.capacity && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.capacity && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.capacity.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, capacity: [...prevFilters.capacity, item]}))
-                                } else{
+                    {variation.capacity.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, capacity: [...prevFilters.capacity, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newData = prevFilters.capacity;
                                         const indexOfElement = newData.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newData.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, capacity: newData};
+                                        return { ...prevFilters, capacity: newData };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {microFaradToReadeble(item)}
                     </ListGroupItem>)}
                 </ListGroup>
@@ -244,31 +244,31 @@ function CapacitorFilter({onChange, components}){
 
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, packaging: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, packaging: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Корпус
             </ListGroupItem>
-            {filters.packaging && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.packaging && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.packaging.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, packaging: [...prevFilters.packaging, item]}))
-                                } else{
+                    {variation.packaging.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, packaging: [...prevFilters.packaging, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newPackaging = prevFilters.packaging;
                                         const indexOfElement = newPackaging.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newPackaging.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, packaging: newPackaging};
+                                        return { ...prevFilters, packaging: newPackaging };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {PackagesWorker.getPackagesById(item)}
                     </ListGroupItem>)}
                 </ListGroup>
@@ -276,31 +276,31 @@ function CapacitorFilter({onChange, components}){
 
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, accuracy: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, accuracy: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Точність
             </ListGroupItem>
-            {filters.accuracy && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.accuracy && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.accuracy.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, accuracy: [...prevFilters.accuracy, item]}))
-                                } else{
+                    {variation.accuracy.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, accuracy: [...prevFilters.accuracy, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newAccuracy = prevFilters.accuracy;
                                         const indexOfElement = newAccuracy.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newAccuracy.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, accuracy: newAccuracy};
+                                        return { ...prevFilters, accuracy: newAccuracy };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {item}
                     </ListGroupItem>)}
                 </ListGroup>
@@ -308,31 +308,31 @@ function CapacitorFilter({onChange, components}){
 
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, materialId: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, materialId: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Матеріал
             </ListGroupItem>
-            {filters.materialId && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.materialId && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.materialId.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, materialId: [...prevFilters.materialId, item]}))
-                                } else{
+                    {variation.materialId.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, materialId: [...prevFilters.materialId, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newData = prevFilters.materialId;
                                         const indexOfElement = newData.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newData.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, materialId: newData};
+                                        return { ...prevFilters, materialId: newData };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {MaterialWorker.getMaterialById(item)}
                     </ListGroupItem>)}
                 </ListGroup>
@@ -340,64 +340,64 @@ function CapacitorFilter({onChange, components}){
         </ListGroup>)
 }
 
-function ChipFilter({onChange, components}){
+function ChipFilter({ onChange, components }) {
     const [filters, setFilters] = useState({});
     const [variation, setVariations] = useState({});
     const [loading, setLoading] = useState(true);
 
-    useEffect(()=>{
-        
+    useEffect(() => {
+
         let variants = {
             packaging: [],
             chipType: []
         }
 
-        components.map(item=>{
+        components.map(item => {
             variants.packaging.push(item.packaging.id);
             variants.chipType.push(item.chipType?.id);
             return null;
         })
 
-        variants.packaging = [ ...new Set(variants.packaging)];
-        variants.chipType = [ ...new Set(variants.chipType)];
+        variants.packaging = [...new Set(variants.packaging)];
+        variants.chipType = [...new Set(variants.chipType)];
 
         setVariations(variants);
         setLoading(false);
-    },[components])
+    }, [components])
 
-    useEffect(()=>{
+    useEffect(() => {
         onChange(filters);
-    },[filters, onChange])
-    
-    return (loading ? <div style={{width: '100%', justifyContent: 'center', verticalAlign: 'center', display: 'flex'}}><Spinner animation='grow'/></div> : 
+    }, [filters, onChange])
+
+    return (loading ? <div style={{ width: '100%', justifyContent: 'center', verticalAlign: 'center', display: 'flex' }}><Spinner animation='grow' /></div> :
         <ListGroup>
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, chipType: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, chipType: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Тип мікросхеми
             </ListGroupItem>
-            {filters.chipType && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.chipType && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.chipType.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, chipType: [...prevFilters.chipType, item]}))
-                                } else{
+                    {variation.chipType.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, chipType: [...prevFilters.chipType, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newData = prevFilters.chipType;
                                         const indexOfElement = newData.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newData.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, chipType: newData};
+                                        return { ...prevFilters, chipType: newData };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {ChipTypeWorker.getChipTypeById(item)}
                     </ListGroupItem>)}
                 </ListGroup>
@@ -405,31 +405,31 @@ function ChipFilter({onChange, components}){
 
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, packaging: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, packaging: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Корпус
             </ListGroupItem>
-            {filters.packaging && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.packaging && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.packaging.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, packaging: [...prevFilters.packaging, item]}))
-                                } else{
+                    {variation.packaging.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, packaging: [...prevFilters.packaging, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newPackaging = prevFilters.packaging;
                                         const indexOfElement = newPackaging.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newPackaging.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, packaging: newPackaging};
+                                        return { ...prevFilters, packaging: newPackaging };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {PackagesWorker.getPackagesById(item)}
                     </ListGroupItem>)}
                 </ListGroup>
@@ -437,67 +437,67 @@ function ChipFilter({onChange, components}){
         </ListGroup>)
 }
 
-function DiodeFilter({onChange, components}){
+function DiodeFilter({ onChange, components }) {
     const [filters, setFilters] = useState({});
     const [variation, setVariations] = useState({});
     const [loading, setLoading] = useState(true);
 
-    useEffect(()=>{
-        
+    useEffect(() => {
+
         let variants = {
             packaging: [],
             voltage: [],
             current: [],
         }
 
-        components.map(item=>{
+        components.map(item => {
             variants.packaging.push(item.packaging.id);
             variants.voltage.push(item.voltage);
             variants.current.push(item.current);
             return null;
         })
 
-        variants.packaging = [ ...new Set(variants.packaging)];
-        variants.voltage = [ ...new Set(variants.voltage)].sort((a,b)=>a-b);
-        variants.current = [ ...new Set(variants.current)].sort((a,b)=>a-b);
+        variants.packaging = [...new Set(variants.packaging)];
+        variants.voltage = [...new Set(variants.voltage)].sort((a, b) => a - b);
+        variants.current = [...new Set(variants.current)].sort((a, b) => a - b);
 
         setVariations(variants);
         setLoading(false);
-    },[components])
+    }, [components])
 
-    useEffect(()=>{
+    useEffect(() => {
         onChange(filters);
-    },[filters, onChange])
-    
-    return (loading ? <div style={{width: '100%', justifyContent: 'center', verticalAlign: 'center', display: 'flex'}}><Spinner animation='grow'/></div> : 
+    }, [filters, onChange])
+
+    return (loading ? <div style={{ width: '100%', justifyContent: 'center', verticalAlign: 'center', display: 'flex' }}><Spinner animation='grow' /></div> :
         <ListGroup>
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, voltage: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, voltage: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Напруга (V)
             </ListGroupItem>
-            {filters.voltage && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.voltage && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.voltage.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, voltage: [...prevFilters.voltage, item]}))
-                                } else{
+                    {variation.voltage.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, voltage: [...prevFilters.voltage, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newData = prevFilters.voltage;
                                         const indexOfElement = newData.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newData.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, voltage: newData};
+                                        return { ...prevFilters, voltage: newData };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {item}
                     </ListGroupItem>)}
                 </ListGroup>
@@ -505,31 +505,31 @@ function DiodeFilter({onChange, components}){
 
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, current: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, current: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Струм (A)
             </ListGroupItem>
-            {filters.current && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.current && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.current.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, current: [...prevFilters.current, item]}))
-                                } else{
+                    {variation.current.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, current: [...prevFilters.current, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newData = prevFilters.current;
                                         const indexOfElement = newData.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newData.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, current: newData};
+                                        return { ...prevFilters, current: newData };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {item}
                     </ListGroupItem>)}
                 </ListGroup>
@@ -537,31 +537,31 @@ function DiodeFilter({onChange, components}){
 
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, packaging: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, packaging: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Корпус
             </ListGroupItem>
-            {filters.packaging && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.packaging && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.packaging.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, packaging: [...prevFilters.packaging, item]}))
-                                } else{
+                    {variation.packaging.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, packaging: [...prevFilters.packaging, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newPackaging = prevFilters.packaging;
                                         const indexOfElement = newPackaging.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newPackaging.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, packaging: newPackaging};
+                                        return { ...prevFilters, packaging: newPackaging };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {PackagesWorker.getPackagesById(item)}
                     </ListGroupItem>)}
                 </ListGroup>
@@ -569,64 +569,64 @@ function DiodeFilter({onChange, components}){
         </ListGroup>)
 }
 
-function QuartzFilter({onChange, components}){
+function QuartzFilter({ onChange, components }) {
     const [filters, setFilters] = useState({});
     const [variation, setVariations] = useState({});
     const [loading, setLoading] = useState(true);
 
-    useEffect(()=>{
-        
+    useEffect(() => {
+
         let variants = {
             packaging: [],
             frequency: [],
         }
-        
-        components.map(item=>{
+
+        components.map(item => {
             variants.packaging.push(item.packaging.id);
             variants.frequency.push(item.frequency);
             return null;
         })
 
-        variants.packaging = [ ...new Set(variants.packaging)];
-        variants.frequency = [ ...new Set(variants.frequency)].sort((a,b)=>a-b);
+        variants.packaging = [...new Set(variants.packaging)];
+        variants.frequency = [...new Set(variants.frequency)].sort((a, b) => a - b);
 
         setVariations(variants);
         setLoading(false);
-    },[components])
+    }, [components])
 
-    useEffect(()=>{
+    useEffect(() => {
         onChange(filters);
-    },[filters, onChange])
-    
-    return (loading ? <div style={{width: '100%', justifyContent: 'center', verticalAlign: 'center', display: 'flex'}}><Spinner animation='grow'/></div> : 
+    }, [filters, onChange])
+
+    return (loading ? <div style={{ width: '100%', justifyContent: 'center', verticalAlign: 'center', display: 'flex' }}><Spinner animation='grow' /></div> :
         <ListGroup>
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, frequency: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, frequency: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Частота
             </ListGroupItem>
-            {filters.frequency && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.frequency && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.frequency.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, frequency: [...prevFilters.frequency, item]}))
-                                } else{
+                    {variation.frequency.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, frequency: [...prevFilters.frequency, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newData = prevFilters.frequency;
                                         const indexOfElement = newData.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newData.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, frequency: newData};
+                                        return { ...prevFilters, frequency: newData };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {HzToReadeble(item)}
                     </ListGroupItem>)}
                 </ListGroup>
@@ -634,31 +634,31 @@ function QuartzFilter({onChange, components}){
 
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, packaging: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, packaging: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Корпус
             </ListGroupItem>
-            {filters.packaging && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.packaging && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.packaging.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, packaging: [...prevFilters.packaging, item]}))
-                                } else{
+                    {variation.packaging.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, packaging: [...prevFilters.packaging, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newPackaging = prevFilters.packaging;
                                         const indexOfElement = newPackaging.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newPackaging.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, packaging: newPackaging};
+                                        return { ...prevFilters, packaging: newPackaging };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {PackagesWorker.getPackagesById(item)}
                     </ListGroupItem>)}
                 </ListGroup>
@@ -666,96 +666,96 @@ function QuartzFilter({onChange, components}){
         </ListGroup>)
 }
 
-function StabilizerFilter({onChange, components}){
+function StabilizerFilter({ onChange, components }) {
     const [filters, setFilters] = useState({});
     const [variation, setVariations] = useState({});
     const [loading, setLoading] = useState(true);
 
-    useEffect(()=>{
-        
+    useEffect(() => {
+
         let variants = {
             packaging: [],
             voltage: [],
         }
 
-        components.map(item=>{
+        components.map(item => {
             variants.packaging.push(item.packaging.id);
             variants.voltage.push(item.voltage);
             return null;
         })
 
-        variants.packaging = [ ...new Set(variants.packaging)];
-        variants.voltage = [ ...new Set(variants.voltage)].sort((a,b)=>a-b);
+        variants.packaging = [...new Set(variants.packaging)];
+        variants.voltage = [...new Set(variants.voltage)].sort((a, b) => a - b);
 
         setVariations(variants);
         setLoading(false);
-    },[components])
+    }, [components])
 
-    useEffect(()=>{
+    useEffect(() => {
         onChange(filters);
-    },[filters, onChange])
-    
-    return (loading ? <div style={{width: '100%', justifyContent: 'center', verticalAlign: 'center', display: 'flex'}}><Spinner animation='grow'/></div> : 
+    }, [filters, onChange])
+
+    return (loading ? <div style={{ width: '100%', justifyContent: 'center', verticalAlign: 'center', display: 'flex' }}><Spinner animation='grow' /></div> :
         <ListGroup>
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, voltage: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, voltage: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Напруга (V)
             </ListGroupItem>
-            {filters.voltage && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.voltage && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.voltage.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, voltage: [...prevFilters.voltage, item]}))
-                                } else{
+                    {variation.voltage.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, voltage: [...prevFilters.voltage, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newData = prevFilters.voltage;
                                         const indexOfElement = newData.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newData.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, voltage: newData};
+                                        return { ...prevFilters, voltage: newData };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {item}
                     </ListGroupItem>)}
                 </ListGroup>
             </ListGroupItem>}
-            
+
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, packaging: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, packaging: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Корпус
             </ListGroupItem>
-            {filters.packaging && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.packaging && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.packaging.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, packaging: [...prevFilters.packaging, item]}))
-                                } else{
+                    {variation.packaging.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, packaging: [...prevFilters.packaging, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newPackaging = prevFilters.packaging;
                                         const indexOfElement = newPackaging.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newPackaging.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, packaging: newPackaging};
+                                        return { ...prevFilters, packaging: newPackaging };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {PackagesWorker.getPackagesById(item)}
                     </ListGroupItem>)}
                 </ListGroup>
@@ -763,96 +763,96 @@ function StabilizerFilter({onChange, components}){
         </ListGroup>)
 }
 
-function TransistorFilter({onChange, components}){
+function TransistorFilter({ onChange, components }) {
     const [filters, setFilters] = useState({});
     const [variation, setVariations] = useState({});
     const [loading, setLoading] = useState(true);
 
-    useEffect(()=>{
-        
+    useEffect(() => {
+
         let variants = {
             packaging: [],
             transistorType: [],
         }
-        
-        components.map(item=>{
+
+        components.map(item => {
             variants.packaging.push(item.packaging.id);
             variants.transistorType.push(item.transistorType?.id);
             return null;
         })
 
-        variants.packaging = [ ...new Set(variants.packaging)];
-        variants.transistorType = [ ...new Set(variants.transistorType)];
+        variants.packaging = [...new Set(variants.packaging)];
+        variants.transistorType = [...new Set(variants.transistorType)];
 
         setVariations(variants);
         setLoading(false);
-    },[components])
+    }, [components])
 
-    useEffect(()=>{
+    useEffect(() => {
         onChange(filters);
-    },[filters, onChange])
-    
-    return (loading ? <div style={{width: '100%', justifyContent: 'center', verticalAlign: 'center', display: 'flex'}}><Spinner animation='grow'/></div> : 
+    }, [filters, onChange])
+
+    return (loading ? <div style={{ width: '100%', justifyContent: 'center', verticalAlign: 'center', display: 'flex' }}><Spinner animation='grow' /></div> :
         <ListGroup>
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, transistorType: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, transistorType: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Тип транзистору
             </ListGroupItem>
-            {filters.transistorType && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.transistorType && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.transistorType.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, transistorType: [...prevFilters.transistorType, item]}))
-                                } else{
+                    {variation.transistorType.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, transistorType: [...prevFilters.transistorType, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newData = prevFilters.transistorType;
                                         const indexOfElement = newData.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newData.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, transistorType: newData};
+                                        return { ...prevFilters, transistorType: newData };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {TransistorTypeWorker.getTransistorTypeById(item)}
                     </ListGroupItem>)}
                 </ListGroup>
             </ListGroupItem>}
-            
+
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, packaging: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, packaging: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Корпус
             </ListGroupItem>
-            {filters.packaging && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.packaging && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.packaging.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, packaging: [...prevFilters.packaging, item]}))
-                                } else{
+                    {variation.packaging.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, packaging: [...prevFilters.packaging, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newPackaging = prevFilters.packaging;
                                         const indexOfElement = newPackaging.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newPackaging.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, packaging: newPackaging};
+                                        return { ...prevFilters, packaging: newPackaging };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {PackagesWorker.getPackagesById(item)}
                     </ListGroupItem>)}
                 </ListGroup>
@@ -860,96 +860,96 @@ function TransistorFilter({onChange, components}){
         </ListGroup>)
 }
 
-function ZenerDiodeFilter({onChange, components}){
+function ZenerDiodeFilter({ onChange, components }) {
     const [filters, setFilters] = useState({});
     const [variation, setVariations] = useState({});
     const [loading, setLoading] = useState(true);
 
-    useEffect(()=>{
-        
+    useEffect(() => {
+
         let variants = {
             packaging: [],
             voltage: [],
         }
 
-        components.map(item=>{
+        components.map(item => {
             variants.packaging.push(item.packaging.id);
             variants.voltage.push(item.voltage);
             return null;
         })
 
-        variants.packaging = [ ...new Set(variants.packaging)];
-        variants.voltage = [ ...new Set(variants.voltage)].sort((a,b)=>a-b);
+        variants.packaging = [...new Set(variants.packaging)];
+        variants.voltage = [...new Set(variants.voltage)].sort((a, b) => a - b);
 
         setVariations(variants);
         setLoading(false);
-    },[components])
+    }, [components])
 
-    useEffect(()=>{
+    useEffect(() => {
         onChange(filters);
-    },[filters, onChange])
-    
-    return (loading ? <div style={{width: '100%', justifyContent: 'center', verticalAlign: 'center', display: 'flex'}}><Spinner animation='grow'/></div> : 
+    }, [filters, onChange])
+
+    return (loading ? <div style={{ width: '100%', justifyContent: 'center', verticalAlign: 'center', display: 'flex' }}><Spinner animation='grow' /></div> :
         <ListGroup>
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, voltage: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, voltage: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Напруга (V)
             </ListGroupItem>
-            {filters.voltage && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.voltage && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.voltage.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, voltage: [...prevFilters.voltage, item]}))
-                                } else{
+                    {variation.voltage.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, voltage: [...prevFilters.voltage, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newData = prevFilters.voltage;
                                         const indexOfElement = newData.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newData.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, voltage: newData};
+                                        return { ...prevFilters, voltage: newData };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {item}
                     </ListGroupItem>)}
                 </ListGroup>
             </ListGroupItem>}
-            
+
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, packaging: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, packaging: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Корпус
             </ListGroupItem>
-            {filters.packaging && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.packaging && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.packaging.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, packaging: [...prevFilters.packaging, item]}))
-                                } else{
+                    {variation.packaging.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, packaging: [...prevFilters.packaging, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newPackaging = prevFilters.packaging;
                                         const indexOfElement = newPackaging.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newPackaging.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, packaging: newPackaging};
+                                        return { ...prevFilters, packaging: newPackaging };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {PackagesWorker.getPackagesById(item)}
                     </ListGroupItem>)}
                 </ListGroup>
@@ -957,61 +957,61 @@ function ZenerDiodeFilter({onChange, components}){
         </ListGroup>)
 }
 
-function DefaultFilter({onChange, components}){
+function DefaultFilter({ onChange, components }) {
     const [filters, setFilters] = useState({});
     const [variation, setVariations] = useState({});
     const [loading, setLoading] = useState(true);
 
-    useEffect(()=>{
-        
+    useEffect(() => {
+
         let variants = {
             packaging: []
         }
 
-        components.map(item=>{
+        components.map(item => {
             variants.packaging.push(item.packaging.id);
             return null;
         })
 
-        variants.packaging = [ ...new Set(variants.packaging)];
+        variants.packaging = [...new Set(variants.packaging)];
 
         setVariations(variants);
         setLoading(false);
-    },[components])
+    }, [components])
 
-    useEffect(()=>{
+    useEffect(() => {
         onChange(filters);
-    },[filters, onChange])
-    
-    return (loading ? <div style={{width: '100%', justifyContent: 'center', verticalAlign: 'center', display: 'flex'}}><Spinner animation='grow'/></div> : 
+    }, [filters, onChange])
+
+    return (loading ? <div style={{ width: '100%', justifyContent: 'center', verticalAlign: 'center', display: 'flex' }}><Spinner animation='grow' /></div> :
         <ListGroup>
             <ListGroupItem variant="info">
                 <input type={'checkbox'}
-                    onChange={event=>{
-                        setFilters(prevFilters => ({...prevFilters, packaging: (event.target.checked ? [] : null)}))
+                    onChange={event => {
+                        setFilters(prevFilters => ({ ...prevFilters, packaging: (event.target.checked ? [] : null) }))
                     }}
-                    style={{marginRight: '4px'}}/>
+                    style={{ marginRight: '4px' }} />
                 Корпус
             </ListGroupItem>
-            {filters.packaging && <ListGroupItem className="col" style={{maxHeight: '200px', overflowY: "scroll"}}>
+            {filters.packaging && <ListGroupItem className="col" style={{ maxHeight: '200px', overflowY: "scroll" }}>
                 <ListGroup>
-                    {variation.packaging.map((item, index)=><ListGroupItem key={index}>
-                        <input type={'checkbox'} 
-                            style={{marginRight: '4px'}}
-                            onChange={(event=>{
-                                if(event.target.checked){
-                                    setFilters(prevFilters => ({...prevFilters, packaging: [...prevFilters.packaging, item]}))
-                                } else{
+                    {variation.packaging.map((item, index) => <ListGroupItem key={index}>
+                        <input type={'checkbox'}
+                            style={{ marginRight: '4px' }}
+                            onChange={(event => {
+                                if (event.target.checked) {
+                                    setFilters(prevFilters => ({ ...prevFilters, packaging: [...prevFilters.packaging, item] }))
+                                } else {
                                     setFilters(prevFilters => {
                                         var newPackaging = prevFilters.packaging;
                                         const indexOfElement = newPackaging.indexOf(item);
-                                        if(indexOfElement !== -1){
+                                        if (indexOfElement !== -1) {
                                             newPackaging.splice(indexOfElement, 1);
                                         }
-                                        return {...prevFilters, packaging: newPackaging};
+                                        return { ...prevFilters, packaging: newPackaging };
                                     })
                                 }
-                            })}/>
+                            })} />
                         {PackagesWorker.getPackagesById(item)}
                     </ListGroupItem>)}
                 </ListGroup>
@@ -1019,13 +1019,13 @@ function DefaultFilter({onChange, components}){
         </ListGroup>)
 }
 
-function getComponentUniqueFilter(component, components, onChange){
+function getComponentUniqueFilter(component, components, onChange) {
 
     switch (component) {
         case Components.resistor:
-            return <ResistorFilter components={components} onChange={onChange}/>
+            return <ResistorFilter components={components} onChange={onChange} />
         case Components.capacitor:
-            return <CapacitorFilter components={components} onChange={onChange}/>
+            return <CapacitorFilter components={components} onChange={onChange} />
         case Components.chip:
             return <ChipFilter components={components} onChange={onChange} />
         case Components.diode:
@@ -1043,71 +1043,71 @@ function getComponentUniqueFilter(component, components, onChange){
     }
 }
 
-export default function FilterForComponent({component, components, onChange}){
+export default function FilterForComponent({ component, components, onChange }) {
     const [filter, setFilter] = useState(null);
     const [childFilter, setChildFilter] = useState(null);
     const [filterComponent, setFilterComponent] = useState(null);
     const searchFieldRef = useRef(null);
-    
-    function clearSearch(){
-        if(searchFieldRef.current){
+
+    function clearSearch() {
+        if (searchFieldRef.current) {
             searchFieldRef.current.value = null;
-            setFilter({nameSearch: null});
+            setFilter({ nameSearch: null });
             setFilterComponent(null);
         }
     }
 
-    function searchComponentsByName(){
-        if(searchFieldRef.current){
+    function searchComponentsByName() {
+        if (searchFieldRef.current) {
             const name = searchFieldRef.current.value;
-            const searchedResult = components.filter(c=>c.name?.toLowerCase().indexOf(name) > -1);
-            setFilter(prevFilters => ({...prevFilters, nameSearch: name}));
+            const searchedResult = components.filter(c => c.name?.toLowerCase().indexOf(name) > -1);
+            setFilter(prevFilters => ({ ...prevFilters, nameSearch: name }));
             setFilterComponent(getComponentUniqueFilter(component, searchedResult, changeFilterInChild));
         }
     }
 
-    function changeFilterInChild(filter){
+    function changeFilterInChild(filter) {
         setChildFilter(filter);
     }
 
-    function clearFilters(){
+    function clearFilters() {
         clearSearch();
     }
 
-    useEffect(()=>{
-        setFilter(prevFilters => ({...prevFilters, ...childFilter}));
+    useEffect(() => {
+        setFilter(prevFilters => ({ ...prevFilters, ...childFilter }));
     }, [childFilter])
 
-    useEffect(()=>{
+    useEffect(() => {
         onChange(filter);
-    },[filter, onChange]);
+    }, [filter, onChange]);
 
-    useEffect(()=>{
-        if(component && components){
+    useEffect(() => {
+        if (component && components) {
             setFilterComponent(getComponentUniqueFilter(component, components, changeFilterInChild));
         }
     }, [component, components, setFilterComponent])
 
-    useEffect(()=>{
-        if(!filterComponent){
+    useEffect(() => {
+        if (!filterComponent) {
             setFilterComponent(getComponentUniqueFilter(component, components, changeFilterInChild));
         }
-    },[filterComponent, component, components, setFilterComponent])
+    }, [filterComponent, component, components, setFilterComponent])
 
     return <div>
         <ListGroup>
             <ListGroupItem >
-                <Form onSubmit={(e)=>{
+                <Form onSubmit={(e) => {
                     searchComponentsByName();
                     e.preventDefault();
                 }}>
-                <InputGroup>
-                    <Form.Control ref={searchFieldRef}/>
-                    <Button variant="outline-success" onClick={searchComponentsByName}>
-                        Пошук
-                    </Button>
-                    <Button variant="outline-danger" onClick={clearSearch}>X</Button>
-                </InputGroup>
+                    <InputGroup>
+                        <Form.Control ref={searchFieldRef} />
+                        <Button variant="outline-success" onClick={searchComponentsByName}>
+                            Пошук
+                        </Button>
+                        <Button variant="outline-danger" onClick={clearSearch}>X</Button>
+                    </InputGroup>
                 </Form>
             </ListGroupItem>
             <ListGroupItem>

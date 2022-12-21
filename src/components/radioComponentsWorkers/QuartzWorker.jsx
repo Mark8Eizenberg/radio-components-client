@@ -3,8 +3,8 @@ import {
     Table, Spinner, Alert, Button,
     Modal, InputGroup, Form
 } from 'react-bootstrap';
-import { 
-    Components as ComponentSelector, 
+import {
+    Components as ComponentSelector,
     showAllActiveComponent, removeComponent,
     addComponent, HzToReadeble,
 } from '../helpers/api/ComponentsEditorWorker';
@@ -20,8 +20,8 @@ export function QuartzWorker() {
     const errorMessage = (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>);
     const populateData = () => {
         setLoading(true);
-        
-        showAllActiveComponent(ComponentSelector.quartz, localStorage.token, 
+
+        showAllActiveComponent(ComponentSelector.quartz, localStorage.token,
             (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>),
             (result) => {
                 setComponents(result);
@@ -37,11 +37,11 @@ export function QuartzWorker() {
                     <Alert dismissible onClose={clearMessage}>
                         {`Кварц ${id} було видалено`}
                     </Alert>);
-                    populateData();
-            }    
+                populateData();
+            }
         )
-        if(!isRemoved){
-            errorMessage({message: "Помилка видалення компоненту"});
+        if (!isRemoved) {
+            errorMessage({ message: "Помилка видалення компоненту" });
         }
     }
 
@@ -61,53 +61,66 @@ export function QuartzWorker() {
                 </thead>
                 <tbody>
                     {components.map(component =>
-                        <tr key={component.id} 
-                            onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                        />)}}>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.id}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.name}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{HzToReadeble(component.frequency)}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.packaging.name}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.count}</td>
+                        <tr key={component.id}
+                            onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.id}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.name}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{HzToReadeble(component.frequency)}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.packaging.name}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.count}</td>
                             <td>
-                            <Button style={{ zIndex: '1000' }} variant='outline-danger' 
-                                    onClick={ () => {if(window.confirm(`Видалити кварц: "${component.name}"?`))deleteQuartz(component.id)} }
+                                <Button style={{ zIndex: '1000' }} variant='outline-danger'
+                                    onClick={() => { if (window.confirm(`Видалити кварц: "${component.name}"?`)) deleteQuartz(component.id) }}
                                 >Видалити компонент
-                            </Button>
+                                </Button>
                             </td>
                         </tr>)}
                 </tbody>
             </Table>
-            <Button 
-                variant="outline-success" 
-                className='w-100' 
+            <Button
+                variant="outline-success"
+                className='w-100'
                 onClick={() => setMessage(
-                    <QuartzAddingModal 
-                        onClose={clearMessage} 
-                        onAdding={(isOk)=>{setMessage(
-                            <Alert dismissible variant='success'
-                                onClose={clearMessage}>Кварц успішно додано
-                            </Alert>);
+                    <QuartzAddingModal
+                        onClose={clearMessage}
+                        onAdding={(isOk) => {
+                            setMessage(
+                                <Alert dismissible variant='success'
+                                    onClose={clearMessage}>Кварц успішно додано
+                                </Alert>);
                             populateData();
-                        }}/>
-                    )}
+                        }} />
+                )}
             >
                 Додати кварц
             </Button>
@@ -116,20 +129,20 @@ export function QuartzWorker() {
 
     useEffect(() => {
         setLoading(true);
-        
-        showAllActiveComponent(ComponentSelector.quartz, localStorage.token, 
+
+        showAllActiveComponent(ComponentSelector.quartz, localStorage.token,
             (error) => setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>),
             (result) => {
                 setComponents(result);
                 setLoading(false);
             }
-        ); 
+        );
     }, []);
 
 
     return <>
-        { message }
-        {loading ? <><p>Триває завантаження...</p><Spinner animation="border" size="sm" /></> : showTable() }
+        {message}
+        {loading ? <><p>Триває завантаження...</p><Spinner animation="border" size="sm" /></> : showTable()}
     </>
 }
 
@@ -149,13 +162,13 @@ export function QuartzAddingModal({ onClose, onAdding }) {
     const close = () => setShow(false);
     const errorMessage = (error) => {
         setMessage(
-            <Alert variant='danger' dismissible onClose={()=>{setMessage(null)}}>
-                {error?.message ?? "Невідома помилка" }
+            <Alert variant='danger' dismissible onClose={() => { setMessage(null) }}>
+                {error?.message ?? "Невідома помилка"}
             </Alert>
         )
     }
 
-    const addQuartz = () =>{
+    const addQuartz = () => {
         var optocouple = {
             name: name,
             frequency: frequency * multiplicator,
@@ -165,20 +178,20 @@ export function QuartzAddingModal({ onClose, onAdding }) {
             count: count,
             datasheet: datasheet
         }
-        
-        if(name == null){
-            errorMessage({message: 'Назва кварцу обов\'язкова' });
+
+        if (name == null) {
+            errorMessage({ message: 'Назва кварцу обов\'язкова' });
             return;
         }
 
-        addComponent(ComponentSelector.quartz, optocouple, localStorage.token, errorMessage, (result)=>{
+        addComponent(ComponentSelector.quartz, optocouple, localStorage.token, errorMessage, (result) => {
             setShow(false);
             onAdding(true);
         });
-        
+
     }
 
-    useEffect(() =>{
+    useEffect(() => {
         !show && onClose();
     }, [show, onClose])
 
@@ -197,12 +210,12 @@ export function QuartzAddingModal({ onClose, onAdding }) {
                 <Form.Control
                     placeholder="Назва кварцу"
                     onChange={(e) => {
-                        setName(e.target.value); 
+                        setName(e.target.value);
                     }}
                 />
             </InputGroup>
             <InputGroup className='mb-3'>
-            <InputGroup.Text id="resistance-number">Частота</InputGroup.Text>
+                <InputGroup.Text id="resistance-number">Частота</InputGroup.Text>
                 <Form.Control
                     aria-label="frequency"
                     aria-describedby="frequency-number"
@@ -213,7 +226,7 @@ export function QuartzAddingModal({ onClose, onAdding }) {
                         } else if (e.target.value.length === 0) {
                             return;
                         } else {
-                            errorMessage({message: 'Частота це число'})
+                            errorMessage({ message: 'Частота це число' })
                             e.target.value = 0;
                         }
                     }}
@@ -231,7 +244,7 @@ export function QuartzAddingModal({ onClose, onAdding }) {
                 <Form.Select onChange={(e) => {
                     setPackaging(Number(e.target.value))
                 }}>
-                    {PackagesWorker.getPackages().map((item, index)=>{
+                    {PackagesWorker.getPackages().map((item, index) => {
                         return <option key={index} value={item.id}>{item.name}</option>
                     })}
                 </Form.Select>
@@ -241,14 +254,14 @@ export function QuartzAddingModal({ onClose, onAdding }) {
                 <InputGroup.Text>Опис</InputGroup.Text>
                 <Form.Control as='textarea' onChange={(e) => {
                     setDescriprion(e.target.value);
-                }}/>
+                }} />
             </InputGroup>
 
             <InputGroup className='mb-3'>
                 <InputGroup.Text>Примітки</InputGroup.Text>
                 <Form.Control as='textarea' onChange={(e) => {
                     setNotice(e.target.value);
-                }}/>
+                }} />
             </InputGroup>
 
             <InputGroup className="mb-3">
@@ -262,22 +275,22 @@ export function QuartzAddingModal({ onClose, onAdding }) {
                         } else if (e.target.value.length === 0) {
                             return;
                         } else {
-                            errorMessage({message: 'Кількість може бути лише в чисельній формі'});
+                            errorMessage({ message: 'Кількість може бути лише в чисельній формі' });
                             e.target.value = 0;
                         }
                     }}
                 />
                 <InputGroup.Text>Штук</InputGroup.Text>
             </InputGroup>
-            
+
             <InputGroup className="mb-3">
                 <InputGroup.Text >Даташит</InputGroup.Text>
-                <Form.Control type="file" onChange={(event)=>{
-                    if(event.target.files){
+                <Form.Control type="file" onChange={(event) => {
+                    if (event.target.files) {
                         setDatasheet(event.target.files[0]);
                     }
-                    
-                }}/>
+
+                }} />
             </InputGroup>
 
         </Modal.Body>

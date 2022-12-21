@@ -3,10 +3,10 @@ import {
     Table, Spinner, Alert, Button,
     Modal, InputGroup, Form
 } from 'react-bootstrap';
-import { 
-    Components as ComponentSelector, 
+import {
+    Components as ComponentSelector,
     showAllActiveComponent, removeComponent,
-    addComponent, 
+    addComponent,
 } from '../helpers/api/ComponentsEditorWorker';
 import { PackagesWorker } from '../helpers/api/ComponentsWorker';
 import ComponentViewer from './ComponentViewer';
@@ -19,15 +19,15 @@ export function StabilizerWorker() {
     const clearMessage = () => setMessage(null);
     const errorMessage = (error) => {
         setMessage(
-            <Alert dismissible onClose={clearMessage}> 
+            <Alert dismissible onClose={clearMessage}>
                 {error.message}
             </Alert>);
     }
     const populateData = () => {
         setLoading(true);
-        
-        showAllActiveComponent(ComponentSelector.stabilizer, localStorage.token, 
-            (error)=>{
+
+        showAllActiveComponent(ComponentSelector.stabilizer, localStorage.token,
+            (error) => {
                 setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>);
             },
             (result) => {
@@ -44,11 +44,11 @@ export function StabilizerWorker() {
                     <Alert dismissible onClose={clearMessage}>
                         {`Стабілізатор ${id} було видалено`}
                     </Alert>);
-                    populateData();
-            }    
+                populateData();
+            }
         )
-        if(!isRemoved){
-            errorMessage({message: "Помилка видалення компоненту"});
+        if (!isRemoved) {
+            errorMessage({ message: "Помилка видалення компоненту" });
         }
     }
 
@@ -69,47 +69,58 @@ export function StabilizerWorker() {
                 <tbody>
                     {components.map(component =>
                         <tr key={component.id}>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.id}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.name}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.voltage} V</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.packaging.name}</td>
-                            <td onClick={()=>{setMessage(
-                                <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
-                                title={component.name}
-                            />)}}>{component.count}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.id}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.name}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.voltage} V</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.packaging.name}</td>
+                            <td onClick={() => {
+                                setMessage(
+                                    <ComponentViewer id={component.id} onClose={clearMessage} onUpdateCallback={populateData}
+                                        title={component.name}
+                                    />)
+                            }}>{component.count}</td>
                             <td>
-                            <Button style={{ zIndex: '1000' }} variant='outline-danger' 
-                                    onClick={ () => {if(window.confirm(`Видалити стабілізатор: "${component.name}"?`))deleteStabilizer(component.id)} }
+                                <Button style={{ zIndex: '1000' }} variant='outline-danger'
+                                    onClick={() => { if (window.confirm(`Видалити стабілізатор: "${component.name}"?`)) deleteStabilizer(component.id) }}
                                 >Видалити компонент</Button>
                             </td>
                         </tr>)}
                 </tbody>
             </Table>
-            <Button 
-                variant="outline-success" 
-                className='w-100' 
+            <Button
+                variant="outline-success"
+                className='w-100'
                 onClick={() => setMessage(
-                    <StabilizerAddingModal 
-                        onClose={clearMessage} 
-                        onAdding={(isOk)=>{setMessage(
-                            <Alert dismissible variant='success'
-                                onClose={clearMessage}>Стабілізатор успішно додано
-                            </Alert>);
+                    <StabilizerAddingModal
+                        onClose={clearMessage}
+                        onAdding={(isOk) => {
+                            setMessage(
+                                <Alert dismissible variant='success'
+                                    onClose={clearMessage}>Стабілізатор успішно додано
+                                </Alert>);
                             populateData();
-                        }}/>
-                    )}
+                        }} />
+                )}
             >
                 Додати стабілізатор
             </Button>
@@ -118,22 +129,22 @@ export function StabilizerWorker() {
 
     useEffect(() => {
         setLoading(true);
-        
-        showAllActiveComponent(ComponentSelector.stabilizer, localStorage.token, 
-            (error)=>{
+
+        showAllActiveComponent(ComponentSelector.stabilizer, localStorage.token,
+            (error) => {
                 setMessage(<Alert dismissible onClose={clearMessage}>{error.message}</Alert>);
             },
             (result) => {
                 setComponents(result);
                 setLoading(false);
             }
-        ); 
+        );
     }, []);
 
 
     return <>
-        { message }
-        {loading ? <><p>Триває завантаження...</p><Spinner animation="border" size="sm" /></> : showTable() }
+        {message}
+        {loading ? <><p>Триває завантаження...</p><Spinner animation="border" size="sm" /></> : showTable()}
     </>
 }
 
@@ -153,29 +164,29 @@ export function StabilizerAddingModal({ onClose, onAdding }) {
 
     const errorMessage = (error) => {
         setMessage(
-            <Alert variant='danger' dismissible onClose={()=>{setMessage(null)}}>
-                {error?.message ?? "Невідома помилка" }
+            <Alert variant='danger' dismissible onClose={() => { setMessage(null) }}>
+                {error?.message ?? "Невідома помилка"}
             </Alert>
         )
     }
 
-    const addStabilizer = () =>{
-        
-        if(name === null){
-            errorMessage({message: 'Назва стабілізатора обов\'язкова' });
+    const addStabilizer = () => {
+
+        if (name === null) {
+            errorMessage({ message: 'Назва стабілізатора обов\'язкова' });
             return;
         }
 
-        if(voltage === null){
-            errorMessage({message: 'Необхідно вказати напругу стабілізатора'})
+        if (voltage === null) {
+            errorMessage({ message: 'Необхідно вказати напругу стабілізатора' })
             return;
         }
 
-        if(isNaN(voltage)){
-            errorMessage({message:'Напруга має містити лише числа'});
+        if (isNaN(voltage)) {
+            errorMessage({ message: 'Напруга має містити лише числа' });
             return;
         }
-        
+
         var stabilizer = {
             name: name,
             voltage: Number(voltage),
@@ -185,15 +196,15 @@ export function StabilizerAddingModal({ onClose, onAdding }) {
             count: count,
             datasheet: datasheet
         }
-        
-        addComponent(ComponentSelector.stabilizer, stabilizer, localStorage.token, errorMessage, (result)=>{
+
+        addComponent(ComponentSelector.stabilizer, stabilizer, localStorage.token, errorMessage, (result) => {
             setShow(false);
             onAdding(true);
         });
-        
+
     }
 
-    useEffect(() =>{
+    useEffect(() => {
         !show && onClose();
     }, [show, onClose])
 
@@ -212,7 +223,7 @@ export function StabilizerAddingModal({ onClose, onAdding }) {
                 <Form.Control
                     placeholder="Назва стабілізатора"
                     onChange={(e) => {
-                        setName(e.target.value); 
+                        setName(e.target.value);
                     }}
                 />
             </InputGroup>
@@ -222,7 +233,7 @@ export function StabilizerAddingModal({ onClose, onAdding }) {
                 <Form.Control
                     placeholder="напруга стабілізатора"
                     onChange={(e) => {
-                        setVoltage(e.target.value); 
+                        setVoltage(e.target.value);
                     }}
                 />
             </InputGroup>
@@ -232,7 +243,7 @@ export function StabilizerAddingModal({ onClose, onAdding }) {
                 <Form.Select onChange={(e) => {
                     setPackaging(Number(e.target.value))
                 }}>
-                    {PackagesWorker.getPackages().map((item, index)=>{
+                    {PackagesWorker.getPackages().map((item, index) => {
                         return <option key={index} value={item.id}>{item.name}</option>
                     })}
                 </Form.Select>
@@ -242,14 +253,14 @@ export function StabilizerAddingModal({ onClose, onAdding }) {
                 <InputGroup.Text>Опис</InputGroup.Text>
                 <Form.Control as='textarea' onChange={(e) => {
                     setDescriprion(e.target.value);
-                }}/>
+                }} />
             </InputGroup>
 
             <InputGroup className='mb-3'>
                 <InputGroup.Text>Примітки</InputGroup.Text>
                 <Form.Control as='textarea' onChange={(e) => {
                     setNotice(e.target.value);
-                }}/>
+                }} />
             </InputGroup>
 
             <InputGroup className="mb-3">
@@ -263,7 +274,7 @@ export function StabilizerAddingModal({ onClose, onAdding }) {
                         } else if (e.target.value.length === 0) {
                             return;
                         } else {
-                            errorMessage({message: 'Кількість може бути лише в чисельній формі'});
+                            errorMessage({ message: 'Кількість може бути лише в чисельній формі' });
                             e.target.value = 0;
                         }
                     }}
@@ -273,12 +284,12 @@ export function StabilizerAddingModal({ onClose, onAdding }) {
 
             <InputGroup className="mb-3">
                 <InputGroup.Text >Даташит</InputGroup.Text>
-                <Form.Control type="file" onChange={(event)=>{
-                    if(event.target.files){
+                <Form.Control type="file" onChange={(event) => {
+                    if (event.target.files) {
                         setDatasheet(event.target.files[0]);
                     }
-                    
-                }}/>
+
+                }} />
             </InputGroup>
 
         </Modal.Body>

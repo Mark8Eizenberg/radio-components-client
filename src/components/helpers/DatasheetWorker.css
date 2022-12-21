@@ -1,4 +1,4 @@
-.--edit-datasheet-background{
+.--edit-datasheet-background {
     z-index: 100;
     position: fixed;
     display: flex;
@@ -11,7 +11,7 @@
     align-items: center;
 }
 
-.--edit-datasheet-container{
+.--edit-datasheet-container {
     background: #fff;
     border: solid #003 1px;
     border-radius: 0.5em;

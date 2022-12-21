@@ -12,7 +12,7 @@ import DropDownCard from './helpers/DropDownCard';
 
 const translateOperation = {
     Remove: 'Взято зі складу',
-    Add : 'Додано в склад',
+    Add: 'Додано в склад',
     Create: 'Створення',
     Delete: 'Видалення',
     Edit: 'Редагування'
@@ -20,7 +20,7 @@ const translateOperation = {
 
 const colorShemaOperation = {
     Remove: 'rgb(249 156 156)',
-    Add : 'rgb(156 249 221)',
+    Add: 'rgb(156 249 221)',
     Create: 'rgb(255 245 173)',
     Delete: 'rgb(255 245 173)',
     Edit: 'rgb(143 165 247)'
@@ -38,8 +38,8 @@ export default class OperationReport extends Component {
             totalPages: 0,
             totalCount: 0,
             countOnPage: 50,
-            filters : { needDateFrom: false, needDateTo: false, needUserId: false },
-            dataHandlers : { dateFrom: null, dateTo: null, userId: null },
+            filters: { needDateFrom: false, needDateTo: false, needUserId: false },
+            dataHandlers: { dateFrom: null, dateTo: null, userId: null },
             message: null
         };
         this.populateReports = this.populateReports.bind(this);
@@ -57,7 +57,7 @@ export default class OperationReport extends Component {
     }
 
     populateReports(page) {
-        this.setState({ loading: true , page: page ?? 0});
+        this.setState({ loading: true, page: page ?? 0 });
         var myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + localStorage.token);
         myHeaders.append("Content-Type", "application/json");
@@ -95,7 +95,8 @@ export default class OperationReport extends Component {
                     totalCount: result.totalCount,
                     totalPages: result.totalPages,
 
-                }) })
+                })
+            })
             .catch(error => console.log('error', error));
     }
 
@@ -112,15 +113,15 @@ export default class OperationReport extends Component {
                 </tr>
             </thead>
             <tbody>
-            {reports.map((operation) =>
-                <tr key={operation.id} style={{background: colorShemaOperation[operation.operationType] ?? '#eee'}}>
-                    <td>{operation.id}</td>
-                    <td>{operation.user?.fullName ?? "Невідомий"}</td>
-                    <td>{translateOperation[operation.operationType] ?? operation.operationType }</td>
-                    <td>{operation.radioComponent?.name ?? "Невідомо"}</td>
-                    <td>{operation.count}</td>
-                    <td>{new Date(operation.dateTime).toLocaleDateString() + " " + new Date(operation.dateTime).toLocaleTimeString()}</td>
-                </tr>
+                {reports.map((operation) =>
+                    <tr key={operation.id} style={{ background: colorShemaOperation[operation.operationType] ?? '#eee' }}>
+                        <td>{operation.id}</td>
+                        <td>{operation.user?.fullName ?? "Невідомий"}</td>
+                        <td>{translateOperation[operation.operationType] ?? operation.operationType}</td>
+                        <td>{operation.radioComponent?.name ?? "Невідомо"}</td>
+                        <td>{operation.count}</td>
+                        <td>{new Date(operation.dateTime).toLocaleDateString() + " " + new Date(operation.dateTime).toLocaleTimeString()}</td>
+                    </tr>
                 )}
             </tbody>
         </Table>)
@@ -131,8 +132,7 @@ export default class OperationReport extends Component {
         if (this.state.totalPages < 5) {
             for (let i = 0; i < this.state.totalPages; i++) {
                 pages.push({
-                    id: i, content: i + 1, disable: false, callback: () =>
-                    {
+                    id: i, content: i + 1, disable: false, callback: () => {
                         this.populateReports(i);
                     }, variant: "info"
                 });
@@ -164,7 +164,7 @@ export default class OperationReport extends Component {
             <Button disabled={this.state.page === 0} onClick={() => {
                 this.populateReports(this.state.page - 1);
             }} variant="info">{"<<"}</Button>
-            {pages.map(p => <Button disabled={p.disable || this.state.page === p.id } key={p.id} onClick={p.callback} variant={p.variant}>{p.content}</Button>) }
+            {pages.map(p => <Button disabled={p.disable || this.state.page === p.id} key={p.id} onClick={p.callback} variant={p.variant}>{p.content}</Button>)}
             <Button disabled={this.state.page + 1 >= this.state.totalPages} onClick={() => {
                 this.populateReports(this.state.page + 1);
             }} variant="info">{">>"}</Button>
@@ -186,7 +186,7 @@ export default class OperationReport extends Component {
                         <Col>
                             <DateTimePicker callbackToGetDate={(dateTime) => {
                                 if (this.state.dataHandlers.dateFrom !== dateTime) {
-                                    this.setState({ dataHandlers: this.#getEditedDictionary('dataHandlers', 'dateFrom', dateTime)});
+                                    this.setState({ dataHandlers: this.#getEditedDictionary('dataHandlers', 'dateFrom', dateTime) });
                                 }
                             }} />
                         </Col>
@@ -194,7 +194,7 @@ export default class OperationReport extends Component {
                     <Row className="p-2">
                         <Col>
                             <label>по</label>
-                            <input  type="checkbox" value={this.state.filters.needDateTo} onChange={(e) => {
+                            <input type="checkbox" value={this.state.filters.needDateTo} onChange={(e) => {
                                 if (this.state.filters.needDateTo !== e.target.checked)
                                     this.setState({ filters: this.#getEditedDictionary('filters', 'needDateTo', e.target.checked) });
                             }}></input>
@@ -228,13 +228,13 @@ export default class OperationReport extends Component {
                     }}>Пошук</Button></Row>
                 </Container>
             </DropDownCard>
-           
+
         </>
 
     }
 
     render() {
-        
+
         return (
             <>
                 <h2 className="text-center">Звіт операцій</h2>
@@ -248,10 +248,10 @@ export default class OperationReport extends Component {
                                     <p>Записів на сторінці:</p>
                                 </Col>
                                 <Col>
-                                    <input type="number" defaultValue={this.state.countOnPage} onChange={(e) => { this.setState({ countOnPage: e.target.value }) } }/>
+                                    <input type="number" defaultValue={this.state.countOnPage} onChange={(e) => { this.setState({ countOnPage: e.target.value }) }} />
                                 </Col>
                                 <Col>
-                                    <Button onClick={() => { this.populateReports(0); } }>Встановити кількість записів</Button>
+                                    <Button onClick={() => { this.populateReports(0); }}>Встановити кількість записів</Button>
                                 </Col>
                             </Row>
                         </Container>
@@ -263,5 +263,5 @@ export default class OperationReport extends Component {
         );
     }
 
-    
+
 }

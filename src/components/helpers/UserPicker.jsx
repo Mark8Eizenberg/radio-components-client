@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 export default function UserPicker({ calbackToSetUser }) {
     const [usersList, setUsersList] = useState(null);
@@ -26,12 +26,12 @@ export default function UserPicker({ calbackToSetUser }) {
         if (typeof (calbackToSetUser) === 'function') {
             calbackToSetUser(user);
         }
-    });
+    }, [user, usersList, setUser, calbackToSetUser]);
 
     return <>
         <select onChange={(e) => { setUser(e.target.value) }}>
             {usersList && usersList.map((user) => <option key={user.id} value={user.id}>{user.fullName}</option>)}
         </select>
     </>
-    
+
 }
